@@ -123,6 +123,8 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         <h2 id="userName">کاربر فرناز</h2>
         <div class="profile-email-line"><div class="profile-email" id="userEmail"></div><span class="profile-verification" id="userEmailStatus" hidden></span></div>
         <div class="profile-phone" id="userPhone"></div>
+        <div class="profile-username" id="userUsername" hidden></div>
+        <p class="profile-about" id="userAbout" hidden></p>
       </div>
     </div>
     <form id="profileForm" class="profile-form" onsubmit="saveProfile(event)">
@@ -132,6 +134,16 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
           <label for="profileNameInput" id="profileNameLabel">نام نمایشی</label>
           <input id="profileNameInput" maxlength="60" required autocomplete="nickname" aria-describedby="profileNameHint">
           <p class="profile-help" id="profileNameHint">این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.</p>
+        </div>
+        <div class="profile-field">
+          <label for="profileUsernameInput" id="profileUsernameLabel">نام کاربری</label>
+          <input id="profileUsernameInput" type="text" maxlength="24" minlength="3" inputmode="text" autocapitalize="none" autocomplete="username" spellcheck="false" dir="ltr" placeholder="your_username" aria-describedby="profileUsernameHint">
+          <p class="profile-help" id="profileUsernameHint">شناسه یکتای شما؛ فقط حروف انگلیسی کوچک، عدد و زیرخط. اختیاری است.</p>
+        </div>
+        <div class="profile-field">
+          <label for="profileAboutInput" id="profileAboutLabel">درباره من</label>
+          <textarea id="profileAboutInput" maxlength="160" rows="3" aria-describedby="profileAboutHint" placeholder="کمی درباره خودت بنویس…"></textarea>
+          <p class="profile-help" id="profileAboutHint">حداکثر ۱۶۰ نویسه؛ این متن در اطلاعات پروفایل شما نمایش داده می‌شود.</p>
         </div>
       </section>
       <section class="profile-section" aria-labelledby="profileContactTitle">
