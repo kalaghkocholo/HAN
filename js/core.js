@@ -32,7 +32,7 @@ function readAppearanceSettings(){
   }catch(_){return {...APPEARANCE_DEFAULTS};}
 }
 let appearanceSettings=readAppearanceSettings();
-let privacySettings={presence_visibility:"contacts",last_seen_visibility:"contacts",show_typing:true,show_read_receipts:true,show_space_online_count:true};
+let privacySettings={presence_visibility:"contacts",last_seen_visibility:"contacts",show_typing:true,show_read_receipts:true,show_space_online_count:true,allow_space_additions:true};
 let farnazPresenceChannel=null,farnazPresenceTimer=null,farnazPresenceMap=new Map(),farnazPresenceContactCache=new Map(),farnazPresenceChannels=new Map(),farnazTypingChannel=null,farnazVisibilityHandler=null,farnazPresenceSessionId=null;
 let privateTypingTimer=null,remoteTypingTimer=null;
 function applyAppearanceSettings(){
@@ -95,6 +95,26 @@ function updateAppearanceSetting(key,value){
   applyAppearanceSettings();
   if($("settingsStatus"))$("settingsStatus").textContent=english?"Settings saved on this device.":"تنظیمات روی این دستگاه ذخیره شد.";
 }
+async function clearAppCache(){
+ const status=$("appCacheStatus"),button=$("clearAppCacheButton");
+ if(!window.caches||typeof window.caches.keys!=="function"){
+  if(status)status.textContent=english?"Cache clearing is not supported in this browser.":"پاک‌سازی کش در این مرورگر پشتیبانی نمی‌شود.";
+  return;
+ }
+ if(button)button.disabled=true;
+ if(status)status.textContent=english?"Clearing temporary app files…":"در حال پاک‌سازی فایل‌های موقت برنامه…";
+ try{
+  const keys=await window.caches.keys();
+  const appCaches=keys.filter(key=>key.startsWith("farnaz-shell-"));
+  const results=await Promise.all(appCaches.map(key=>window.caches.delete(key)));
+  if(results.some(result=>!result))throw new Error("Some app cache entries could not be deleted.");
+  if(status)status.textContent=english
+   ?"Temporary app cache cleared. Your account, chats, and drafts were not deleted."
+   :"کش موقت برنامه پاک شد؛ حساب، گفتگوها و پیش‌نویس‌ها حذف نشدند.";
+ }catch(error){
+  if(status)status.textContent=(english?"Could not clear app cache: ":"پاک‌سازی کش ناموفق بود: ")+(error?.message||String(error));
+ }finally{if(button)button.disabled=false;}
+}
 function resetAppearanceSettings(){
   appearanceSettings={...APPEARANCE_DEFAULTS};
   try{localStorage.setItem(APPEARANCE_KEY,JSON.stringify(appearanceSettings));}catch(_){}
@@ -115,6 +135,7 @@ function applySettingsLanguage(){
     showTypingLabel:["نمایش «در حال نوشتن…»","Show typing status"],showTypingHint:["وضعیت نوشتن در گفتگوها نمایش داده شود.","Show when you are typing in chats."],
     showReadReceiptsLabel:["رسید خواندن پیام‌ها","Read receipts"],showReadReceiptsHint:["اجازه بده دیگران خوانده‌شدن پیام را ببینند.","Let others know when you have read their messages."],
     showSpaceOnlineCountLabel:["تعداد اعضای آنلاین گروه","Online group members"],showSpaceOnlineCountHint:["نمایش تعداد آنلاین‌ها در گروه‌ها فعال باشد.","Show the number of members currently online in groups."],
+    storageTitle:["ذخیره‌سازی","Storage"],clearAppCacheLabel:["پاک‌سازی کش برنامه","Clear app cache"],clearAppCacheHint:["فقط فایل‌های موقت برنامه حذف می‌شوند؛ حساب، گفتگوها و پیش‌نویس‌ها باقی می‌مانند.","Only temporary app files are cleared. Your account, chats, and drafts stay intact."],clearAppCacheButton:["پاک‌سازی","Clear cache"],
     appearanceTitle:["ظاهر برنامه","Appearance"],themeLabel:["حالت نمایش","Theme"],
     themeHint:["روشن، تیره یا هماهنگ با دستگاه","Light, dark, or follow device"],
     fontSizeLabel:["اندازه نوشته","Text size"],fontSizeHint:["اندازه متن در سراسر برنامه","Text size across the app"],
@@ -1129,7 +1150,7 @@ function toggleLanguage(){
     contactsMembersTab:["عضو فرناز","Farnaz members"],
     contactsIntro:["مخاطبان ذخیره‌شده را انتخاب کن یا از جست‌وجوی پایین حساب جدیدی پیدا کن.","Choose a saved contact or find a new account using the search control below."],
     savedContactsStatus:["",""],
-    profilePhoneCountryLabel:["کد کشور شماره تلفن","Phone country code"],
+    profilePhoneCountryLabel:["کد کشور شماره تلفن","Phone country code"],profilePhoneLabel:["شماره موبایل","Mobile number"],allowSpaceAdditionsLabel:["اجازه اضافه‌شدن من به گروه‌ها و کانال‌ها","Allow others to add me to groups and channels"],allowSpaceAdditionsHint:["اگر خاموش باشد، دیگران نمی‌توانند شما را مستقیماً اضافه کنند؛ خودتان همچنان می‌توانید عضو شوید.","When off, others cannot add you directly; you can still join spaces yourself."],
     showPhoneSettingLabel:["نمایش شماره موبایل به مخاطبان","Show my phone number to contacts"],
     showPhoneSettingHint:["اگر این گزینه خاموش باشد، شماره شما در اطلاعات مخاطب نمایش داده نمی‌شود.","When off, your number is hidden from contact information."],
     profileHeading:["پروفایل من","My profile"],profileIntro:["اطلاعات حساب خود را مدیریت کن.","Manage your account information."],
@@ -1221,7 +1242,7 @@ async function showUser(user){
   try{cachedProfile=await window.FarnazLocalStore?.getSnapshot(user.id,"profile");}catch(cacheError){console.warn("Cached profile read:",cacheError);}
   if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
   if(cachedProfile){
-    privacySettings={presence_visibility:cachedProfile.presence_visibility||"contacts",last_seen_visibility:cachedProfile.last_seen_visibility||"contacts",show_typing:cachedProfile.show_typing!==false,show_read_receipts:cachedProfile.show_read_receipts!==false,show_space_online_count:cachedProfile.show_space_online_count!==false};
+    privacySettings={presence_visibility:cachedProfile.presence_visibility||"contacts",last_seen_visibility:cachedProfile.last_seen_visibility||"contacts",show_typing:cachedProfile.show_typing!==false,show_read_receipts:cachedProfile.show_read_receipts!==false,show_space_online_count:cachedProfile.show_space_online_count!==false,allow_space_additions:cachedProfile.allow_space_additions!==false};
     applyPrivacySettings();
     currentProfileName=cachedProfile.display_name||user.user_metadata?.display_name||"";
     currentUsername=cachedProfile.username||"";currentAbout=cachedProfile.about||"";
@@ -1237,7 +1258,7 @@ async function showUser(user){
   }
   try{
     const {data,error}=await retryRead("current user profile",()=>getClient().from("profiles")
-      .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count").eq("id",user.id).maybeSingle(),2,18000);
+      .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count,allow_space_additions").eq("id",user.id).maybeSingle(),2,18000);
     if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
     if(error)throw error;
     let profile=data;
@@ -1245,13 +1266,13 @@ async function showUser(user){
       const fallbackName=(user.user_metadata?.display_name||user.email?.split("@")[0]||"Farnaz user").trim();
       const created=await retryRead("create current user profile",()=>getClient().from("profiles")
         .upsert({id:user.id,display_name:fallbackName,phone:user.phone||null,show_phone:true},{onConflict:"id"})
-        .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count").single(),2,18000);
+        .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count,allow_space_additions").single(),2,18000);
       if(created.error)throw created.error;
       // Logout/account switching may happen while profile creation is pending.
       if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
       profile=created.data;
     }
-    privacySettings={presence_visibility:profile?.presence_visibility||"contacts",last_seen_visibility:profile?.last_seen_visibility||"contacts",show_typing:profile?.show_typing!==false,show_read_receipts:profile?.show_read_receipts!==false,show_space_online_count:profile?.show_space_online_count!==false};
+    privacySettings={presence_visibility:profile?.presence_visibility||"contacts",last_seen_visibility:profile?.last_seen_visibility||"contacts",show_typing:profile?.show_typing!==false,show_read_receipts:profile?.show_read_receipts!==false,show_space_online_count:profile?.show_space_online_count!==false,allow_space_additions:profile?.allow_space_additions!==false};
     applyPrivacySettings();
     startFarnazPresence().catch(e=>console.warn("Farnaz presence:",e));
     currentProfileName=profile?.display_name||user.user_metadata?.display_name||"";
@@ -1452,14 +1473,17 @@ window.farnazCanSeePresence=async function(userId){
 };
 
 function applyPrivacySettings(){
- const values={presenceVisibilitySetting:privacySettings.presence_visibility,lastSeenVisibilitySetting:privacySettings.last_seen_visibility,showTypingSetting:privacySettings.show_typing,showReadReceiptsSetting:privacySettings.show_read_receipts,showSpaceOnlineCountSetting:privacySettings.show_space_online_count};
+ const values={presenceVisibilitySetting:privacySettings.presence_visibility,lastSeenVisibilitySetting:privacySettings.last_seen_visibility,showTypingSetting:privacySettings.show_typing,showReadReceiptsSetting:privacySettings.show_read_receipts,showSpaceOnlineCountSetting:privacySettings.show_space_online_count,allowSpaceAdditionsSetting:privacySettings.allow_space_additions!==false};
  for(const [id,value] of Object.entries(values)){const el=$(id);if(el){if(el.type==="checkbox")el.checked=!!value;else el.value=value;}}
 }
 async function savePrivacySetting(key,value){
  if(!currentUser)return;
  const userId=String(currentUser.id);
  const allowed={presence_visibility:["everyone","contacts","nobody"],last_seen_visibility:["everyone","contacts","nobody"]};
+ const booleanKeys=["show_typing","show_read_receipts","show_space_online_count","allow_space_additions"];
  if(allowed[key]&&!allowed[key].includes(value))return;
+ if(booleanKeys.includes(key)&&typeof value!=="boolean")return;
+ if(!allowed[key]&&!booleanKeys.includes(key))return;
  const previous=privacySettings[key];privacySettings={...privacySettings,[key]:value};
  const status=$("privacySettingsStatus");if(status)status.textContent=english?"Saving…":"در حال ذخیره…";
  try{
@@ -1560,8 +1584,8 @@ async function saveProfile(event){
     if(String(currentUser?.id)!==userId)throw new Error("Account changed while saving; please retry on the current account.");
     setStatus("profileStatus",english?"Saving profile details...":"در حال ذخیره مشخصات پروفایل...");
     const {data,error}=await client.from("profiles")
-      .upsert({id:userId,display_name:name,username:username||null,about:about||null,phone:phone||null,avatar_url:avatarUrl||null,show_phone:showPhone,presence_visibility:profilePrivacy.presence_visibility,last_seen_visibility:profilePrivacy.last_seen_visibility,show_typing:profilePrivacy.show_typing,show_read_receipts:profilePrivacy.show_read_receipts,show_space_online_count:profilePrivacy.show_space_online_count},{onConflict:"id"})
-      .select("id,display_name,username,about,phone,avatar_url,show_phone").single();
+      .upsert({id:userId,display_name:name,username:username||null,about:about||null,phone:phone||null,avatar_url:avatarUrl||null,show_phone:showPhone,presence_visibility:profilePrivacy.presence_visibility,last_seen_visibility:profilePrivacy.last_seen_visibility,show_typing:profilePrivacy.show_typing,show_read_receipts:profilePrivacy.show_read_receipts,show_space_online_count:profilePrivacy.show_space_online_count,allow_space_additions:profilePrivacy.allow_space_additions!==false},{onConflict:"id"})
+      .select("id,display_name,username,about,phone,avatar_url,show_phone,allow_space_additions").single();
     if(error)throw error;
     if(String(currentUser?.id)!==userId)return;
     currentProfileName=data.display_name||name;currentUsername=data.username||"";currentAbout=data.about||"";

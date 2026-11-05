@@ -118,8 +118,14 @@ input[type=file]{font-size:11px;padding:9px}
 .avatar.medium{width:45px;height:45px;font-size:17px}
 .avatar.small{width:39px;height:39px;font-size:15px}
 .profile-panel{display:flex;flex-direction:column;gap:14px}
-.profile-top{display:flex;align-items:center;gap:13px;margin-bottom:2px;padding:14px;border:1px solid var(--border);border-radius:16px;background:var(--panel2)}
-.profile-info{min-width:0;flex:1}
+.profile-top{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:2px;padding:18px 14px;border:1px solid var(--border);border-radius:16px;background:var(--panel2);text-align:center}
+.profile-info{min-width:0;width:100%;text-align:center}
+.profile-info h2{text-align:center}
+.profile-email-line{justify-content:center}
+.profile-email{text-align:center}
+.profile-phone{text-align:center}
+.profile-username{text-align:center}
+.profile-about{text-align:center}
 .profile-info h2{margin:0 0 6px;overflow-wrap:anywhere;font-size:17px}
 .profile-email-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
 .profile-email{font-size:11px;color:var(--muted);overflow-wrap:anywhere;direction:ltr;text-align:right}
@@ -137,11 +143,16 @@ input[type=file]{font-size:11px;padding:9px}
 .profile-field{display:grid;gap:6px;min-width:0}
 .profile-field>label{margin:0;color:var(--white);font-size:12px;font-weight:700}
 .profile-field input:not([type=file]),.profile-field select{width:100%;min-height:44px;margin:0;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--white);font:inherit}
+.profile-phone-input-group{display:flex;align-items:stretch;width:100%;min-width:0;min-height:46px;overflow:hidden;border:1px solid var(--border);border-radius:10px;background:var(--bg)}
+.profile-phone-input-group select{flex:0 0 124px;width:124px;min-width:0;min-height:44px;padding:8px 7px;border:0;border-right:1px solid var(--border);border-radius:0;background:transparent;color:var(--white);font-size:11px}
+.profile-phone-input-group input{flex:1 1 auto;min-width:0;min-height:44px;padding:10px 9px;border:0!important;border-radius:0!important;background:transparent!important;color:var(--white);font:inherit;text-align:left}
+.profile-phone-input-group input:focus,.profile-phone-input-group select:focus{outline:2px solid var(--accent);outline-offset:-2px}
 .profile-field input[type=file]{width:100%;min-height:42px;margin:0;padding:8px;border:1px dashed var(--border);border-radius:10px;background:var(--bg);color:var(--white)}
 .profile-help{margin:0;color:var(--muted);font-size:11px;line-height:1.8}
 .profile-privacy-control{display:grid;gap:6px;padding-top:10px;border-top:1px solid var(--border)}
 .profile-phone-visibility{display:flex;align-items:center;gap:9px;margin:0;color:var(--white);font-size:12px;line-height:1.7}
 .profile-phone-visibility input{width:18px;height:18px;flex:0 0 18px;margin:0;accent-color:var(--mint)}
+#profilePage>.page-heading[hidden]{display:none!important}
 .profile-actions{display:grid}
 .profile-actions .action-button{width:100%;min-height:46px;margin:0}
 .profile-status{min-height:20px;margin:0}
