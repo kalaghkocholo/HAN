@@ -1053,7 +1053,7 @@ function updateAuthTexts(){
     :signup?(v?"Create an account to stay connected.":"برای ارتباط نزدیک‌تر، حساب خودت را بساز."):(v?"Sign in with your email and password.":"با ایمیل و رمز عبورت وارد شو.");
   $("authSubmit").textContent=recovery?(v?"Save new password":"ذخیره رمز جدید"):signup?(v?"Sign up":"ثبت‌نام"):(v?"Sign in":"ورود");
   $("authSwitch").textContent=signup
-    ?(v?"You can add your mobile number after email confirmation.":"شماره موبایل را پس از تأیید ایمیل تکمیل می‌کنی.")
+    ?(v?"After confirming your email, please complete your profile: enter your name and mobile number, then select “Save changes” to continue.":"پس از تأیید ایمیل، لطفاً پروفایل خود را تکمیل کنید؛ نام و شماره موبایل‌تان را وارد کنید و دکمهٔ «ذخیره تغییرات» را بزنید تا بتوانید وارد فرناز شوید.")
     :(v?"Use your email and password to continue.":"با ایمیل و رمز عبورت وارد فرناز شو.");
   $("authNameLabel").textContent=v?"Display name":"نام نمایشی";
   $("authEmailLabel").textContent=v?"Email":"ایمیل";
