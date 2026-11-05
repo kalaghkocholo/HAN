@@ -998,6 +998,7 @@ function toggleAuthPasswordVisibility(){
   field.type=field.type==="password"?"text":"password";
   syncAuthPasswordToggle();
 }
+window.toggleAuthPasswordVisibility=toggleAuthPasswordVisibility;
 async function signInSocial(provider="google"){
   const button=$("googleAuth");
   if(button?.disabled)return;
