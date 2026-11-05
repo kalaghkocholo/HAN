@@ -1148,7 +1148,8 @@ function toggleLanguage(){
     const names=english?["Iran","Germany","United States / Canada","United Kingdom","Turkey"]:["ایران","آلمان","آمریکا / کانادا","بریتانیا","ترکیه"];
     Array.from(select.options).forEach((option,i)=>{option.textContent=names[i]+" (+"+option.value+")";});
   });
-  $("footerText").textContent="Farnaz · Closer, wherever you are.";
+  const footerText=$("footerText");
+  if(footerText)footerText.textContent="Farnaz · Closer, wherever you are.";
   $("messageText").placeholder=english?"Write a message...":"پیامت را بنویس...";
   $("showActiveChats").textContent=english?"Chats":"گفتگوها";$("showArchivedChats").textContent=english?"Archive":"آرشیو";
   $("attachmentMenuButton").title=english?"Add attachment":"افزودن پیوست";
