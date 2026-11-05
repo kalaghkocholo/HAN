@@ -1141,6 +1141,8 @@ function toggleLanguage(){
   Object.entries(labels).forEach(([id,pair])=>{if($(id))$(id).textContent=pair[english?1:0];});
   if($("language"))$("language").textContent=english?"فا":"EN";
   if($("welcomeLanguageButton")){$("welcomeLanguageButton").textContent=english?"فا":"EN";$("welcomeLanguageButton").setAttribute("aria-label",english?"Switch to Persian":"Switch to English");}
+  const authLanguageButton=$("authLanguageButton");
+  if(authLanguageButton){authLanguageButton.textContent=english?"فا":"EN";authLanguageButton.setAttribute("aria-label",english?"تغییر زبان به فارسی":"Switch language to English");authLanguageButton.title=authLanguageButton.getAttribute("aria-label");}
   if($("contactsImportToggle"))$("contactsImportToggle").textContent=$("phoneContactsImport")&&!$("phoneContactsImport").hidden?"×":"＋";
   if($("start"))$("start").textContent=english?"Sign in to Farnaz →":"ورود به فرناز ←";
   ["profilePhoneCountry"].forEach(id=>{
