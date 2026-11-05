@@ -1130,11 +1130,13 @@ function toggleLanguage(){
     contactsIntro:["مخاطبان ذخیره‌شده را انتخاب کن یا از جست‌وجوی پایین حساب جدیدی پیدا کن.","Choose a saved contact or find a new account using the search control below."],
     savedContactsStatus:["",""],
     profilePhoneCountryLabel:["کد کشور شماره تلفن","Phone country code"],
-    showPhoneSettingLabel:["نمایش شماره موبایل به مخاطبان (پیش‌فرض روشن)","Show my phone number to contacts (on by default)"],
-    showPhoneSettingHint:["اگر خاموشش کنی، شماره‌ات در اطلاعات مخاطب نمایش داده نمی‌شود.","Turn this off to hide your number from contact info."],
+    showPhoneSettingLabel:["نمایش شماره موبایل به مخاطبان","Show my phone number to contacts"],
+    showPhoneSettingHint:["اگر این گزینه خاموش باشد، شماره شما در اطلاعات مخاطب نمایش داده نمی‌شود.","When off, your number is hidden from contact information."],
     profileHeading:["پروفایل من","My profile"],profileIntro:["اطلاعات حساب خود را مدیریت کن.","Manage your account information."],
-    profileNameLabel:["نام نمایشی","Display name"],profilePhoneLabel:["شماره موبایل با کد کشور","Phone number with country code"],
-    avatarFileLabel:["تصویر پروفایل","Profile picture"],avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت.","JPG, PNG or WebP; maximum 3 MB."],
+    profileIdentityTitle:["اطلاعات هویتی","Identity"],profileContactTitle:["راه ارتباطی و حریم خصوصی","Contact & privacy"],profilePhotoTitle:["تصویر پروفایل","Profile photo"],
+    profileNameLabel:["نام نمایشی","Display name"],profileNameHint:["این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.","This name is shown to your contacts."],
+    profilePhoneLabel:["شماره موبایل با کد کشور","Mobile number with country code"],profilePhoneHint:["شماره را همراه کد کشور وارد کنید. این مرحله به معنی تأیید پیامکی شماره نیست.","Enter your number with its country code. This does not verify it by SMS."],
+    avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
     saveProfileButton:["ذخیره تغییرات","Save changes"],logoutButton:["خروج از حساب","Sign out"],
     navChats:["گفتگوها","Chats"],navContacts:["مخاطبان","Contacts"],navProfile:["پروفایل","Profile"],navSettings:["تنظیمات","Settings"],
     messagePrivacyNote:["",""],homeLogin:["ورود یا ثبت‌نام","Sign in or sign up"]
@@ -1191,6 +1193,15 @@ function renderUser(user,name){
   document.body.dataset.authState="user";
   $("userName").textContent=currentProfileName||(english?"Farnaz user":"کاربر فرناز");
   $("userEmail").textContent=user.email||"";
+  const emailStatus=$("userEmailStatus");
+  if(emailStatus){
+    const hasEmail=!!user.email;
+    const verified=!!(user.email_confirmed_at||user.confirmed_at);
+    emailStatus.hidden=!hasEmail;
+    emailStatus.textContent=verified?(english?"Email verified":"ایمیل تأییدشده"):(english?"Email not verified":"ایمیل تأییدنشده");
+    emailStatus.classList.toggle("is-verified",verified);
+    emailStatus.classList.toggle("is-unverified",!verified);
+  }
   setPhoneDisplay($("userPhone"),currentPhone);
   renderAvatar($("userAvatar"),currentAvatarUrl,$("userName").textContent);
 }

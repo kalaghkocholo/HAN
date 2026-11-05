@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
 <meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
 <title>فرناز | Farnaz</title>
-<link rel="preload" href="./js/core.js?v=20261106-auth-buttons1" as="script">
+<link rel="preload" href="./js/core.js?v=20261106-profile1" as="script">
 <link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
 <style>
 :root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
@@ -40,8 +40,8 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 .han-farnaz-launch{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:1px solid #7896c5;border-radius:10px;background:#7896c5;color:#fff;text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .han-farnaz-launch:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style>
-<link rel="stylesheet" href="./styles.css?v=20261106-auth-buttons1" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link rel="stylesheet" href="./styles.css?v=20261106-auth-buttons1"></noscript>
+<link rel="stylesheet" href="./styles.css?v=20261106-profile1" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link rel="stylesheet" href="./styles.css?v=20261106-profile1"></noscript>
 <link rel="stylesheet" href="./spaces.css?v=20261105-matin-shared2" media="print" onload="this.onload=null;this.media='all'">
 <link rel="stylesheet" href="./chat-viewport.css?v=20261105-matin-shared2">
 </head>
@@ -116,33 +116,54 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 <!-- صفحه پروفایل -->
 <section class="page" id="profilePage">
   <div class="page-heading"><h2 id="profileHeading">پروفایل من</h2><p id="profileIntro">اطلاعات حساب خود را مدیریت کن.</p></div>
-  <div class="panel">
+  <div class="panel profile-panel">
     <div class="profile-top">
-      <div class="avatar large" id="userAvatar">F</div>
+      <div class="avatar large" id="userAvatar" aria-label="تصویر پروفایل">F</div>
       <div class="profile-info">
         <h2 id="userName">کاربر فرناز</h2>
-        <div class="profile-email" id="userEmail"></div>
+        <div class="profile-email-line"><div class="profile-email" id="userEmail"></div><span class="profile-verification" id="userEmailStatus" hidden></span></div>
         <div class="profile-phone" id="userPhone"></div>
       </div>
     </div>
-    <form id="profileForm" onsubmit="saveProfile(event)">
-      <label for="profileNameInput" id="profileNameLabel">نام نمایشی</label>
-      <input id="profileNameInput" maxlength="60" required autocomplete="nickname">
-      <label for="profilePhoneInput" id="profilePhoneLabel">شماره موبایل با کد کشور</label>
-      <label for="profilePhoneCountry" id="profilePhoneCountryLabel">کد کشور شماره تلفن</label>
-      <select id="profilePhoneCountry" aria-label="Phone country code" style="width:100%;padding:10px;border:1px solid #43516a;border-radius:10px;background:var(--bg);color:var(--white)">
-        <option value="98" selected>ایران (+98)</option><option value="49">آلمان (+49)</option><option value="1">آمریکا / کانادا (+1)</option><option value="44">بریتانیا (+44)</option><option value="90">ترکیه (+90)</option>
-      </select>
-      <input id="profilePhoneInput" type="tel" dir="ltr" maxlength="25" placeholder="0912..." autocomplete="tel">
-      <label class="profile-phone-visibility" for="showPhoneSetting"><input id="showPhoneSetting" type="checkbox" checked> <span id="showPhoneSettingLabel">نمایش شماره موبایل به مخاطبان (پیش‌فرض روشن)</span></label>
-      <p class="muted-note" id="showPhoneSettingHint">اگر خاموشش کنی، شماره‌ات در اطلاعات مخاطب نمایش داده نمی‌شود.</p>
-      <label for="avatarFile" id="avatarFileLabel">تصویر پروفایل</label>
-      <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
-      <p class="muted-note" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت.</p>
-      <button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button>
+    <form id="profileForm" class="profile-form" onsubmit="saveProfile(event)">
+      <section class="profile-section" aria-labelledby="profileIdentityTitle">
+        <h3 class="profile-section-title" id="profileIdentityTitle">اطلاعات هویتی</h3>
+        <div class="profile-field">
+          <label for="profileNameInput" id="profileNameLabel">نام نمایشی</label>
+          <input id="profileNameInput" maxlength="60" required autocomplete="nickname" aria-describedby="profileNameHint">
+          <p class="profile-help" id="profileNameHint">این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.</p>
+        </div>
+      </section>
+      <section class="profile-section" aria-labelledby="profileContactTitle">
+        <h3 class="profile-section-title" id="profileContactTitle">راه ارتباطی و حریم خصوصی</h3>
+        <div class="profile-field">
+          <label for="profilePhoneCountry" id="profilePhoneCountryLabel">کد کشور شماره تلفن</label>
+          <select id="profilePhoneCountry" class="profile-country-select" aria-describedby="profilePhoneHint">
+            <option value="98" selected>ایران (+98)</option><option value="49">آلمان (+49)</option><option value="1">آمریکا / کانادا (+1)</option><option value="44">بریتانیا (+44)</option><option value="90">ترکیه (+90)</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="profilePhoneInput" id="profilePhoneLabel">شماره موبایل با کد کشور</label>
+          <input id="profilePhoneInput" type="tel" dir="ltr" maxlength="25" placeholder="0912..." autocomplete="tel" aria-describedby="profilePhoneHint">
+          <p class="profile-help" id="profilePhoneHint">شماره را همراه کد کشور وارد کنید. این مرحله به معنی تأیید پیامکی شماره نیست.</p>
+        </div>
+        <div class="profile-privacy-control">
+          <label class="profile-phone-visibility" for="showPhoneSetting"><input id="showPhoneSetting" type="checkbox" checked> <span id="showPhoneSettingLabel">نمایش شماره موبایل به مخاطبان</span></label>
+          <p class="profile-help" id="showPhoneSettingHint">اگر این گزینه خاموش باشد، شماره شما در اطلاعات مخاطب نمایش داده نمی‌شود.</p>
+        </div>
+      </section>
+      <section class="profile-section" aria-labelledby="profilePhotoTitle">
+        <h3 class="profile-section-title" id="profilePhotoTitle">تصویر پروفایل</h3>
+        <div class="profile-field">
+          <label for="avatarFile" id="avatarFileLabel">انتخاب تصویر پروفایل</label>
+          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="avatarNote">
+          <p class="profile-help" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.</p>
+        </div>
+      </section>
+      <div class="profile-actions"><button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button></div>
     </form>
-    <p id="profileStatus" class="status" role="status"></p>
-    <button class="secondary-button" id="logoutButton" type="button" onclick="logout()">خروج از حساب</button>
+    <p id="profileStatus" class="status profile-status" role="status" aria-live="polite"></p>
+    <div class="profile-account-actions"><button class="secondary-button" id="logoutButton" type="button" onclick="logout()">خروج از حساب</button></div>
   </div>
 </section>
 
@@ -464,7 +485,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   });
   function loadLocalScripts(){
     const core=document.createElement("script");
-    core.src="./js/core.js?v=20261106-auth-buttons1";
+    core.src="./js/core.js?v=20261106-profile1";
     watchScript(core,()=>{
       // A script's load event can still fire after a runtime exception.
       // Verify the core boot contract before loading features or attempting
