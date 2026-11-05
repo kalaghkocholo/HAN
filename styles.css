@@ -247,9 +247,9 @@ html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16
 .auth-inline-action{align-self:flex-end;min-height:34px;padding:5px 2px;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:650;text-align:right;cursor:pointer}
 .auth-inline-action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
 .auth-inline-action:disabled{opacity:.55;cursor:wait}
-.auth-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 20px;background:var(--panel2);border-radius:12px}
-.auth-mode-tab{min-height:42px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-weight:650}
-.auth-mode-tab.is-active{background:var(--panel);color:var(--white);box-shadow:0 1px 3px #0001}
+.auth-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 20px;background:rgba(218,239,236,.8);border:1px solid rgba(87,166,158,.16);border-radius:12px}
+.auth-mode-tab{min-height:42px;border:0;border-radius:9px;background:transparent;color:#58777a;font-weight:650;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.auth-mode-tab.is-active{background:#278f88;color:#fff;box-shadow:0 3px 10px rgba(39,143,136,.2)}
 #authForm{display:flex;flex-direction:column;gap:9px}
 #authForm label{font-size:12px;font-weight:650;margin-top:5px}
 #authForm input{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--white);outline:none}
@@ -849,6 +849,11 @@ input,textarea,select,#messageSearchQuery,#messageSearchKind,#messageSearchFrom,
 #authBox #authForm input{background:rgba(255,255,255,.92)!important;color:#203b43!important;border-color:#d5e7e6!important}
 #authBox .social-auth-button{background:rgba(255,255,255,.9)!important;color:#203b43!important;border-color:#d5e7e6!important}
 #authBox .auth-language-switch{background:rgba(255,255,255,.8)!important;color:#45666b!important;border-color:#d5e7e6!important}
+#authBox .auth-submit{background:linear-gradient(135deg,#278f88 0%,#36a99d 100%)!important;color:#fff!important;border:1px solid rgba(25,119,112,.18)!important;box-shadow:0 6px 16px rgba(39,143,136,.2)!important}
+#authBox .auth-submit:active{filter:brightness(.96);transform:translateY(1px)}
+#authBox .auth-mode-tabs{background:rgba(218,239,236,.8)!important;border-color:rgba(87,166,158,.16)!important}
+#authBox .auth-mode-tab{color:#58777a!important}
+#authBox .auth-mode-tab.is-active{background:#278f88!important;color:#fff!important;box-shadow:0 3px 10px rgba(39,143,136,.2)!important}
 .social-auth[hidden],.auth-divider[hidden]{display:none!important}
 body[data-theme="light"] .hero,body[data-theme="light"] .panel,body[data-theme="light"] .feature,
 body[data-theme="light"] .settings-card,body[data-theme="light"] .list-item,
