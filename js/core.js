@@ -1158,7 +1158,7 @@ function toggleLanguage(){
     profileNameLabel:["نام نمایشی","Display name"],profileNameHint:["این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.","This name is shown to your contacts."],
     profileUsernameLabel:["نام کاربری","Username"],profileUsernameHint:["شناسه یکتای شما؛ ۳ تا ۲۴ نویسه، فقط حروف کوچک انگلیسی، عدد و زیرخط. اختیاری است.","Your unique ID; 3–24 characters, lowercase letters, numbers and underscores. Optional."],
     profileAboutLabel:["درباره من","About me"],profileAboutHint:["حداکثر ۱۶۰ نویسه؛ این متن در اطلاعات پروفایل شما نمایش داده می‌شود.","Up to 160 characters; shown in your profile information."],
-    profilePhoneLabel:["شماره موبایل با کد کشور","Mobile number with country code"],profilePhoneHint:["شماره را همراه کد کشور وارد کنید. این مرحله به معنی تأیید پیامکی شماره نیست.","Enter your number with its country code. This does not verify it by SMS."],
+    profilePhoneLabel:["شماره موبایل","Mobile number"],profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
     avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
     saveProfileButton:["ذخیره تغییرات","Save changes"],logoutButton:["خروج از حساب","Sign out"],
     navChats:["گفتگوها","Chats"],navContacts:["مخاطبان","Contacts"],navProfile:["پروفایل","Profile"],navSettings:["تنظیمات","Settings"],
