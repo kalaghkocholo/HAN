@@ -984,7 +984,7 @@ async function requestPasswordRecovery(){
   }
 }
 function syncAuthPasswordToggle(){
-  const field=$("authPassword"),button=$("toggleAuthPassword");
+  const field=$("authPassword"),button=$("authPasswordVisibilityButton");
   if(!field||!button)return;
   const visible=field.type==="text";
   const label=english?(visible?"Hide password":"Show password"):(visible?"مخفی‌کردن رمز عبور":"نمایش رمز عبور");
