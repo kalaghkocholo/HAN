@@ -1,0 +1,529 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#080f2b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Farnaz">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./farnaz-icon.svg?v=20261024-4" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
+<meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
+<title>فرناز | Farnaz</title>
+<link rel="preload" href="./js/core.js?v=20261105-safe-update1" as="script">
+<link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
+<style>
+:root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--white)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;min-height:100dvh;height:100dvh;overflow:hidden}
+button{font:inherit;cursor:pointer}
+.app{width:100%;max-width:560px;height:100dvh;min-height:0;margin:auto;overflow-y:auto;padding:calc(10px + env(safe-area-inset-top, 0px)) 13px calc(94px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17px}
+.page{display:none}.page.active{display:block}
+#authBox{display:none}
+.bottom-nav{display:none}
+#homePage{position:relative}
+#homePage>.welcome-language-switch{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:max(16px,calc((100vw - 560px)/2 + 16px));z-index:9999;width:42px;height:34px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--muted);font-weight:700}
+.welcome-shell{position:relative;min-height:min(68dvh,620px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 20px 22px;border:0;border-radius:0;background:transparent}
+.welcome-mark{width:82px;height:82px;display:grid;place-items:center;margin-bottom:16px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.welcome-mark img{width:84px;height:84px;object-fit:contain}
+.welcome-kicker{font-size:10px;letter-spacing:3px;font-weight:800;color:#7896c5;direction:ltr}
+.welcome-shell h2{max-width:290px;font-size:25px;line-height:1.7;margin:13px 0 4px}
+.welcome-shell>p{max-width:280px;margin:0 0 20px;color:var(--muted);font-size:13px}
+.welcome-shell .primary{max-width:300px;min-height:48px;border-radius:10px;background:#7896c5;color:#fff}
+.welcome-secondary{width:100%;max-width:300px;margin-top:9px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--white);font-size:13px}
+@media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:74px;height:74px}.welcome-mark img{width:68px;height:68px}}
+</style>
+<link rel="stylesheet" href="./styles.css?v=20261105-matin-shared2" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link rel="stylesheet" href="./styles.css?v=20261105-matin-shared2"></noscript>
+<link rel="stylesheet" href="./spaces.css?v=20261105-matin-shared2" media="print" onload="this.onload=null;this.media='all'">
+<link rel="stylesheet" href="./chat-viewport.css?v=20261105-matin-shared2">
+</head>
+<body data-auth-state="guest">
+<main class="app">
+<header>
+  <div class="brand-stack"><button id="headerFButton" class="logo logo-button" type="button" hidden onclick="navigate('chatsPage')" aria-label="گفتگوها" title="گفتگوها">F</button></div>
+</header>
+<div id="connectionBanner" class="connection-banner" role="status" aria-live="polite" hidden></div>
+
+<!-- صفحه گفتگوها -->
+<section class="page" id="chatsPage">
+  <div class="chats-topline"><div class="page-heading"><h2 id="chatsHeading">گفتگوها</h2><p id="chatsIntro">گفتگوهای اخیرت را اینجا می‌بینی.</p></div><button class="chats-new-button" type="button" onclick="startNewChat()" aria-label="گفتگوی جدید" title="گفتگوی جدید"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+  <label class="conversation-search" for="conversationSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="conversationSearch" type="search" autocomplete="off" placeholder="جستجوی گفتگوها" aria-label="جستجوی گفتگوها"></label>
+  <div class="conversation-tools"><button class="mini-button" id="showActiveChats" type="button" onclick="setConversationView('active')">گفتگوها</button><button class="mini-button" id="showArchivedChats" type="button" onclick="setConversationView('archived')">آرشیو</button></div>
+  <div class="list" id="conversationList"></div>
+  <div id="inboxStatus" class="status muted-note" role="status"></div>
+</section>
+
+<!-- صفحه مخاطبان -->
+<section class="page" id="contactsPage">
+  <div class="page-heading"><h2 id="contactsHeading">مخاطبان</h2></div>
+  <div class="contacts-category-tabs" role="group" aria-label="دسته‌بندی مخاطبان">
+    <button class="contacts-category-tab is-active" id="contactsAllTab" type="button" aria-pressed="true" onclick="setContactsCategory('all')">همه</button>
+    <button class="contacts-category-tab" id="contactsMembersTab" type="button" aria-pressed="false" onclick="setContactsCategory('members')">عضو فرناز</button>
+  </div>
+  <button class="contacts-import-toggle" id="contactsImportToggle" type="button" aria-expanded="false" aria-controls="phoneContactsImport" onclick="toggleContactsImport()" aria-label="افزودن یا همگام‌سازی مخاطب" title="افزودن یا همگام‌سازی مخاطب">＋</button>
+  <section class="phone-contacts-import" id="phoneContactsImport" aria-labelledby="phoneContactsImportTitle" hidden>
+    <div class="phone-contacts-import-heading"><span class="phone-contacts-import-icon" aria-hidden="true">▤</span><div><h3 id="phoneContactsImportTitle">افزودن و همگام‌سازی مخاطبان</h3><p id="phoneContactsImportIntro">می‌توانی مخاطب را دستی اضافه کنی یا از دفترچه تلفن انتخاب کنی. مخاطبان ذخیره‌شده فقط برای حساب خودت هستند.</p></div></div>
+    <form id="manualContactForm" class="manual-contact-form" onsubmit="addManualPhoneContact(event)">
+      <h4 id="manualContactTitle">افزودن دستی مخاطب</h4>
+      <label for="manualContactName" id="manualContactNameLabel">نام مخاطب</label>
+      <input id="manualContactName" type="text" maxlength="120" autocomplete="off" required placeholder="نام و نام خانوادگی">
+      <label for="manualContactCountry" id="manualContactCountryLabel">کد کشور</label>
+      <select id="manualContactCountry" class="phone-contacts-country" aria-label="Phone country code">
+        <option value="98" selected>ایران (+98)</option><option value="49">آلمان (+49)</option><option value="1">آمریکا / کانادا (+1)</option><option value="44">بریتانیا (+44)</option><option value="90">ترکیه (+90)</option>
+      </select>
+      <label for="manualContactPhone" id="manualContactPhoneLabel">شماره موبایل</label>
+      <input id="manualContactPhone" type="tel" dir="ltr" maxlength="25" autocomplete="tel" required placeholder="0912... یا +98912...">
+      <button class="action-button phone-contacts-import-button" id="manualContactSaveButton" type="submit">ذخیره مخاطب</button>
+      <p id="manualContactStatus" class="status muted-note" role="status"></p>
+    </form>
+    <button class="action-button phone-contacts-import-button" id="pickPhoneContactsButton" type="button" onclick="syncPhoneContactsFromPicker()">انتخاب مخاطبان از دفترچه تلفن</button>
+    <p id="phoneContactsImportStatus" class="status muted-note" role="status"></p>
+    <p class="muted-note" id="phoneContactsPrivacyNote">اگر Safari راهنمای فعال‌سازی نشان داد، Contact Picker API را در تنظیمات پیشرفته Safari روشن کن و Safari را دوباره باز کن. در هر بار همگام‌سازی فقط مخاطبانی که خودت انتخاب می‌کنی به فرناز ارسال می‌شوند.</p>
+    <details class="phone-contacts-vcf-fallback"><summary id="phoneContactsVcfFallbackLabel">روش جایگزین: واردکردن فایل VCF</summary>
+      <label for="phoneContactsCountry" id="phoneContactsCountryLabel">کد کشور برای شماره‌های محلی</label>
+      <select id="phoneContactsCountry" aria-label="Phone country code" class="phone-contacts-country">
+        <option value="98" selected>ایران (+98)</option><option value="49">آلمان (+49)</option><option value="1">آمریکا / کانادا (+1)</option><option value="44">بریتانیا (+44)</option><option value="90">ترکیه (+90)</option>
+      </select>
+      <input id="phoneContactsFile" type="file" accept=".vcf,text/vcard,text/x-vcard" hidden>
+      <button class="action-button phone-contacts-import-button" id="importPhoneContactsButton" type="button" onclick="document.getElementById('phoneContactsFile').click()">واردکردن / به‌روزرسانی فایل VCF</button>
+    </details>
+  </section>
+  <input id="savedFarnazContactFilter" type="search" autocomplete="off" placeholder="جستجو در مخاطبان" aria-label="جستجو در مخاطبان">
+  <p id="savedFarnazContactSearchStatus" class="status muted-note" role="status" aria-live="polite"></p>
+  <section class="contacts-category-section" id="savedContactsSection">
+    <div class="phone-contacts-subheading"><h3 id="savedFarnazContactsTitle">مخاطبان فرناز</h3></div>
+    <div class="list" id="savedContactsList"></div>
+    <p id="savedContactsStatus" class="status muted-note" role="status"></p>
+  </section>
+  <section class="contacts-category-section" id="unmatchedPhoneContactsSection">
+    <div class="phone-contacts-subheading"><h3 id="unmatchedPhoneContactsTitle">مخاطبان گوشی که هنوز عضو فرناز نیستند</h3></div>
+    <div class="list" id="unmatchedPhoneContactsList"></div>
+    <p id="unmatchedPhoneContactsStatus" class="status muted-note" role="status"></p>
+  </section>
+
+
+</section>
+
+<!-- صفحه پروفایل -->
+<section class="page" id="profilePage">
+  <div class="page-heading"><h2 id="profileHeading">پروفایل من</h2><p id="profileIntro">اطلاعات حساب خود را مدیریت کن.</p></div>
+  <div class="panel">
+    <div class="profile-top">
+      <div class="avatar large" id="userAvatar">F</div>
+      <div class="profile-info">
+        <h2 id="userName">کاربر فرناز</h2>
+        <div class="profile-email" id="userEmail"></div>
+        <div class="profile-phone" id="userPhone"></div>
+      </div>
+    </div>
+    <form id="profileForm" onsubmit="saveProfile(event)">
+      <label for="profileNameInput" id="profileNameLabel">نام نمایشی</label>
+      <input id="profileNameInput" maxlength="60" required autocomplete="nickname">
+      <label for="profilePhoneInput" id="profilePhoneLabel">شماره موبایل با کد کشور</label>
+      <label for="profilePhoneCountry" id="profilePhoneCountryLabel">کد کشور شماره تلفن</label>
+      <select id="profilePhoneCountry" aria-label="Phone country code" style="width:100%;padding:10px;border:1px solid #43516a;border-radius:10px;background:var(--bg);color:var(--white)">
+        <option value="98" selected>ایران (+98)</option><option value="49">آلمان (+49)</option><option value="1">آمریکا / کانادا (+1)</option><option value="44">بریتانیا (+44)</option><option value="90">ترکیه (+90)</option>
+      </select>
+      <input id="profilePhoneInput" type="tel" dir="ltr" maxlength="25" placeholder="0912..." autocomplete="tel">
+      <label class="profile-phone-visibility" for="showPhoneSetting"><input id="showPhoneSetting" type="checkbox" checked> <span id="showPhoneSettingLabel">نمایش شماره موبایل به مخاطبان (پیش‌فرض روشن)</span></label>
+      <p class="muted-note" id="showPhoneSettingHint">اگر خاموشش کنی، شماره‌ات در اطلاعات مخاطب نمایش داده نمی‌شود.</p>
+      <label for="avatarFile" id="avatarFileLabel">تصویر پروفایل</label>
+      <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
+      <p class="muted-note" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت.</p>
+      <button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button>
+    </form>
+    <p id="profileStatus" class="status" role="status"></p>
+    <button class="secondary-button" id="logoutButton" type="button" onclick="logout()">خروج از حساب</button>
+  </div>
+</section>
+
+<!-- تنظیمات شخصی‌سازی -->
+<section class="page settings-page" id="settingsPage">
+  <div class="page-heading"><h2 id="settingsHeading">تنظیمات</h2><p class="settings-intro" id="settingsIntro">ظاهر فرناز را مطابق سلیقه‌ات تنظیم کن؛ تغییرات روی همین دستگاه ذخیره می‌شوند.</p></div>
+  <div class="settings-card">
+    <h3 id="appearanceTitle">ظاهر برنامه</h3>
+    <div class="setting-row">
+      <div class="setting-copy"><strong id="themeLabel">حالت نمایش</strong><small id="themeHint">روشن، تیره یا هماهنگ با دستگاه</small></div>
+      <select class="setting-control" id="themeSetting" aria-label="حالت نمایش" onchange="updateAppearanceSetting('theme',this.value)">
+        <option value="dark">تیره</option><option value="light">روشن</option><option value="system">مطابق دستگاه</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <div class="setting-copy"><strong id="fontSizeLabel">اندازه نوشته</strong><small id="fontSizeHint">اندازه متن در سراسر برنامه</small></div>
+      <select class="setting-control" id="fontSizeSetting" aria-label="اندازه نوشته" onchange="updateAppearanceSetting('fontSize',this.value)">
+        <option value="small">کوچک</option><option value="medium">معمولی</option><option value="large">بزرگ</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <div class="setting-copy"><strong id="fontFamilyLabel">فونت فارسی</strong><small id="fontFamilyHint">انتخاب فونت خوانا</small></div>
+      <select class="setting-control" id="fontFamilySetting" aria-label="فونت فارسی" onchange="updateAppearanceSetting('fontFamily',this.value)">
+        <option value="system">پیش‌فرض دستگاه</option><option value="serif">سریف</option><option value="rounded">گرد و نرم</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <div class="setting-copy"><strong id="fontColorLabel">رنگ نوشته</strong><small id="fontColorHint">رنگ متن برنامه را انتخاب کن</small></div>
+      <select class="setting-control" id="fontColorSetting" aria-label="رنگ نوشته" onchange="updateAppearanceSetting('fontColor',this.value)">
+        <option value="auto">خودکار بر اساس تم</option>
+        <option value="black">سیاه</option>
+        <option value="white">سفید</option>
+      </select>
+    </div>
+  </div>
+  <div class="settings-card">
+    <h3 id="accentTitle">رنگ اصلی</h3>
+    <div class="setting-copy"><strong id="accentLabel">رنگ تأکیدی فرناز</strong><small id="accentHint">برای دکمه‌ها و جزئیات رابط کاربری</small></div>
+    <div class="color-options" role="group" aria-label="انتخاب رنگ اصلی">
+      <button type="button" class="color-choice" style="background:#50e3c2" data-color="#50e3c2" aria-label="فیروزه‌ای" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#7c9cff" data-color="#7c9cff" aria-label="آبی" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#c084fc" data-color="#c084fc" aria-label="بنفش" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#fb7185" data-color="#fb7185" aria-label="صورتی" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#fbbf24" data-color="#fbbf24" aria-label="کهربایی" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#4ade80" data-color="#4ade80" aria-label="سبز" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#000000" data-color="#000000" aria-label="سیاه" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+      <button type="button" class="color-choice" style="background:#ffffff" data-color="#ffffff" aria-label="سفید" onclick="updateAppearanceSetting('accent',this.dataset.color)"></button>
+    </div>
+  </div>
+  <div class="settings-card">
+    <h3 id="outgoingBubbleTitle">رنگ حباب پیام‌های من</h3>
+    <div class="setting-copy"><strong id="outgoingBubbleLabel">پیام‌های ارسالی</strong><small id="outgoingBubbleHint">رنگ حباب پیام‌هایی که خودت می‌فرستی</small></div>
+    <div class="color-options bubble-color-options" role="group" aria-label="رنگ پیام‌های ارسالی">
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="auto" style="background:linear-gradient(135deg,#50e3c2 50%,#27364b 50%)" aria-label="خودکار" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#c6d2e8" style="background:#c6d2e8" aria-label="سرمه‌ای کم‌رنگ" title="سرمه‌ای کم‌رنگ" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#50e3c2" style="background:#50e3c2" aria-label="فیروزه‌ای" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#7c9cff" style="background:#7c9cff" aria-label="آبی" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#c084fc" style="background:#c084fc" aria-label="بنفش" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#fb7185" style="background:#fb7185" aria-label="صورتی" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#fbbf24" style="background:#fbbf24" aria-label="کهربایی" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#4ade80" style="background:#4ade80" aria-label="سبز" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#000000" style="background:#000000" aria-label="سیاه" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#ffffff" style="background:#ffffff" aria-label="سفید" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+    
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#d1d5db" style="background:#d1d5db" aria-label="خاکستری روشن" title="خاکستری روشن" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="outgoingBubble" data-bubble-color="#6b7280" style="background:#6b7280" aria-label="خاکستری تیره" title="خاکستری تیره" onclick="updateAppearanceSetting('outgoingBubble',this.dataset.bubbleColor)"></button></div>
+    <div class="setting-copy" style="margin-top:16px"><strong id="incomingBubbleLabel">پیام‌های دریافتی</strong><small id="incomingBubbleHint">رنگ حباب پیام‌هایی که مخاطب می‌فرستد</small></div>
+    <div class="color-options bubble-color-options" role="group" aria-label="رنگ پیام‌های دریافتی">
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="auto" style="background:linear-gradient(135deg,#50e3c2 50%,#27364b 50%)" aria-label="خودکار" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#bde7fa" style="background:#bde7fa" aria-label="آبی آسمانی کم‌رنگ" title="آبی آسمانی کم‌رنگ" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#50e3c2" style="background:#50e3c2" aria-label="فیروزه‌ای" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#7c9cff" style="background:#7c9cff" aria-label="آبی" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#c084fc" style="background:#c084fc" aria-label="بنفش" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#fb7185" style="background:#fb7185" aria-label="صورتی" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#fbbf24" style="background:#fbbf24" aria-label="کهربایی" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#4ade80" style="background:#4ade80" aria-label="سبز" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#000000" style="background:#000000" aria-label="سیاه" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#ffffff" style="background:#ffffff" aria-label="سفید" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+    
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#d1d5db" style="background:#d1d5db" aria-label="خاکستری روشن" title="خاکستری روشن" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button>
+      <button type="button" class="color-choice bubble-color-choice" data-bubble-target="incomingBubble" data-bubble-color="#6b7280" style="background:#6b7280" aria-label="خاکستری تیره" title="خاکستری تیره" onclick="updateAppearanceSetting('incomingBubble',this.dataset.bubbleColor)"></button></div>
+  </div>
+  <div class="settings-card" id="notificationsSettingsCard">
+    <h3 id="notificationsHeading">اعلان‌ها</h3>
+    <div class="setting-row"><div class="setting-copy"><strong id="notificationsLabel">اعلان پیام‌ها</strong><small id="notificationsHint">اجازه نمایش اعلان روی این دستگاه؛ اعلان پس از بسته‌شدن برنامه به پیکربندی Push سرور هم نیاز دارد.</small></div><button class="setting-control" type="button" id="enableNotificationsButton" onclick="enableFarnazNotifications()">فعال‌سازی اعلان</button></div>
+    <p id="notificationsStatus" class="status muted-note" role="status"></p>
+  </div>
+  
+  <div class="settings-card" id="privacySettingsCard">
+    <h3 id="privacyTitle">حضور و حریم خصوصی</h3>
+    <div class="setting-row"><div class="setting-copy"><strong id="presenceVisibilityLabel">نمایش آنلاین بودن</strong><small id="presenceVisibilityHint">چه کسانی وضعیت آنلاین تو را ببینند؟</small></div><select class="setting-control" id="presenceVisibilitySetting" aria-label="نمایش آنلاین بودن" onchange="savePrivacySetting('presence_visibility',this.value)"><option value="everyone">همه</option><option value="contacts" selected>فقط مخاطبانم</option><option value="nobody">هیچ‌کس</option></select></div>
+    <div class="setting-row"><div class="setting-copy"><strong id="lastSeenVisibilityLabel">آخرین بازدید</strong><small id="lastSeenVisibilityHint">چه کسانی زمان آخرین حضورت را ببینند؟</small></div><select class="setting-control" id="lastSeenVisibilitySetting" aria-label="آخرین بازدید" onchange="savePrivacySetting('last_seen_visibility',this.value)"><option value="everyone">همه</option><option value="contacts" selected>فقط مخاطبانم</option><option value="nobody">هیچ‌کس</option></select></div>
+    <label class="privacy-toggle"><input id="showTypingSetting" type="checkbox" checked onchange="savePrivacySetting('show_typing',this.checked)"><span><strong id="showTypingLabel">نمایش «در حال نوشتن…»</strong><small id="showTypingHint">وضعیت نوشتن در گفتگوها نمایش داده شود.</small></span></label>
+    <label class="privacy-toggle"><input id="showReadReceiptsSetting" type="checkbox" checked onchange="savePrivacySetting('show_read_receipts',this.checked)"><span><strong id="showReadReceiptsLabel">رسید خواندن پیام‌ها</strong><small id="showReadReceiptsHint">اجازه بده دیگران خوانده‌شدن پیام را ببینند.</small></span></label>
+    <label class="privacy-toggle"><input id="showSpaceOnlineCountSetting" type="checkbox" checked onchange="savePrivacySetting('show_space_online_count',this.checked)"><span><strong id="showSpaceOnlineCountLabel">تعداد اعضای آنلاین گروه</strong><small id="showSpaceOnlineCountHint">نمایش تعداد آنلاین‌ها در گروه‌ها فعال باشد.</small></span></label>
+    <p id="privacySettingsStatus" class="status muted-note" role="status"></p>
+  </div>
+  <div class="settings-card">
+    <h3 id="languageTitle">زبان</h3>
+    <div class="setting-row">
+      <div class="setting-copy"><strong id="languageLabel">زبان برنامه</strong><small id="languageHint">فارسی یا انگلیسی</small></div>
+      <button class="setting-control" type="button" id="settingsLanguageButton" onclick="toggleLanguage()">English / فارسی</button>
+    </div>
+  </div>
+  <button class="settings-reset" id="resetSettingsButton" type="button" onclick="resetAppearanceSettings()">بازگردانی تنظیمات اولیه</button>
+  <p id="settingsStatus" class="status muted-note" role="status"></p>
+</section>
+
+<!-- صفحه اختصاصی گفتگو -->
+<section class="page" id="chatPage">
+  <div class="chat-header space-detail-head conversation-header">
+    <button class="space-secondary conversation-back-button" id="backToChats" type="button" onclick="backFromChat()" aria-label="بازگشت به فهرست گفتگوها" title="بازگشت"><span>← بازگشت</span></button>
+    <div class="space-title-wrap chat-heading">
+      <div class="space-avatar avatar medium" id="chatAvatar" title="اطلاعات مخاطب">F</div>
+      <div class="space-title-copy chat-person">
+        <h3 id="conversationTitle" onclick="openContactInfo()" title="اطلاعات مخاطب">گفتگو</h3>
+        <small id="chatSubtitle" class="space-muted">گفتگوی خصوصی</small>
+      </div>
+    </div>
+    <div class="space-call-actions call-actions">
+      <button class="space-call-button call-button" type="button" onclick="startCall('audio')" aria-label="تماس صوتی" title="تماس صوتی"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.7a14 14 0 0 0 4.8 4.8L15 13l2-2 5 2v4c0 1.1-.9 2-2 2C9.2 21 3 14.8 3 6c0-1.1.9-2 2-2Z"></path></svg></button>
+      <button class="space-call-button call-button" type="button" onclick="startCall('video')" aria-label="تماس تصویری" title="تماس تصویری"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"></rect><path d="m15 10 6-3v10l-6-3z"></path></svg></button>
+    </div>
+  </div>
+  <div class="conversation-tools" id="selectionToolbar"><span class="muted-note" id="selectedCount">۰ پیام انتخاب شده</span><button class="mini-button" type="button" onclick="replyToSelected()">پاسخ</button><button class="mini-button" type="button" onclick="forwardSelectedMessages()">فوروارد</button><button class="mini-button danger" type="button" onclick="deleteSelectedMessages()">حذف</button><button class="mini-button" type="button" onclick="exitMessageSelection()">لغو</button></div>
+  <button class="mini-button" id="loadOlderButton" type="button" onclick="loadOlderMessages()" hidden>پیام‌های قدیمی‌تر</button>
+  <div id="messageList" class="conversation-message-list" role="log" aria-live="polite" aria-label="پیام‌های گفتگو"></div>
+  <div id="replyPreview" class="message-quote" hidden></div>
+  <form id="sendMessageForm" class="conversation-composer">
+    <div class="composer-shell conversation-composer-shell">
+      <div class="voice-preview" id="voicePreview" hidden>
+        <div class="voice-preview-heading"><span id="voicePreviewLabel">پیام صوتی آماده ارسال</span><button class="voice-preview-remove" id="removeVoicePreview" type="button" onclick="discardRecordedVoice()" aria-label="حذف صدای ضبط‌شده">×</button></div>
+        <audio id="voicePreviewPlayer" controls preload="metadata"></audio>
+        <span class="voice-preview-size" id="voicePreviewSize"></span>
+      </div>
+      <div class="send-row">
+        <textarea id="messageText" maxlength="5000" rows="1" placeholder="پیامت را بنویس..." aria-label="متن پیام"></textarea>
+      </div>
+      <div class="composer-actions">
+        <div class="composer-left">
+          <button class="composer-icon" id="attachmentMenuButton" type="button" onclick="toggleAttachmentMenu()" aria-label="افزودن پیوست" title="افزودن پیوست" aria-haspopup="menu" aria-expanded="false">＋</button>
+        <div class="attachment-menu" id="attachmentMenu" role="menu" aria-label="گزینه‌های پیوست" hidden>
+          <button class="attachment-option" id="attachmentPhotoOption" type="button" role="menuitem" onclick="chooseAttachment('photo')"><span class="attachment-option-icon">🖼</span><span>انتخاب عکس</span></button>
+          <button class="attachment-option" id="attachmentCameraOption" type="button" role="menuitem" onclick="chooseAttachment('camera')"><span class="attachment-option-icon">📷</span><span>گرفتن عکس با دوربین</span></button>
+          <button class="attachment-option" id="attachmentFileOption" type="button" role="menuitem" onclick="chooseAttachment('file')"><span class="attachment-option-icon">📎</span><span>انتخاب فایل</span></button>
+        </div></div>
+        
+        <div class="composer-right">
+          <button class="mini-button" id="cancelEditButton" type="button" onclick="cancelMessageEdit()" hidden>لغو ویرایش</button><span class="muted-note" id="attachmentHint">فایل تا ۲۰ مگابایت</span>
+          <button class="composer-icon" id="recordAudioButton" type="button" onclick="toggleAudioRecording()" aria-label="ضبط پیام صوتی" title="پیام صوتی">🎙</button>
+          <button class="composer-icon send" id="sendMessageButton" type="submit" aria-label="ارسال پیام" title="ارسال پیام">➤</button>
+        </div>
+      </div>
+      <div id="messageComposerTools"><input id="photoFile" type="file" accept="image/*"><input id="attachmentFile" type="file"><input id="cameraFile" type="file" accept="image/*" capture="environment"></div>
+    </div>
+  </form>
+  <p id="sendMessageStatus" class="status" role="status"></p>
+</section>
+
+
+</main>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="ناوبری اصلی">
+  <div class="nav-inner">
+    <button class="nav-button" data-page="profilePage" type="button" onclick="navigate('profilePage')">
+      <span class="nav-icon">◉</span><span id="navProfile">پروفایل</span>
+    </button>
+    <button class="nav-button active" data-page="chatsPage" type="button" onclick="navigate('chatsPage')">
+      <span class="nav-icon">▤</span><span id="navChats">گفتگوها</span>
+    </button>
+    <button class="nav-button" id="navSpacesBtn" data-page="spacesPage" type="button" onclick="navigate('spacesPage')">
+      <span class="nav-icon">◎</span><span id="navSpaces">گروه‌ها</span>
+    </button>
+    <button class="nav-button" data-page="contactsPage" type="button" onclick="navigate('contactsPage')">
+      <span class="nav-icon">♙</span><span id="navContacts">مخاطبان</span>
+    </button>
+    <button class="nav-button" data-page="settingsPage" type="button" onclick="navigate('settingsPage')" aria-label="تنظیمات" title="تنظیمات">
+      <span class="nav-icon" aria-hidden="true">⚙</span><span id="navSettings">تنظیمات</span>
+    </button>
+  </div>
+</nav>
+
+<div id="authBox" role="dialog" aria-modal="true" aria-label="ورود و ثبت‌نام">
+  <button id="authLanguageButton" class="auth-language-switch" type="button" onclick="toggleLanguage()" aria-label="Change language">EN</button>
+  <div class="auth-card">
+    <h2 id="authTitle" hidden>ثبت‌نام در فرناز</h2>
+    <p id="authMessage" hidden>برای ارتباط نزدیک‌تر، حساب خودت را بساز.</p>
+    <div class="auth-mode-tabs" id="authModeTabs" role="group" aria-label="ورود یا ثبت‌نام">
+      <button type="button" id="authSignupTab" class="auth-mode-tab is-active" aria-pressed="true" onclick="setAuthMode('signup')">ثبت‌نام</button>
+      <button type="button" id="authLoginTab" class="auth-mode-tab" aria-pressed="false" onclick="setAuthMode('login')">ورود</button>
+    </div>
+    <div class="social-auth">
+      <button type="button" id="googleAuth" class="social-auth-button" onclick="signInSocial('google')"><svg class="google-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v2.95h3.87c2.27-2.09 3.57-5.17 3.57-8.59Z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.96-1.08 7.95-2.93l-3.87-2.95c-1.08.72-2.46 1.15-4.08 1.15-3.14 0-5.8-2.12-6.75-4.97H1.25v3.04A12 12 0 0 0 12 24Z"/>
+        <path fill="#FBBC05" d="M5.25 14.3A7.2 7.2 0 0 1 4.87 12c0-.8.14-1.57.38-2.3V6.66H1.25A12 12 0 0 0 0 12c0 1.94.46 3.77 1.25 5.34l4-3.04Z"/>
+        <path fill="#EA4335" d="M12 4.73c1.76 0 3.34.61 4.59 1.82l3.44-3.44C17.95 1.17 15.24 0 12 0A12 12 0 0 0 1.25 6.66l4 3.04C6.2 6.85 8.86 4.73 12 4.73Z"/>
+      </svg><span id="googleAuthLabel">ادامه با Google</span></button>
+    </div>
+    <div class="auth-divider"><span id="authOrLabel">یا با ایمیل</span></div>
+    <form id="authForm">
+      <div id="nameField">
+        <label for="authName" id="authNameLabel">نام نمایشی</label>
+        <input id="authName" type="text" autocomplete="name" required maxlength="60" placeholder="نام شما">
+      </div>
+      <label for="authEmail" id="authEmailLabel">ایمیل</label>
+      <input id="authEmail" type="email" inputmode="email" autocapitalize="none" spellcheck="false" autocomplete="username" enterkeyhint="next" required placeholder="you@example.com">
+      <label for="authPassword" id="authPasswordLabel">رمز عبور (حداقل ۸ کاراکتر)</label>
+      <div class="auth-password-control">
+        <input id="authPassword" type="password" autocapitalize="none" spellcheck="false" autocomplete="new-password" minlength="8" required placeholder="رمز عبور">
+        <button id="toggleAuthPassword" class="auth-password-toggle" type="button" onclick="toggleAuthPassword()" aria-label="نمایش رمز عبور" aria-pressed="false">نمایش</button>
+      </div>
+      <button id="authForgotPassword" class="auth-inline-action" type="button" onclick="requestPasswordRecovery()" hidden>رمز عبور را فراموش کرده‌اید؟</button>
+      <button id="authSubmit" class="auth-submit" type="submit">ثبت‌نام</button>
+      <button id="authRecoveryBack" class="auth-inline-action" type="button" onclick="setAuthMode('login')" hidden>بازگشت به ورود</button>
+    </form>
+    <p id="authStatus" class="status" role="status"></p>
+    <p id="authSwitch" class="auth-switch-hint">حساب کاربری داری؟ از بخش ورود استفاده کن.</p>
+  </div>
+</div>
+
+<script src="./js/local-store.js?v=20261026-3"></script>
+<script>
+(function(){
+  window.FARNAZ_LIVEKIT_CALLS_ENABLED = new URLSearchParams(window.location.search).get("livekitPilot") === "1";
+  const SCRIPT_TIMEOUT_MS=20000;
+  function watchScript(script,onload,onerror,timeoutMs=SCRIPT_TIMEOUT_MS){
+    let settled=false;
+    const finish=(callback,error)=>{
+      if(settled)return;
+      settled=true;
+      clearTimeout(timer);
+      callback(error);
+    };
+    const timer=setTimeout(()=>{
+      if(settled)return;
+      settled=true;
+      script.remove();
+      onerror(new Error("Script load timed out: "+script.src));
+    },timeoutMs);
+    script.onload=()=>finish(onload);
+    script.onerror=()=>finish(onerror,new Error("Script failed to load: "+script.src));
+  }
+  const FARNAZ_ERROR_REPORT_KEY="farnaz-startup-error-report-v1";
+  function saveFarnazErrorReport(entry){
+    try{
+      const previous=JSON.parse(localStorage.getItem(FARNAZ_ERROR_REPORT_KEY)||"[]");
+      const reports=Array.isArray(previous)?previous:[];
+      reports.push({...entry,time:new Date().toISOString()});
+      localStorage.setItem(FARNAZ_ERROR_REPORT_KEY,JSON.stringify(reports.slice(-8)));
+    }catch(storageError){
+      console.warn("[Farnaz startup] Could not persist error report:",storageError);
+    }
+  }
+  function getFarnazErrorReport(){
+    try{return JSON.parse(localStorage.getItem(FARNAZ_ERROR_REPORT_KEY)||"[]");}
+    catch(_){return [];}
+  }
+  async function copyFarnazErrorReport(){
+    const report=JSON.stringify(getFarnazErrorReport(),null,2);
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(report);
+        const button=document.getElementById("farnazCopyErrorReport");
+        if(button)button.textContent="گزارش کپی شد";
+      }else{
+        window.prompt("گزارش خطا را کپی کن:",report);
+      }
+    }catch(_){
+      window.prompt("گزارش خطا را کپی کن:",report);
+    }
+  }
+  function showLoadError(message,flag,details){
+    window[flag]=true;
+    const report={type:flag,message:String(message||""),...(details||{})};
+    saveFarnazErrorReport(report);
+    const status=document.getElementById("authStatus");
+    if(status)status.textContent=message;
+    // Keep startup diagnostics visible on the home screen, not inside a closed dialog.
+    const banner=document.getElementById("connectionBanner");
+    if(banner){
+      banner.hidden=false;
+      banner.textContent=message+" ";
+      banner.style.cssText="display:block!important;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:12px;right:12px;z-index:100000;max-width:560px;margin:0 auto;padding:14px 16px;border:1px solid #b45309;border-radius:12px;background:#fff7ed;color:#7c2d12;box-shadow:0 8px 28px #0004;line-height:1.6;direction:rtl;text-align:right";
+      let copyButton=document.getElementById("farnazCopyErrorReport");
+      if(!copyButton){
+        copyButton=document.createElement("button");
+        copyButton.id="farnazCopyErrorReport";
+        copyButton.type="button";
+        copyButton.textContent="کپی گزارش خطا";
+        copyButton.style.cssText="display:block;margin-top:10px;padding:8px 12px;border:1px solid #9a3412;border-radius:8px;background:#fff;color:#7c2d12";
+        copyButton.addEventListener("click",copyFarnazErrorReport);
+        banner.appendChild(copyButton);
+      }
+    }
+    console.error("[Farnaz startup]",report);
+  }
+  // Save actionable details for uncaught errors from application modules.
+  window.addEventListener("error",event=>{
+    const file=String(event.filename||"");
+    if(file.includes("/js/core.js")||file.includes("/js/chat-menu-v5.js")||file.includes("/js/spaces.js")||file.includes("/js/calls.js")){
+      showLoadError("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد. گزارش خطا ذخیره شد؛ برای ارسال جزئیات، «کپی گزارش خطا» را بزن.","FARNAZ_RUNTIME_ERROR",{
+        errorName:event.error?.name||"Error",
+        errorMessage:String(event.message||event.error?.message||"Unknown runtime error").slice(0,500),
+        source:file.split("/").pop().split("?")[0],
+        line:Number(event.lineno)||null,
+        column:Number(event.colno)||null,
+        stack:String(event.error?.stack||"").slice(0,1800)
+      });
+    }
+  });
+  window.addEventListener("unhandledrejection",event=>{
+    const reason=event.reason;
+    showLoadError("یکی از عملیات‌های آغازین فرناز با خطای مدیریت‌نشده روبه‌رو شد. گزارش خطا ذخیره شد؛ برای ارسال جزئیات، «کپی گزارش خطا» را بزن.","FARNAZ_UNHANDLED_REJECTION",{
+      errorName:reason?.name||"Error",
+      errorMessage:String(reason?.message||reason||"Unknown rejection").slice(0,500),
+      stack:String(reason?.stack||"").slice(0,1800)
+    });
+  });
+  function loadLocalScripts(){
+    const core=document.createElement("script");
+    core.src="./js/core.js?v=20261105-safe-update1";
+    watchScript(core,()=>{
+      // A script's load event can still fire after a runtime exception.
+      // Verify the core boot contract before loading features or attempting
+      // session restoration.
+      if(typeof window.FarnazBoot!=="function"){
+        showLoadError("هستهٔ فرناز دریافت شد اما راه‌اندازی آن کامل نشد. برنامه را تازه‌سازی کن؛ اگر تکرار شد باید خطای اجرایی بررسی شود.","FARNAZ_CORE_BOOT_MISSING");
+        return;
+      }
+      const featureScripts=[
+        "./js/chat-menu-v5.js?v=20261105-matin-shared2",
+        "./js/spaces.js?v=20261105-matin-shared2",
+        "./js/calls.js?v=20261105-matin-shared2"
+      ];
+      if(window.FARNAZ_LIVEKIT_CALLS_ENABLED===true){
+        featureScripts.push(
+          "./js/livekit-sdk-loader.js?v=20261105-pilot1",
+          "./js/livekit-calls.js?v=20261105-pilot2",
+          "./js/livekit-call-sessions.js?v=20261105-pilot1",
+          "./js/livekit-call-controller.js?v=20261105-pilot1",
+          "./js/livekit-call-ui.js?v=20261105-pilot1"
+        );
+      }
+      let featureIndex=0;
+      const loadNextFeature=()=>{
+        if(featureIndex>=featureScripts.length){
+          if(typeof window.FarnazBoot==="function")window.FarnazBoot();
+          else showLoadError("راه‌اندازی برنامه کامل نشد. صفحه را تازه‌سازی کن و دوباره تلاش کن.","FARNAZ_APP_LOAD_FAILED");
+          return;
+        }
+        const script=document.createElement("script");
+        script.src=featureScripts[featureIndex++];
+        watchScript(script,loadNextFeature,()=>{
+          showLoadError("بارگذاری بخشی از برنامه ناموفق بود یا بیش از حد طول کشید. صفحه را تازه‌سازی کن و اتصال را بررسی کن.","FARNAZ_APP_LOAD_FAILED");
+          loadNextFeature();
+        },20000);
+        document.body.appendChild(script);
+      };
+      loadNextFeature();
+    },()=>{
+      showLoadError("بارگذاری هستهٔ برنامه ناموفق بود یا بیش از حد طول کشید. صفحه را تازه‌سازی کن و اتصال را بررسی کن.","FARNAZ_APP_LOAD_FAILED");
+    });
+    document.body.appendChild(core);
+  }
+  function loadSupabaseSdk(){
+    const script=document.createElement("script");
+    script.src="./js/supabase-sdk.js";
+    watchScript(script,()=>{
+      if(!window.supabase||typeof window.supabase.createClient!=="function"){
+        showLoadError("کتابخانهٔ داخلی ورود بارگذاری شد، اما آماده نیست. صفحه را تازه‌سازی کن.","FARNAZ_SUPABASE_LOAD_FAILED");
+        return;
+      }
+      window.FARNAZ_SUPABASE_LOAD_FAILED=false;
+      loadLocalScripts();
+    },()=>{
+      showLoadError("کتابخانهٔ داخلی ورود بارگذاری نشد یا بیش از حد طول کشید. اتصال را بررسی و صفحه را دوباره باز کن.","FARNAZ_SUPABASE_LOAD_FAILED");
+    });
+    document.head.appendChild(script);
+  }
+  // The SDK must be ready before core initializes. Every dynamic script now
+  // has a bounded wait so a stalled mobile request cannot freeze app startup.
+  loadSupabaseSdk();
+})();
+</script>
+</body>
+</html>

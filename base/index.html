@@ -1,0 +1,847 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101828">
+<meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
+<title>فرناز | Farnaz</title>
+<style>
+:root{
+  --bg:#101828;--panel:#172237;--panel2:#1d2b42;
+  --border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;
+  --white:#f8fafc;--danger:#ffaaa9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--white);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;min-height:100dvh
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--mint);outline-offset:2px
+}
+.app{
+  max-width:560px;margin:auto;min-height:100dvh;
+  padding:12px 13px calc(94px + env(safe-area-inset-bottom))
+}
+header{
+  display:flex;align-items:center;gap:10px;
+  min-height:48px;margin:4px 0 17px
+}
+.logo{
+  width:40px;height:40px;flex-shrink:0;border-radius:13px;
+  display:grid;place-items:center;background:var(--mint);
+  color:var(--bg);font-size:23px;font-weight:800
+}
+.brand-text{flex:1;min-width:0}
+h1{font-size:20px;margin:0}
+.sub{color:var(--muted);font-size:11px;margin-top:3px}
+.icon-button{
+  display:grid;place-items:center;width:40px;height:40px;
+  border:1px solid var(--border);border-radius:13px;
+  background:var(--panel);color:var(--white);font-size:19px
+}
+.page{display:none;animation:appear .15s ease-out}
+.page.active{display:block}
+@keyframes appear{from{opacity:.65}to{opacity:1}}
+.hero,.panel,.feature{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:17px
+}
+.hero{
+  padding:20px 16px;margin-bottom:15px;
+  background:linear-gradient(145deg,#1c2b43,#172237)
+}
+.tag{color:var(--mint);font-size:11px;font-weight:700}
+h2{font-size:18px;line-height:1.5;margin:9px 0}
+h3{font-size:14px;margin:0}
+p{color:#b6c1d1;line-height:1.7;font-size:12px}
+.primary,.action-button,.auth-submit{
+  border:0;border-radius:11px;padding:11px 13px;
+  background:var(--mint);color:var(--bg);
+  font-size:13px;font-weight:750
+}
+.primary{width:100%;margin-top:8px}
+.action-button{width:100%;margin-top:9px}
+.secondary-button{
+  width:100%;margin-top:8px;padding:10px;
+  border:1px solid #526078;border-radius:10px;
+  background:transparent;color:var(--white);font-size:12px
+}
+.page-heading{margin:5px 2px 13px}
+.page-heading p{margin:4px 0}
+.panel{padding:14px 12px;margin-bottom:12px}
+.features{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.feature{padding:12px 10px}
+.emoji{font-size:20px}
+.feature h3{font-size:12px;margin:7px 0 3px}
+.feature p{font-size:11px;margin:0}
+.muted-note{color:var(--muted);font-size:11px}
+.status{font-size:12px;line-height:1.6;overflow-wrap:anywhere;min-height:0}
+.error-text{color:var(--danger)!important}
+label{display:block;margin:12px 0 5px;font-size:12px;color:#dbe4ee}
+input,textarea{
+  width:100%;min-width:0;padding:11px 10px;
+  border:1px solid #43516a;border-radius:10px;
+  background:var(--bg);color:var(--white)
+}
+textarea{resize:vertical;min-height:55px;line-height:1.6}
+input::placeholder,textarea::placeholder{color:#8492a7}
+input[type=file]{font-size:11px;padding:9px}
+.form-row{display:flex;gap:8px;align-items:center}
+.form-row input{flex:1}
+.form-row button{flex-shrink:0;width:auto;margin:0}
+.avatar{
+  display:grid;place-items:center;overflow:hidden;flex-shrink:0;
+  border-radius:50%;background:var(--mint);color:var(--bg);
+  font-weight:800
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar.large{width:76px;height:76px;font-size:27px}
+.avatar.medium{width:45px;height:45px;font-size:17px}
+.avatar.small{width:39px;height:39px;font-size:15px}
+.profile-top{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.profile-info{min-width:0;flex:1}
+.profile-info h2{margin:0 0 5px;overflow-wrap:anywhere}
+.profile-email{font-size:11px;color:var(--muted);overflow-wrap:anywhere;direction:ltr;text-align:right}
+.profile-phone{font-size:12px;color:var(--muted);margin-top:5px}
+.list{display:flex;flex-direction:column;gap:7px}
+.list-item{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:10px;text-align:start;color:var(--white);
+  border:1px solid var(--border);border-radius:13px;
+  background:var(--bg)
+}
+.list-item:active{background:var(--panel2)}
+.list-details{flex:1;min-width:0}
+.list-name{display:block;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.list-preview{
+  display:block;font-size:11px;color:var(--muted);margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.list-time{font-size:10px;color:var(--muted);margin-top:5px}
+.empty-state{text-align:center;padding:24px 10px;color:var(--muted);font-size:12px;line-height:1.8}
+.bottom-nav{
+  position:fixed;z-index:100;bottom:0;left:0;right:0;
+  padding:8px 9px calc(8px + env(safe-area-inset-bottom));
+  display:none;justify-content:center;
+  background:#111c2df5;border-top:1px solid var(--border);
+  backdrop-filter:blur(15px)
+}
+.bottom-nav.visible{display:flex}
+.nav-inner{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.nav-button{
+  min-height:57px;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:4px;
+  border:0;border-radius:13px;background:transparent;color:var(--muted);
+  font-size:10px
+}
+.nav-button .nav-icon{font-size:21px;line-height:1.2}
+.nav-button.active{background:#203b43;color:var(--mint);font-weight:700}
+#chatPage{padding-bottom:5px}
+.chat-header{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 0 12px;border-bottom:1px solid var(--border)
+}
+.chat-person{flex:1;min-width:0}
+.chat-person strong{display:block;font-size:13px;overflow-wrap:anywhere}
+.chat-person small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.call-actions{display:flex;gap:6px}
+.call-button{
+  width:38px;height:38px;display:grid;place-items:center;
+  border:1px solid var(--border);border-radius:12px;
+  background:var(--panel);color:var(--mint);font-size:18px
+}
+.back-button{
+  width:36px;height:38px;border:0;background:transparent;
+  color:var(--white);font-size:22px
+}
+#messageList{
+  display:flex;flex-direction:column;gap:8px;
+  min-height:150px;max-height:calc(100dvh - 290px);
+  overflow-y:auto;padding:14px 2px
+}
+.message{
+  max-width:86%;border-radius:13px;padding:9px 11px;
+  overflow-wrap:anywhere;white-space:pre-wrap
+}
+.my-message{align-self:flex-start;background:#23564f}
+.their-message{align-self:flex-end;background:#27364b}
+.message p{color:var(--white);font-size:12px;margin:0 0 5px;white-space:pre-wrap}
+.message time{display:block;color:#c0ccda;font-size:9px}
+#sendMessageForm{
+  position:sticky;bottom:0;background:var(--bg);
+  padding:8px 0 calc(4px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border)
+}
+.send-row{display:flex;align-items:flex-end;gap:7px}
+.send-row textarea{flex:1;min-height:44px;max-height:120px;resize:vertical}
+.send-row button{width:45px;height:44px;flex-shrink:0;margin:0;padding:0}
+.language{
+  display:block;margin:14px auto 0;background:transparent;
+  color:var(--muted);border:1px solid #35445a;
+  border-radius:9px;padding:7px 12px;font-size:11px
+}
+footer{text-align:center;color:#718096;font-size:10px;padding:17px 0 7px}
+#authBox{
+  display:none;position:fixed;inset:0;background:#101828ee;
+  z-index:9999;align-items:center;justify-content:center;
+  padding:12px;overflow-y:auto
+}
+.auth-card{
+  background:#182437;padding:18px;border:1px solid #35445a;
+  border-radius:16px;width:100%;max-width:370px;margin:auto
+}
+.auth-card h2{font-size:18px}
+.close-button{float:left;background:none;color:white;border:0;font-size:24px}
+.auth-submit{width:100%;margin-top:14px}
+.auth-link{background:none;color:var(--mint);border:0;padding:12px 0;font-size:12px}
+[hidden]{display:none!important}
+@media(max-width:360px){
+  .app{padding-left:9px;padding-right:9px}
+  .hero{padding:15px 12px}
+  .call-actions{gap:3px}
+  .call-button{width:34px;height:36px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="logo">F</div>
+  <div class="brand-text">
+    <h1 id="brand">فرناز</h1>
+    <div class="sub" id="subtitle">ارتباطی نزدیک‌تر، در هر کجا</div>
+  </div>
+  <button class="icon-button" id="language" type="button" onclick="toggleLanguage()" aria-label="تغییر زبان">EN</button>
+</header>
+
+<!-- صفحه شروع -->
+<section class="page active" id="homePage">
+  <div class="hero">
+    <div class="tag" id="welcome">خوش آمدی به فرناز</div>
+    <h2 id="headline">آدم‌های مهم زندگی‌ات، همیشه نزدیک تو</h2>
+    <p id="description">یک فضای ساده برای گفتگو و ارتباط با کسانی که برایت مهم‌اند.</p>
+    <button class="primary" id="start" type="button" onclick="openAuth()">شروع کنیم ←</button>
+  </div>
+  <div class="features">
+    <article class="feature"><div class="emoji">💬</div><h3 id="f1">گفتگوی خصوصی</h3><p id="f1d">پیام‌هایت را مرتب دنبال کن.</p></article>
+    <article class="feature"><div class="emoji">📷</div><h3 id="f2">عکس و فایل</h3><p id="f2d">لحظه‌ها و فایل‌ها را به اشتراک بگذار.</p></article>
+    <article class="feature"><div class="emoji">🔔</div><h3 id="f3">یادآوری‌ها</h3><p id="f3d">کارهای مهم را فراموش نکن.</p></article>
+    <article class="feature"><div class="emoji">📞</div><h3 id="f4">تماس صوتی و تصویری</h3><p id="f4d">ارتباطی فراتر از پیام متنی.</p></article>
+  </div>
+  <button class="language" type="button" onclick="openAuth()" id="homeLogin">ورود یا ثبت‌نام</button>
+</section>
+
+<!-- صفحه گفتگوها -->
+<section class="page" id="chatsPage">
+  <div class="page-heading"><h2 id="chatsHeading">گفتگوها</h2><p id="chatsIntro">گفتگوهای اخیرت را اینجا می‌بینی.</p></div>
+  <div class="panel">
+    <button class="primary" id="newChatButton" type="button" onclick="navigate('contactsPage')">＋ گفتگوی جدید</button>
+  </div>
+  <div class="list" id="conversationList"></div>
+  <div id="inboxStatus" class="status muted-note" role="status"></div>
+</section>
+
+<!-- صفحه مخاطبان -->
+<section class="page" id="contactsPage">
+  <div class="page-heading"><h2 id="contactsHeading">مخاطبان</h2><p id="contactsIntro">با ایمیل یا شماره تلفن، مخاطب را پیدا کن.</p></div>
+  <div class="panel">
+    <form id="recipientForm">
+      <label for="recipientValue" id="recipientLabel">ایمیل یا شماره تلفن با کد کشور</label>
+      <input id="recipientValue" type="text" required autocomplete="off" placeholder="email@example.com یا +98912...">
+      <button class="action-button" id="findRecipientBtn" type="submit">پیدا کردن مخاطب</button>
+    </form>
+    <p id="recipientStatus" class="status" role="status"></p>
+  </div>
+  <h3 id="foundHeading" style="margin:16px 3px 10px">نتیجه جست‌وجو</h3>
+  <div id="foundContact"></div>
+  <p class="muted-note" id="contactNote">جست‌وجو فقط برای حساب‌های ثبت‌شده در فرناز انجام می‌شود.</p>
+</section>
+
+<!-- صفحه پروفایل -->
+<section class="page" id="profilePage">
+  <div class="page-heading"><h2 id="profileHeading">پروفایل من</h2><p id="profileIntro">اطلاعات حساب خود را مدیریت کن.</p></div>
+  <div class="panel">
+    <div class="profile-top">
+      <div class="avatar large" id="userAvatar">F</div>
+      <div class="profile-info">
+        <h2 id="userName">کاربر فرناز</h2>
+        <div class="profile-email" id="userEmail"></div>
+        <div class="profile-phone" id="userPhone"></div>
+      </div>
+    </div>
+    <form id="profileForm">
+      <label for="profileNameInput" id="profileNameLabel">نام نمایشی</label>
+      <input id="profileNameInput" maxlength="60" required autocomplete="nickname">
+      <label for="profilePhoneInput" id="profilePhoneLabel">شماره موبایل با کد کشور</label>
+      <input id="profilePhoneInput" type="tel" maxlength="20" placeholder="+98912..." autocomplete="tel">
+      <label for="avatarFile" id="avatarFileLabel">تصویر پروفایل</label>
+      <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
+      <p class="muted-note" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت.</p>
+      <button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button>
+    </form>
+    <p id="profileStatus" class="status" role="status"></p>
+    <button class="secondary-button" id="logoutButton" type="button" onclick="logout()">خروج از حساب</button>
+  </div>
+</section>
+
+<!-- صفحه اختصاصی گفتگو -->
+<section class="page" id="chatPage">
+  <div class="chat-header">
+    <button class="back-button" id="backToChats" type="button" onclick="backFromChat()" aria-label="بازگشت">→</button>
+    <div class="avatar medium" id="chatAvatar">F</div>
+    <div class="chat-person">
+      <strong id="conversationTitle">گفتگو</strong>
+      <small id="chatSubtitle">گفتگوی خصوصی</small>
+    </div>
+    <div class="call-actions">
+      <button class="call-button" type="button" onclick="startCall('audio')" aria-label="تماس صوتی" title="تماس صوتی">☎</button>
+      <button class="call-button" type="button" onclick="startCall('video')" aria-label="تماس تصویری" title="تماس تصویری">▣</button>
+    </div>
+  </div>
+  <div id="messageList" role="log" aria-live="polite" aria-label="پیام‌های گفتگو"></div>
+  <form id="sendMessageForm">
+    <div class="send-row">
+      <textarea id="messageText" maxlength="5000" required rows="1" placeholder="پیامت را بنویس..."></textarea>
+      <button class="action-button" id="sendMessageButton" type="submit" aria-label="ارسال پیام" title="ارسال پیام">➤</button>
+    </div>
+  </form>
+  <p id="sendMessageStatus" class="status" role="status"></p>
+</section>
+
+<footer id="footerText">Farnaz · Closer, wherever you are.</footer>
+</main>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="ناوبری اصلی">
+  <div class="nav-inner">
+    <button class="nav-button active" data-page="chatsPage" type="button" onclick="navigate('chatsPage')">
+      <span class="nav-icon">▤</span><span id="navChats">گفتگوها</span>
+    </button>
+    <button class="nav-button" data-page="contactsPage" type="button" onclick="navigate('contactsPage')">
+      <span class="nav-icon">♙</span><span id="navContacts">مخاطبان</span>
+    </button>
+    <button class="nav-button" data-page="profilePage" type="button" onclick="navigate('profilePage')">
+      <span class="nav-icon">◉</span><span id="navProfile">پروفایل</span>
+    </button>
+  </div>
+</nav>
+
+<div id="authBox" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <button type="button" class="close-button" onclick="closeAuth()" aria-label="بستن">×</button>
+    <h2 id="authTitle">ثبت‌نام در فرناز</h2>
+    <p id="authMessage">برای ارتباط نزدیک‌تر، حساب خودت را بساز.</p>
+    <form id="authForm">
+      <div id="nameField">
+        <label for="authName" id="authNameLabel">نام نمایشی</label>
+        <input id="authName" type="text" autocomplete="name" required maxlength="60" placeholder="نام شما">
+      </div>
+      <label for="authEmail" id="authEmailLabel">ایمیل</label>
+      <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+      <label for="authPassword" id="authPasswordLabel">رمز عبور (حداقل ۸ کاراکتر)</label>
+      <input id="authPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="رمز عبور">
+      <button id="authSubmit" class="auth-submit" type="submit">ثبت‌نام</button>
+    </form>
+    <p id="authStatus" class="status" role="status"></p>
+    <button id="authSwitch" class="auth-link" type="button" onclick="switchAuthMode()">قبلاً حساب ساخته‌ام؛ ورود</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+
+window.FARNAZ_CONFIG = {
+  supabaseUrl: "https://iemykhluluoymsbqpjsn.supabase.co",
+  supabasePublishableKey: "sb_publishable_LhUmVjXJlazgYRtEvXna6g_GGKxi_kC"
+};
+
+let english=false,authMode="signup",farnazClient=null,currentUser=null;
+let currentProfileName="",currentAvatarUrl="",currentPhone="";
+let currentChatUser=null,messageSubscription=null;
+let profileRequestNumber=0,chatRequestNumber=0,previousPage="chatsPage";
+
+const $=id=>document.getElementById(id);
+
+
+function getClient(){
+  if(farnazClient)return farnazClient;
+
+  const c=window.FARNAZ_CONFIG;
+
+  if(!c?.supabaseUrl||!c?.supabasePublishableKey){
+    throw new Error("تنظیمات Supabase ناقص است.");
+  }
+
+  if(!window.supabase?.createClient){
+    throw new Error("کتابخانه Supabase بارگذاری نشده؛ صفحه را تازه‌سازی کن.");
+  }
+
+  farnazClient=window.supabase.createClient(
+    c.supabaseUrl,
+    c.supabasePublishableKey,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
+  );
+
+  return farnazClient;
+}
+
+function setStatus(id,msg,isError=false){
+  const e=$(id);if(!e)return;
+  e.textContent=msg;e.classList.toggle("error-text",isError);
+}
+function normalizePhone(v){return(v||"").trim().replace(/[\s().-]/g,"");}
+function initials(name){return(name||"F").trim().charAt(0).toLocaleUpperCase()||"F";}
+function renderAvatar(el,url,name){
+  if(!el)return;
+  el.replaceChildren();
+  if(url){
+    const img=document.createElement("img");
+    img.src=url;img.alt=english?"Profile picture":"تصویر پروفایل";
+    img.onerror=()=>{el.replaceChildren();el.textContent=initials(name);};
+    el.appendChild(img);
+  }else el.textContent=initials(name);
+}
+function navigate(pageId){
+  if(!currentUser){openAuth();return;}
+  if(!$ (pageId))return;
+  if(pageId==="chatPage"&&!currentChatUser)return;
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===pageId));
+  document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.page===pageId));
+  $("bottomNav").classList.toggle("visible",pageId!=="homePage"&&pageId!=="chatPage");
+  if(pageId==="chatsPage")refreshConversationList();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function backFromChat(){navigate(previousPage==="contactsPage"?"contactsPage":"chatsPage");}
+function openAuth(){
+  $("authBox").style.display="flex";setStatus("authStatus","");
+  $("authName").value="";$("authEmail").value="";$("authPassword").value="";
+  updateAuthTexts();
+}
+function closeAuth(){$("authBox").style.display="none";}
+function switchAuthMode(){
+  authMode=authMode==="signup"?"login":"signup";
+  const signup=authMode==="signup";
+  $("nameField").style.display=signup?"block":"none";
+  $("authName").required=signup;
+  $("authPassword").autocomplete=signup?"new-password":"current-password";
+  setStatus("authStatus","");updateAuthTexts();
+}
+function updateAuthTexts(){
+  const v=english;
+  $("authTitle").textContent=authMode==="signup"?(v?"Create your Farnaz account":"ثبت‌نام در فرناز"):(v?"Sign in to Farnaz":"ورود به فرناز");
+  $("authMessage").textContent=authMode==="signup"?(v?"Create an account to stay connected.":"برای ارتباط نزدیک‌تر، حساب خودت را بساز."):(v?"Sign in with your email and password.":"با ایمیل و رمز عبورت وارد شو.");
+  $("authSubmit").textContent=authMode==="signup"?(v?"Sign up":"ثبت‌نام"):(v?"Sign in":"ورود");
+  $("authSwitch").textContent=authMode==="signup"?(v?"Already have an account? Sign in":"قبلاً حساب ساخته‌ام؛ ورود"):(v?"Need an account? Sign up":"حساب ندارم؛ ثبت‌نام");
+}
+function toggleLanguage(){
+  english=!english;
+  document.documentElement.lang=english?"en":"fa";
+  document.documentElement.dir=english?"ltr":"rtl";
+  const labels={
+    brand:["فرناز","Farnaz"],subtitle:["ارتباطی نزدیک‌تر، در هر کجا","Closer, wherever you are"],
+    welcome:["خوش آمدی به فرناز","WELCOME TO FARNAZ"],
+    headline:["آدم‌های مهم زندگی‌ات، همیشه نزدیک تو","The people who matter, closer to you"],
+    description:["یک فضای ساده برای گفتگو و ارتباط با کسانی که برایت مهم‌اند.","A simple space to stay connected."],
+    start:["شروع کنیم ←","Let's begin →"],f1:["گفتگوی خصوصی","Private chat"],
+    f1d:["پیام‌هایت را مرتب دنبال کن.","Keep conversations organized."],
+    f2:["عکس و فایل","Photos & files"],f2d:["لحظه‌ها و فایل‌ها را به اشتراک بگذار.","Share moments and files."],
+    f3:["یادآوری‌ها","Reminders"],f3d:["کارهای مهم را فراموش نکن.","Remember what matters."],
+    f4:["تماس صوتی و تصویری","Voice & video calls"],f4d:["ارتباطی فراتر از پیام متنی.","Connect beyond text."],
+    chatsHeading:["گفتگوها","Chats"],chatsIntro:["گفتگوهای اخیرت را اینجا می‌بینی.","Your recent conversations appear here."],
+    newChatButton:["＋ گفتگوی جدید","＋ New chat"],contactsHeading:["مخاطبان","Contacts"],
+    contactsIntro:["با ایمیل یا شماره تلفن، مخاطب را پیدا کن.","Find someone by email or phone."],
+    recipientLabel:["ایمیل یا شماره تلفن با کد کشور","Email or phone with country code"],
+    findRecipientBtn:["پیدا کردن مخاطب","Find contact"],foundHeading:["نتیجه جست‌وجو","Search result"],
+    contactNote:["جست‌وجو فقط برای حساب‌های ثبت‌شده در فرناز انجام می‌شود.","Search works for registered Farnaz accounts."],
+    profileHeading:["پروفایل من","My profile"],profileIntro:["اطلاعات حساب خود را مدیریت کن.","Manage your account information."],
+    profileNameLabel:["نام نمایشی","Display name"],profilePhoneLabel:["شماره موبایل با کد کشور","Phone number with country code"],
+    avatarFileLabel:["تصویر پروفایل","Profile picture"],avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت.","JPG, PNG or WebP; maximum 3 MB."],
+    saveProfileButton:["ذخیره تغییرات","Save changes"],logoutButton:["خروج از حساب","Sign out"],
+    navChats:["گفتگوها","Chats"],navContacts:["مخاطبان","Contacts"],navProfile:["پروفایل","Profile"],
+    messagePrivacyNote:["",""],homeLogin:["ورود یا ثبت‌نام","Sign in or sign up"]
+  };
+  Object.entries(labels).forEach(([id,pair])=>{if($(id))$(id).textContent=pair[english?1:0];});
+  $("language").textContent=english?"فا":"EN";
+  $("footerText").textContent="Farnaz · Closer, wherever you are.";
+  $("recipientValue").placeholder=english?"email@example.com or +98912...":"email@example.com یا +98912...";
+  $("messageText").placeholder=english?"Write a message...":"پیامت را بنویس...";
+  $("authNameLabel").textContent=english?"Display name":"نام نمایشی";
+  $("authEmailLabel").textContent=english?"Email":"ایمیل";
+  $("authPasswordLabel").textContent=english?"Password (at least 8 characters)":"رمز عبور (حداقل ۸ کاراکتر)";
+  updateAuthTexts();
+  if(currentUser)refreshConversationList();
+}
+function renderUser(user,name){
+  currentUser=user;currentProfileName=(name||"").trim();
+  $("userName").textContent=currentProfileName||(english?"Farnaz user":"کاربر فرناز");
+  $("userEmail").textContent=user.email||"";
+  $("userPhone").textContent=currentPhone||"";
+  renderAvatar($("userAvatar"),currentAvatarUrl,$("userName").textContent);
+}
+async function showUser(user){
+  const request=++profileRequestNumber;
+  currentUser=user;renderUser(user,user.user_metadata?.display_name||"");
+  setStatus("profileStatus",english?"Loading profile...":"در حال بارگذاری پروفایل...");
+  try{
+    const {data,error}=await getClient().from("profiles")
+      .select("id,display_name,avatar_url,phone").eq("id",user.id).maybeSingle();
+    if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
+    if(error)throw error;
+    currentProfileName=data?.display_name||user.user_metadata?.display_name||"";
+    currentAvatarUrl=data?.avatar_url||"";currentPhone=data?.phone||"";
+    renderUser(user,currentProfileName);
+    $("profileNameInput").value=currentProfileName;
+    $("profilePhoneInput").value=currentPhone;
+    setStatus("profileStatus",data?(english?"Profile loaded.":"پروفایل بارگذاری شد."):
+      (english?"Profile record not found.":"رکورد پروفایل پیدا نشد."));
+  }catch(e){
+    console.error("Profile read:",e);
+    setStatus("profileStatus",(english?"Could not load profile: ":"بارگذاری پروفایل ناموفق بود: ")+e.message,true);
+  }
+}
+function showGuest(){
+  profileRequestNumber++;currentUser=null;currentProfileName="";currentAvatarUrl="";currentPhone="";
+  currentChatUser=null;
+  $("bottomNav").classList.remove("visible");
+  $("userName").textContent=english?"Farnaz user":"کاربر فرناز";
+  $("userEmail").textContent="";$("userPhone").textContent="";
+  $("profileForm").reset();
+  $("conversationList").replaceChildren();$("foundContact").replaceChildren();
+  $("messageList").replaceChildren();
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="homePage"));
+}
+async function saveProfile(event){
+  event.preventDefault();if(!currentUser)return;
+  const name=$("profileNameInput").value.trim();
+  const phone=normalizePhone($("profilePhoneInput").value);
+  const file=$("avatarFile").files[0];
+  const button=$("saveProfileButton");
+  if(!name||name.length>60){
+    setStatus("profileStatus",english?"Enter a name up to 60 characters.":"نامی بین ۱ تا ۶۰ نویسه وارد کن.",true);return;
+  }
+  if(phone&&!/^\+[1-9]\d{7,14}$/.test(phone)){
+    setStatus("profileStatus",english?"Use international phone format, e.g. +98912...":"شماره را با کد کشور وارد کن؛ مثل +98912...",true);return;
+  }
+  if(file&&!["image/jpeg","image/png","image/webp"].includes(file.type)){
+    setStatus("profileStatus",english?"Use JPG, PNG or WebP.":"فقط عکس JPG، PNG یا WebP مجاز است.",true);return;
+  }
+  if(file&&file.size>3*1024*1024){
+    setStatus("profileStatus",english?"Image must be 3 MB or smaller.":"حجم عکس باید حداکثر ۳ مگابایت باشد.",true);return;
+  }
+  button.disabled=true;setStatus("profileStatus",english?"Saving profile...":"در حال ذخیره پروفایل...");
+  try{
+    const client=getClient();let avatarUrl=currentAvatarUrl;
+    if(file){
+      const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
+      const path=currentUser.id+"/avatar-"+Date.now()+"."+ext;
+      const {error}=await client.storage.from("avatars").upload(path,file,{contentType:file.type,upsert:false});
+      if(error)throw error;
+      avatarUrl=client.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+    }
+    const {data,error}=await client.from("profiles")
+      .update({display_name:name,phone:phone||null,avatar_url:avatarUrl||null})
+      .eq("id",currentUser.id).select("id,display_name,phone,avatar_url").maybeSingle();
+    if(error)throw error;
+    if(!data)throw new Error(english?"Profile row was not updated.":"رکورد پروفایل به‌روزرسانی نشد.");
+    currentProfileName=data.display_name||name;currentPhone=data.phone||"";
+    currentAvatarUrl=data.avatar_url||"";
+    await client.auth.updateUser({data:{display_name:currentProfileName}});
+    renderUser(currentUser,currentProfileName);$("avatarFile").value="";
+    setStatus("profileStatus",english?"Profile saved.":"پروفایل ذخیره شد.");
+  }catch(e){
+    console.error("Profile save:",e);
+    setStatus("profileStatus",(english?"Could not save profile: ":"ذخیره پروفایل ناموفق بود: ")+e.message,true);
+  }finally{button.disabled=false;}
+}
+async function logout(){
+  $("logoutButton").disabled=true;
+  try{
+    const {error}=await getClient().auth.signOut();if(error)throw error;
+    await stopMessageSubscription();showGuest();
+  }catch(e){
+    setStatus("profileStatus",(english?"Sign out failed: ":"خروج ناموفق بود: ")+e.message,true);
+  }finally{$("logoutButton").disabled=false;}
+}
+async function stopMessageSubscription(){
+  if(!messageSubscription||!farnazClient)return;
+  const ch=messageSubscription;messageSubscription=null;
+  try{await farnazClient.removeChannel(ch);}catch(e){console.warn(e);}
+}
+async function getContactProfile(id){
+  const {data,error}=await getClient().rpc("get_farnaz_user_profile",{search_user_id:id});
+  if(error)throw error;
+  return Array.isArray(data)?(data[0]||null):(data||null);
+}
+function openChat(contact,fromPage="chatsPage"){
+  currentChatUser=contact;previousPage=fromPage;
+  $("conversationTitle").textContent=contact.display_name||(english?"Farnaz user":"مخاطب فرناز");
+  $("chatSubtitle").textContent=english?"Private conversation":"گفتگوی خصوصی";
+  renderAvatar($("chatAvatar"),contact.avatar_url||"",$("conversationTitle").textContent);
+  setStatus("sendMessageStatus","");
+  navigate("chatPage");loadMessages();
+}
+function makeContactButton(contact,preview="",timeText=""){
+  const button=document.createElement("button");
+  button.type="button";button.className="list-item";
+  const avatar=document.createElement("span");avatar.className="avatar medium";
+  renderAvatar(avatar,contact.avatar_url||"",contact.display_name);
+  const details=document.createElement("span");details.className="list-details";
+  const name=document.createElement("span");name.className="list-name";
+  name.textContent=contact.display_name||(english?"Farnaz user":"مخاطب فرناز");
+  const desc=document.createElement("span");desc.className="list-preview";
+  desc.textContent=preview;
+  details.append(name,desc);button.append(avatar,details);
+  if(timeText){const time=document.createElement("span");time.className="list-time";time.textContent=timeText;details.appendChild(time);}
+  button.addEventListener("click",()=>openChat(contact,"chatsPage"));
+  return button;
+}
+async function refreshConversationList(){
+  const list=$("conversationList");if(!list||!currentUser)return;
+  const myId=currentUser.id;
+  setStatus("inboxStatus",english?"Loading conversations...":"در حال بارگذاری گفتگوها...");
+  try{
+    const {data,error}=await getClient().from("messages")
+      .select("id,sender_id,receiver_id,body,created_at")
+      .or("sender_id.eq."+myId+",receiver_id.eq."+myId)
+      .order("created_at",{ascending:false}).limit(1000);
+    if(error)throw error;
+    if(currentUser?.id!==myId)return;
+    const conversations=new Map();
+    for(const m of data||[]){
+      const id=m.sender_id===myId?m.receiver_id:m.sender_id;
+      if(!id||id===myId||conversations.has(id))continue;
+      conversations.set(id,{user_id:id,lastMessage:m.body||"",created_at:m.created_at,lastSender:m.sender_id});
+    }
+    list.replaceChildren();
+    if(!conversations.size){
+      setStatus("inboxStatus",english?"No conversations yet. Start one from Contacts.":"هنوز گفتگویی نداری؛ از بخش مخاطبان گفتگوی جدید بساز.");return;
+    }
+    setStatus("inboxStatus","");
+    const entries=[...conversations.values()];
+    const profiles=await Promise.all(entries.map(async c=>{
+      try{return await getContactProfile(c.user_id);}catch(e){console.warn("Contact profile:",e);return null;}
+    }));
+    if(currentUser?.id!==myId)return;
+    entries.forEach((c,i)=>{
+      const p=profiles[i]||{};
+      const name=p.display_name||(english?"Farnaz user":"مخاطب فرناز");
+      const preview=(c.lastSender===myId?(english?"You: ":"شما: "):"")+c.lastMessage;
+      const contact={user_id:c.user_id,display_name:name,avatar_url:p.avatar_url||""};
+      const btn=makeContactButton(contact,preview,new Date(c.created_at).toLocaleString(english?"en":"fa-IR"));
+      list.appendChild(btn);
+    });
+  }catch(e){
+    console.error("Inbox load:",e);
+    setStatus("inboxStatus",(english?"Could not load conversations: ":"بارگذاری گفتگوها ناموفق بود: ")+e.message,true);
+  }
+}
+async function findRecipient(event){
+  event.preventDefault();
+  if(!currentUser){openAuth();return;}
+  const value=$("recipientValue").value.trim();
+  if(!value){setStatus("recipientStatus",english?"Enter an email or phone number.":"ایمیل یا شماره را وارد کن.",true);return;}
+  const button=$("findRecipientBtn");button.disabled=true;
+  $("foundContact").replaceChildren();
+  setStatus("recipientStatus",english?"Searching...":"در حال جست‌وجو...");
+  try{
+    const client=getClient();let data,error;
+    if(value.includes("@")){
+      ({data,error}=await client.rpc("find_farnaz_user",{search_email:value}));
+    }else{
+      const phone=normalizePhone(value);
+      if(!/^\+[1-9]\d{7,14}$/.test(phone))
+        throw new Error(english?"Use international phone format, e.g. +98912...":"شماره باید با کد کشور وارد شود؛ مثل +98912...");
+      ({data,error}=await client.rpc("find_farnaz_user_by_phone",{search_phone:phone}));
+    }
+    if(error)throw error;
+    if(!data||!data.length){
+      setStatus("recipientStatus",english?"No account found. Check the details.":"حسابی پیدا نشد؛ اطلاعات را بررسی کن.");return;
+    }
+    const r=data[0];
+    const id=r.user_id||r.id;
+    if(!id)throw new Error(english?"Search did not return a user ID.":"جست‌وجو شناسهٔ کاربر را برنگرداند.");
+    if(id===currentUser.id){
+      setStatus("recipientStatus",english?"You cannot message yourself.":"نمی‌توانی به حساب خودت پیام بدهی.",true);return;
+    }
+    let profile=null;
+    try{profile=await getContactProfile(id);}catch(e){console.warn(e);}
+    const contact={
+      user_id:id,
+      display_name:r.display_name||profile?.display_name||(english?"Farnaz user":"کاربر فرناز"),
+      avatar_url:r.avatar_url||profile?.avatar_url||"",
+      phone:r.phone||profile?.phone||""
+    };
+    $("foundContact").appendChild(makeContactButton(
+      contact,english?"Tap to open a private conversation":"برای باز کردن گفتگوی خصوصی بزن"
+    ));
+    setStatus("recipientStatus",english?"Contact found.":"مخاطب پیدا شد.");
+    previousPage="contactsPage";
+  }catch(e){
+    console.error("Find recipient:",e);
+    setStatus("recipientStatus",(english?"Search failed: ":"جست‌وجوی مخاطب ناموفق بود: ")+e.message,true);
+  }finally{button.disabled=false;}
+}
+async function loadMessages(){
+  if(!currentUser||!currentChatUser)return;
+  const request=++chatRequestNumber,myId=currentUser.id,contactId=currentChatUser.user_id;
+  $("messageList").replaceChildren();
+  setStatus("sendMessageStatus",english?"Loading messages...":"در حال بارگذاری پیام‌ها...");
+  try{
+    const {data,error}=await getClient().from("messages")
+      .select("id,sender_id,receiver_id,body,created_at")
+      .or("and(sender_id.eq."+myId+",receiver_id.eq."+contactId+"),and(sender_id.eq."+contactId+",receiver_id.eq."+myId+")")
+      .order("created_at",{ascending:true}).limit(500);
+    if(error)throw error;
+    if(request!==chatRequestNumber||currentUser?.id!==myId||currentChatUser?.user_id!==contactId)return;
+    renderMessages(data||[],myId);setStatus("sendMessageStatus","");
+  }catch(e){
+    console.error("Load messages:",e);
+    setStatus("sendMessageStatus",(english?"Could not load messages: ":"دریافت پیام‌ها ناموفق بود: ")+e.message,true);
+  }
+}
+function renderMessages(messages,myId){
+  const list=$("messageList");list.replaceChildren();
+  if(!messages.length){
+    const empty=document.createElement("div");empty.className="empty-state";
+    empty.textContent=english?"No messages yet. Say hello!":"هنوز پیامی ردوبدل نشده؛ سلام کن!";
+    list.appendChild(empty);
+  }
+  for(const m of messages){
+    const item=document.createElement("article");
+    item.className="message "+(m.sender_id===myId?"my-message":"their-message");
+    const body=document.createElement("p");body.textContent=m.body||"";
+    const time=document.createElement("time");const date=new Date(m.created_at);
+    time.dateTime=date.toISOString();time.textContent=date.toLocaleTimeString(english?"en":"fa-IR",{hour:"2-digit",minute:"2-digit"});
+    item.append(body,time);list.appendChild(item);
+  }
+  list.scrollTop=list.scrollHeight;
+}
+async function subscribeToMessages(){
+  await stopMessageSubscription();if(!currentUser)return;
+  const myId=currentUser.id,client=getClient();
+  messageSubscription=client.channel("farnaz-inbox-"+myId)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+      if(currentUser?.id!==myId)return;
+      const m=payload.new;
+      if(m.sender_id!==myId&&m.receiver_id!==myId)return;
+      refreshConversationList();
+      if(currentChatUser&&
+        ((m.sender_id===myId&&m.receiver_id===currentChatUser.user_id)||
+         (m.sender_id===currentChatUser.user_id&&m.receiver_id===myId)))loadMessages();
+    })
+    .subscribe(status=>{
+      if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")
+        setStatus("inboxStatus",english?"Live updates unavailable.":"به‌روزرسانی زنده در دسترس نیست.");
+    });
+}
+async function sendMessage(event){
+  event.preventDefault();
+  if(!currentUser||!currentChatUser){
+    setStatus("sendMessageStatus",english?"Choose a contact first.":"ابتدا مخاطب را انتخاب کن.",true);return;
+  }
+  const input=$("messageText"),body=input.value.trim();if(!body)return;
+  const button=$("sendMessageButton");button.disabled=true;
+  setStatus("sendMessageStatus",english?"Sending...":"در حال ارسال...");
+  try{
+    const {data:s,error:se}=await getClient().auth.getSession();if(se)throw se;
+    if(!s.session||s.session.user.id!==currentUser.id)
+      throw new Error(english?"Session expired. Sign in again.":"نشست منقضی شده؛ دوباره وارد شو.");
+    const receiverId=currentChatUser.user_id;
+    const {error}=await getClient().from("messages").insert({
+      sender_id:currentUser.id,receiver_id:receiverId,body
+    });
+    if(error)throw error;
+    input.value="";setStatus("sendMessageStatus",english?"Message sent.":"پیام ارسال شد.");
+    await loadMessages();await refreshConversationList();
+  }catch(e){
+    console.error("Send message:",e);
+    setStatus("sendMessageStatus",(english?"Could not send: ":"ارسال پیام ناموفق بود: ")+e.message,true);
+  }finally{button.disabled=false;}
+}
+function startCall(type){
+  alert(english?
+    (type==="video"?"Video calling is not configured yet.":"Audio calling is not configured yet."):
+    (type==="video"?"تماس تصویری هنوز راه‌اندازی نشده است.":"تماس صوتی هنوز راه‌اندازی نشده است."));
+}
+$("authForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button=$("authSubmit"),email=$("authEmail").value.trim();
+  const password=$("authPassword").value,name=$("authName").value.trim();
+  button.disabled=true;setStatus("authStatus",english?"Connecting...":"در حال اتصال...");
+  try{
+    const client=getClient();let result;
+    if(authMode==="signup"){
+      result=await client.auth.signUp({
+        email,password,
+        options:{
+          emailRedirectTo:"https://kalaghkocholo.github.io/Farnaz/",
+          data:{display_name:name}
+        }
+      });
+      if(result.error)throw result.error;
+      if(!result.data.session){
+        setStatus("authStatus",english?
+          "Sign-up submitted. Confirm your email, then sign in.":
+          "ثبت‌نام انجام شد. ایمیلت را تأیید کن و سپس وارد شو.");return;
+      }
+    }else{
+      result=await client.auth.signInWithPassword({email,password});
+      if(result.error)throw result.error;
+    }
+    if(!result.data.user)throw new Error("اطلاعات حساب دریافت نشد.");
+    closeAuth();await showUser(result.data.user);
+    await subscribeToMessages();await refreshConversationList();
+    navigate("chatsPage");
+  }catch(e){
+    console.error("Auth:",e);
+    setStatus("authStatus",(english?"Error: ":"خطا: ")+e.message,true);
+  }finally{button.disabled=false;}
+});
+$("profileForm").addEventListener("submit",saveProfile);
+$("recipientForm").addEventListener("submit",findRecipient);
+$("sendMessageForm").addEventListener("submit",sendMessage);
+$("authBox").addEventListener("click",e=>{if(e.target.id==="authBox")closeAuth();});
+$("authBox").addEventListener("keydown",e=>{if(e.key==="Escape")closeAuth();});
+$("messageText").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendMessageForm").requestSubmit();}
+});
+
+async function initializeApp(){
+  try{
+    const client=getClient(),{data,error}=await client.auth.getSession();if(error)throw error;
+    if(data.session?.user){
+      await showUser(data.session.user);await subscribeToMessages();
+      await refreshConversationList();navigate("chatsPage");
+    }else showGuest();
+    client.auth.onAuthStateChange((event,session)=>{
+      setTimeout(async()=>{
+        if(session?.user&&currentUser?.id!==session.user.id){
+          await showUser(session.user);await subscribeToMessages();
+          await refreshConversationList();navigate("chatsPage");
+        }else if(event==="SIGNED_OUT"){
+          await stopMessageSubscription();showGuest();
+        }
+      },0);
+    });
+  }catch(e){
+    console.error("Initialization:",e);
+    setStatus("authStatus",(english?"Account loading failed: ":"بارگذاری حساب ناموفق بود: ")+e.message,true);
+  }
+}
+initializeApp();
+</script>
+</body>
+</html>

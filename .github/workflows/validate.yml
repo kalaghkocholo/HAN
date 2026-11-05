@@ -1,0 +1,50 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    name: Static validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Validate JavaScript syntax
+        run: |
+          node --check js/supabase-sdk.js
+          node --check js/local-store.js
+          node --check js/core.js
+          node --check js/chat-menu-v5.js
+          node --check js/spaces.js
+          node --check js/calls.js
+          node --check js/livekit-calls.js
+          node --check js/livekit-call-sessions.js
+          node --check js/livekit-call-controller.js
+          node --check js/livekit-call-ui.js
+          node --check js/livekit-sdk-loader.js
+          node --check service-worker.js
+          node --check scripts/validate.mjs
+      - name: Validate application structure
+        run: node scripts/validate.mjs
+      - name: Validate call infrastructure security invariants
+        run: node scripts/validate-call-infra.mjs
+      - name: Test isolated LiveKit adapter
+        run: node --test tests/livekit-adapter.test.mjs tests/livekit-call-sessions.test.mjs tests/livekit-call-controller.test.mjs tests/livekit-call-ui.test.mjs tests/livekit-sdk-loader.test.mjs
+      - name: Type-check LiveKit token endpoint
+        run: deno check --no-config --no-lock supabase/functions/livekit-token/index.ts

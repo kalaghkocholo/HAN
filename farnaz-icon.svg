@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101d49"/><stop offset="1" stop-color="#030718"/></linearGradient>
+<linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#31f4e6"/><stop offset=".4" stop-color="#138dff"/><stop offset=".72" stop-color="#5c63ff"/><stop offset="1" stop-color="#d66cff"/></linearGradient>
+<linearGradient id="wing" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1be8e5"/><stop offset=".55" stop-color="#1768ff"/><stop offset="1" stop-color="#7c42f5"/></linearGradient>
+<linearGradient id="beak" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#38e9f4"/><stop offset="1" stop-color="#ba75ff"/></linearGradient>
+</defs>
+<rect width="512" height="512" rx="104" fill="url(#bg)"/>
+<path d="M74 105 Q74 88 94 88 H190 Q210 88 210 108 V151 Q210 171 190 171 H139 L113 194 L118 171 H94 Q74 171 74 151Z" fill="#10295b" stroke="#32e7e3" stroke-width="5"/>
+<path d="M99 119 H183 M99 140 H165" stroke="#79f6f1" stroke-width="7" stroke-linecap="round"/>
+<path d="M355 111 Q386 140 355 169 M378 92 Q420 140 378 188" fill="none" stroke="#638cff" stroke-width="7" stroke-linecap="round"/>
+<path d="M245 294 Q169 332 111 414 Q197 390 272 333Z" fill="url(#wing)"/>
+<path d="M274 309 Q220 359 204 439 Q278 394 313 329Z" fill="url(#feather)"/>
+<path d="M221 290 Q164 314 120 371 Q204 352 257 314Z" fill="#1269df"/>
+<path d="M144 281 Q174 210 239 165 Q287 132 326 151 Q357 165 376 192 L435 226 L377 239 Q362 284 324 307 Q278 338 239 328 Q179 321 144 281Z" fill="#081944"/>
+<path d="M144 281 Q173 211 239 165 Q278 145 322 150 Q276 174 251 215 Q219 268 239 328 Q183 315 144 281Z" fill="url(#feather)"/>
+<path d="M177 276 Q226 211 303 177 Q345 163 373 193 Q332 186 303 219 Q276 250 264 292 Q221 300 177 276Z" fill="url(#wing)"/>
+<path d="M151 329 Q198 285 249 262" fill="none" stroke="#a4fff8" stroke-width="4" stroke-linecap="round"/>
+<path d="M169 354 Q211 322 258 302" fill="none" stroke="#9cb6ff" stroke-width="3" stroke-linecap="round"/>
+<path d="M344 202 Q389 198 436 229 L378 240 Q356 228 344 202Z" fill="url(#beak)"/>
+<path d="M301 197 Q322 180 344 197 Q324 215 301 197Z" fill="#03091d"/>
+<circle cx="326" cy="197" r="7" fill="#67fff6"/><circle cx="328" cy="195" r="2.5" fill="#fff"/>
+<circle cx="104" cy="235" r="3" fill="#38e6ee"/><circle cx="414" cy="282" r="3" fill="#a56aff"/>
+</svg>
