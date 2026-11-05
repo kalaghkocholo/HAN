@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
 <meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
 <title>فرناز | Farnaz</title>
-<link rel="preload" href="./js/core.js?v=20261105-safe-update1" as="script">
+<link rel="preload" href="./js/core.js?v=20261105-auth-entry1" as="script">
 <link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
 <style>
 :root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
@@ -38,8 +38,8 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 .welcome-secondary{width:100%;max-width:300px;margin-top:9px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--white);font-size:13px}
 @media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:74px;height:74px}.welcome-mark img{width:68px;height:68px}}
 </style>
-<link rel="stylesheet" href="./styles.css?v=20261105-matin-shared2" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link rel="stylesheet" href="./styles.css?v=20261105-matin-shared2"></noscript>
+<link rel="stylesheet" href="./styles.css?v=20261105-auth-entry1" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link rel="stylesheet" href="./styles.css?v=20261105-auth-entry1"></noscript>
 <link rel="stylesheet" href="./spaces.css?v=20261105-matin-shared2" media="print" onload="this.onload=null;this.media='all'">
 <link rel="stylesheet" href="./chat-viewport.css?v=20261105-matin-shared2">
 </head>
@@ -331,6 +331,22 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       <button type="button" id="authSignupTab" class="auth-mode-tab is-active" aria-pressed="true" onclick="setAuthMode('signup')">ثبت‌نام</button>
       <button type="button" id="authLoginTab" class="auth-mode-tab" aria-pressed="false" onclick="setAuthMode('login')">ورود</button>
     </div>
+    <form id="authForm">
+      <div id="nameField" hidden>
+        <label for="authName" id="authNameLabel">نام نمایشی</label>
+        <input id="authName" type="text" autocomplete="name" maxlength="60" placeholder="نام شما">
+      </div>
+      <label for="authEmail" id="authEmailLabel">ایمیل</label>
+      <input id="authEmail" type="email" inputmode="email" autocapitalize="none" spellcheck="false" autocomplete="username" enterkeyhint="next" required placeholder="you@example.com">
+      <label for="authPassword" id="authPasswordLabel">رمز عبور (حداقل ۸ کاراکتر)</label>
+      <div class="auth-password-control">
+        <input id="authPassword" type="password" autocapitalize="none" spellcheck="false" autocomplete="new-password" minlength="8" required placeholder="رمز عبور">
+        <button id="toggleAuthPassword" class="auth-password-toggle" type="button" onclick="toggleAuthPassword()" aria-label="نمایش رمز عبور" title="نمایش رمز عبور" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button>
+      </div>
+      <button id="authForgotPassword" class="auth-inline-action" type="button" onclick="requestPasswordRecovery()" hidden>رمز عبور را فراموش کرده‌اید؟</button>
+      <button id="authSubmit" class="auth-submit" type="submit">ثبت‌نام</button>
+      <button id="authRecoveryBack" class="auth-inline-action" type="button" onclick="setAuthMode('login')" hidden>بازگشت به ورود</button>
+    </form>
     <div class="social-auth">
       <button type="button" id="googleAuth" class="social-auth-button" onclick="signInSocial('google')"><svg class="google-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v2.95h3.87c2.27-2.09 3.57-5.17 3.57-8.59Z"/>
@@ -340,22 +356,6 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       </svg><span id="googleAuthLabel">ادامه با Google</span></button>
     </div>
     <div class="auth-divider"><span id="authOrLabel">یا با ایمیل</span></div>
-    <form id="authForm">
-      <div id="nameField">
-        <label for="authName" id="authNameLabel">نام نمایشی</label>
-        <input id="authName" type="text" autocomplete="name" required maxlength="60" placeholder="نام شما">
-      </div>
-      <label for="authEmail" id="authEmailLabel">ایمیل</label>
-      <input id="authEmail" type="email" inputmode="email" autocapitalize="none" spellcheck="false" autocomplete="username" enterkeyhint="next" required placeholder="you@example.com">
-      <label for="authPassword" id="authPasswordLabel">رمز عبور (حداقل ۸ کاراکتر)</label>
-      <div class="auth-password-control">
-        <input id="authPassword" type="password" autocapitalize="none" spellcheck="false" autocomplete="new-password" minlength="8" required placeholder="رمز عبور">
-        <button id="toggleAuthPassword" class="auth-password-toggle" type="button" onclick="toggleAuthPassword()" aria-label="نمایش رمز عبور" aria-pressed="false">نمایش</button>
-      </div>
-      <button id="authForgotPassword" class="auth-inline-action" type="button" onclick="requestPasswordRecovery()" hidden>رمز عبور را فراموش کرده‌اید؟</button>
-      <button id="authSubmit" class="auth-submit" type="submit">ثبت‌نام</button>
-      <button id="authRecoveryBack" class="auth-inline-action" type="button" onclick="setAuthMode('login')" hidden>بازگشت به ورود</button>
-    </form>
     <p id="authStatus" class="status" role="status"></p>
     <p id="authSwitch" class="auth-switch-hint">حساب کاربری داری؟ از بخش ورود استفاده کن.</p>
   </div>
@@ -461,7 +461,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   });
   function loadLocalScripts(){
     const core=document.createElement("script");
-    core.src="./js/core.js?v=20261105-safe-update1";
+    core.src="./js/core.js?v=20261105-auth-entry1";
     watchScript(core,()=>{
       // A script's load event can still fire after a runtime exception.
       // Verify the core boot contract before loading features or attempting
