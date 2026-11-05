@@ -223,7 +223,11 @@ footer{text-align:center;color:#718096;font-size:10px;padding:17px 0 7px}
 .connection-banner{margin:0 0 12px;padding:10px 12px;border:1px solid #8b6b32;border-radius:12px;background:#332b1b;color:#ffe2a8;font-size:12px;line-height:1.6}
 .connection-banner[hidden]{display:none!important}
 #authBox{
-  display:none;position:fixed;inset:0;background:var(--bg);
+  display:none;position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 8% 12%,rgba(128,220,208,.34) 0,rgba(128,220,208,0) 38%),
+    radial-gradient(ellipse at 92% 88%,rgba(164,211,239,.38) 0,rgba(164,211,239,0) 42%),
+    linear-gradient(145deg,#f9fdff 0%,#edf8f6 52%,#f5fbff 100%);
   z-index:9999;align-items:center;justify-content:center;
   padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto
 }
@@ -231,13 +235,15 @@ footer{text-align:center;color:#718096;font-size:10px;padding:17px 0 7px}
 html[dir="rtl"] .auth-language-switch{left:max(16px,calc((100vw - 560px)/2 + 16px));right:auto}
 html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16px));left:auto}
 .auth-card{
-  background:var(--bg);padding:18px 8px;border:0;
-  border-radius:0;width:100%;max-width:390px;margin:auto
+  background:rgba(255,255,255,.84);padding:25px 20px;border:1px solid rgba(112,190,184,.24);
+  border-radius:24px;width:100%;max-width:390px;margin:auto;
+  box-shadow:0 18px 55px rgba(46,105,112,.12);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)
 }
 .auth-card h2{font-size:23px;font-weight:750;margin:0 0 7px;text-align:center}
 .auth-card>p:not(.status){text-align:center;color:var(--muted);margin:0 0 22px;font-size:13px}
 .auth-submit{width:100%;margin-top:18px;min-height:48px;border-radius:12px}
-.auth-switch-hint{color:var(--white);font-size:12px;line-height:1.9;text-align:center;margin:14px 0 0;padding:11px 13px;border:1px solid rgba(80,227,194,.28);border-radius:11px;background:rgba(80,227,194,.08);box-shadow:0 3px 14px rgba(0,0,0,.12)}
+.auth-switch-hint{color:#38575b;font-size:12px;line-height:1.9;text-align:center;margin:14px 0 0;padding:11px 13px;border:1px solid rgba(66,167,157,.28);border-radius:12px;background:rgba(115,211,198,.13);box-shadow:0 3px 14px rgba(44,106,112,.07)}
 .auth-inline-action{align-self:flex-end;min-height:34px;padding:5px 2px;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:650;text-align:right;cursor:pointer}
 .auth-inline-action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
 .auth-inline-action:disabled{opacity:.55;cursor:wait}
@@ -836,8 +842,13 @@ input,textarea,select,#messageSearchQuery,#messageSearchKind,#messageSearchFrom,
 .message-reaction-chip.mine{border-color:var(--accent)!important;background:color-mix(in srgb,var(--accent) 18%,var(--panel2))!important}
 .message-pinned-banner{border-color:var(--border)!important}
 .secondary-button{border-color:var(--border)!important;color:var(--white)!important}
-.auth-card{background:var(--bg)!important;color:var(--white)!important;border:0!important;box-shadow:none!important}
-#authBox{background:var(--bg)!important}
+.auth-card{background:rgba(255,255,255,.84)!important;color:#203b43!important;border:1px solid rgba(112,190,184,.24)!important;box-shadow:0 18px 55px rgba(46,105,112,.12)!important}
+#authBox{background:radial-gradient(ellipse at 8% 12%,rgba(128,220,208,.34) 0,rgba(128,220,208,0) 38%),radial-gradient(ellipse at 92% 88%,rgba(164,211,239,.38) 0,rgba(164,211,239,0) 42%),linear-gradient(145deg,#f9fdff 0%,#edf8f6 52%,#f5fbff 100%)!important}
+#authBox .auth-card h2,#authBox .auth-card label{color:#203b43!important}
+#authBox .auth-card>p:not(.status){color:#627b80!important}
+#authBox #authForm input{background:rgba(255,255,255,.92)!important;color:#203b43!important;border-color:#d5e7e6!important}
+#authBox .social-auth-button{background:rgba(255,255,255,.9)!important;color:#203b43!important;border-color:#d5e7e6!important}
+#authBox .auth-language-switch{background:rgba(255,255,255,.8)!important;color:#45666b!important;border-color:#d5e7e6!important}
 .social-auth[hidden],.auth-divider[hidden]{display:none!important}
 body[data-theme="light"] .hero,body[data-theme="light"] .panel,body[data-theme="light"] .feature,
 body[data-theme="light"] .settings-card,body[data-theme="light"] .list-item,
