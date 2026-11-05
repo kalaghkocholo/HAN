@@ -237,7 +237,7 @@ html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16
 .auth-card h2{font-size:23px;font-weight:750;margin:0 0 7px;text-align:center}
 .auth-card>p:not(.status){text-align:center;color:var(--muted);margin:0 0 22px;font-size:13px}
 .auth-submit{width:100%;margin-top:18px;min-height:48px;border-radius:12px}
-.auth-switch-hint{color:var(--muted);font-size:11px;text-align:center;margin:10px 0 0}
+.auth-switch-hint{color:var(--white);font-size:12px;line-height:1.9;text-align:center;margin:14px 0 0;padding:11px 13px;border:1px solid rgba(80,227,194,.28);border-radius:11px;background:rgba(80,227,194,.08);box-shadow:0 3px 14px rgba(0,0,0,.12)}
 .auth-inline-action{align-self:flex-end;min-height:34px;padding:5px 2px;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:650;text-align:right;cursor:pointer}
 .auth-inline-action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
 .auth-inline-action:disabled{opacity:.55;cursor:wait}
