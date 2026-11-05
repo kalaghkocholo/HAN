@@ -984,7 +984,7 @@ async function requestPasswordRecovery(){
   }
 }
 function syncAuthPasswordToggle(){
-  const field=$("authPassword"),button=$("authPasswordVisibilityButton");
+  const field=$("authPassword"),button=$("toggleAuthPassword");
   if(!field||!button)return;
   const visible=field.type==="text";
   const label=english?(visible?"Hide password":"Show password"):(visible?"مخفی‌کردن رمز عبور":"نمایش رمز عبور");
@@ -992,7 +992,7 @@ function syncAuthPasswordToggle(){
   button.setAttribute("aria-label",label);
   button.setAttribute("title",label);
 }
-function toggleAuthPassword(){
+function toggleAuthPasswordVisibility(){
   const field=$("authPassword");
   if(!field)return;
   field.type=field.type==="password"?"text":"password";
