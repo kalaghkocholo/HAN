@@ -923,13 +923,12 @@ function openSignup(){authMode="signup";openAuth();}
 function openLogin(){authMode="login";openAuth();}
 function openAuth(){
   const signup=authMode==="signup";
-  $("nameField").style.display=signup?"block":"none";
-  $("authName").required=signup;
+  $("nameField").style.display="none";
+  $("authName").required=false;
   $("authEmail").autocomplete="username";
   $("authPassword").autocomplete=signup||authMode==="recovery"?"new-password":"current-password";
   $("authPassword").type="password";
-  const passwordToggle=$("toggleAuthPassword");
-  if(passwordToggle){passwordToggle.textContent=english?"Show":"نمایش";passwordToggle.setAttribute("aria-pressed","false");}
+  syncAuthPasswordToggle();
   document.querySelector(".app")?.classList.add("auth-open");
   if($("headerFButton"))$("headerFButton").hidden=true;
   $("authBox").style.display="flex";setStatus("authStatus","");
@@ -984,14 +983,20 @@ async function requestPasswordRecovery(){
     if(button)button.disabled=false;
   }
 }
-function toggleAuthPassword(){
+function syncAuthPasswordToggle(){
   const field=$("authPassword"),button=$("toggleAuthPassword");
   if(!field||!button)return;
-  const reveal=field.type==="password";
-  field.type=reveal?"text":"password";
-  button.textContent=english?(reveal?"Hide":"Show"):(reveal?"مخفی":"نمایش");
-  button.setAttribute("aria-pressed",String(reveal));
-  button.setAttribute("aria-label",english?(reveal?"Hide password":"Show password"):(reveal?"مخفی‌کردن رمز عبور":"نمایش رمز عبور"));
+  const visible=field.type==="text";
+  const label=english?(visible?"Hide password":"Show password"):(visible?"مخفی‌کردن رمز عبور":"نمایش رمز عبور");
+  button.setAttribute("aria-pressed",String(visible));
+  button.setAttribute("aria-label",label);
+  button.setAttribute("title",label);
+}
+function toggleAuthPassword(){
+  const field=$("authPassword");
+  if(!field)return;
+  field.type=field.type==="password"?"text":"password";
+  syncAuthPasswordToggle();
 }
 async function signInSocial(provider="google"){
   const button=$("googleAuth");
@@ -1019,8 +1024,8 @@ function setAuthMode(mode){
   if(!["login","signup","recovery"].includes(mode))return;
   authMode=mode;
   const signup=authMode==="signup",recovery=authMode==="recovery";
-  $("nameField").style.display=signup?"block":"none";
-  $("authName").required=signup;
+  $("nameField").style.display="none";
+  $("authName").required=false;
   $("authEmailLabel").hidden=recovery;
   $("authEmail").hidden=recovery;
   $("authEmail").required=!recovery;
@@ -1029,8 +1034,7 @@ function setAuthMode(mode){
   $("authPassword").minLength=8;
   $("authPassword").autocomplete=signup||recovery?"new-password":"current-password";
   $("authPassword").type="password";
-  const passwordToggle=$("toggleAuthPassword");
-  if(passwordToggle){passwordToggle.textContent=english?"Show":"نمایش";passwordToggle.setAttribute("aria-pressed","false");}
+  syncAuthPasswordToggle();
   $("authModeTabs").hidden=recovery;
   $("authForgotPassword").hidden=authMode!=="login";
   $("authRecoveryBack").hidden=!recovery;
@@ -1073,12 +1077,7 @@ function updateAuthTexts(){
   $("authRecoveryBack").textContent=v?"Back to sign in":"بازگشت به ورود";
   const languageButton=$("authLanguageButton");
   if(languageButton)languageButton.textContent=v?"فا":"EN";
-  const passwordToggle=$("toggleAuthPassword");
-  if(passwordToggle){
-    const visible=$("authPassword").type==="text";
-    passwordToggle.textContent=v?(visible?"Hide":"Show"):(visible?"مخفی":"نمایش");
-    passwordToggle.setAttribute("aria-label",v?(visible?"Hide password":"Show password"):(visible?"مخفی‌کردن رمز عبور":"نمایش رمز عبور"));
-  }
+  syncAuthPasswordToggle();
 }
 /* Keep one welcome language toggle globally; preserve the separate Settings language control. */
 function normalizeWelcomeLanguageButton(){
@@ -2751,7 +2750,7 @@ async function refreshConversationList(){
     authForm.addEventListener("submit",async event=>{
       event.preventDefault();
       const button=$("authSubmit"),email=$("authEmail").value.trim();
-      const password=$("authPassword").value,name=$("authName").value.trim();
+      const password=$("authPassword").value;
       const phone="";
       if(!button||button.disabled)return;
       button.disabled=true;
@@ -2775,7 +2774,6 @@ async function refreshConversationList(){
             email,password,
             options:{
               emailRedirectTo:getAuthRedirectUrl(),
-              data:{display_name:name}
             }
           });
           if(result.error)throw result.error;
