@@ -341,7 +341,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       <label for="authPassword" id="authPasswordLabel">رمز عبور (حداقل ۸ کاراکتر)</label>
       <div class="auth-password-control">
         <input id="authPassword" type="password" autocapitalize="none" spellcheck="false" autocomplete="new-password" minlength="8" required placeholder="رمز عبور">
-        <button id="toggleAuthPassword" class="auth-password-toggle" type="button" onclick="toggleAuthPassword()" aria-label="نمایش رمز عبور" title="نمایش رمز عبور" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button>
+        <button id="authPasswordVisibilityButton" class="auth-password-toggle" type="button" onclick="toggleAuthPassword()" aria-label="نمایش رمز عبور" title="نمایش رمز عبور" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button>
       </div>
       <button id="authForgotPassword" class="auth-inline-action" type="button" onclick="requestPasswordRecovery()" hidden>رمز عبور را فراموش کرده‌اید؟</button>
       <button id="authSubmit" class="auth-submit" type="submit">ثبت‌نام</button>
