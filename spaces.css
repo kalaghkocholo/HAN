@@ -1,6 +1,5 @@
 /* Force a single, non-wrapping navigation strip on narrow iPhone screens. */
-.bottom-nav .nav-inner
-{
+.bottom-nav .nav-inner {
   display:flex!important;
   flex-flow:row nowrap!important;
   align-items:stretch!important;
@@ -9,8 +8,7 @@
   min-width:0!important;
   gap:2px!important;
 }
-.bottom-nav .nav-button
-{
+.bottom-nav .nav-button {
   display:flex!important;
   flex:1 1 0!important;
   width:0!important;
@@ -21,8 +19,7 @@
   white-space:nowrap!important;
   overflow:hidden!important;
 }
-.bottom-nav .nav-button>span:not(.nav-icon)
-{
+.bottom-nav .nav-button>span:not(.nav-icon) {
   display:block!important;
   width:100%!important;
   max-width:100%!important;
@@ -33,50 +30,38 @@
   font-size:clamp(7px,2.25vw,10px)!important;
   line-height:1.2!important;
 }
-#spacesPage
-{
+#spacesPage {
   padding-bottom:20px
 }
-.spaces-head,
-.spaces-tabs,
-.spaces-actions,
-.space-actions
-{
+.spaces-head,.spaces-tabs,.spaces-actions,.space-actions {
   display:flex;
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
   justify-content:space-between
 }
-.spaces-tabs
-{
+.spaces-tabs {
   margin:12px 0;
   justify-content:flex-start
 }
-.spaces-tabs button,
-.space-secondary
-{
+.spaces-tabs button,.space-secondary {
   padding:9px 12px;
   border-radius:12px;
   border:1px solid var(--border,var(--line,#334155));
   background:var(--panel2,var(--card,#172033));
   color:var(--white,var(--text,#f7f9fc))
 }
-.spaces-tabs .active,
-.space-primary
-{
+.spaces-tabs .active,.space-primary {
   background:var(--accent,#50e3c2);
   color:var(--accent-ink,#111);
   border:0
 }
-.space-primary
-{
+.space-primary {
   padding:10px 14px;
   border-radius:12px;
   font-weight:700
 }
-.space-card
-{
+.space-card {
   display:flex;
   align-items:center;
   gap:12px;
@@ -89,8 +74,7 @@
   background:var(--panel,var(--card,#172033));
   color:var(--white,var(--text,#f7f9fc))
 }
-.space-avatar
-{
+.space-avatar {
   width:44px;
   height:44px;
   border-radius:14px;
@@ -100,58 +84,46 @@
   font-size:22px;
   flex-shrink:0
 }
-.space-copy
-{
+.space-copy {
   flex:1;
   min-width:0
 }
-.space-copy strong,
-.space-copy small
-{
+.space-copy strong,.space-copy small {
   display:block;
   overflow-wrap:anywhere
 }
-.space-copy small,
-.space-muted
-{
+.space-copy small,.space-muted {
   opacity:.72;
   font-size:12px;
   margin-top:4px
 }
-.space-detail-head
-{
+.space-detail-head {
   display:flex;
   align-items:center;
   gap:10px;
   margin:14px 0
 }
-.space-detail-head>div:nth-child(2)
-{
+.space-detail-head>div:nth-child(2) {
   flex:1;
   min-width:0
 }
-.space-detail-head h3
-{
+.space-detail-head h3 {
   margin:0 0 4px
 }
-.space-actions
-{
+.space-actions {
   justify-content:flex-start;
   margin:10px 0
 }
-.space-code
-{
+.space-code {
   word-break:break-all;
   font-family:monospace
 }
-.space-empty
-{
+.space-empty {
   padding:25px;
   text-align:center;
   opacity:.7
 }
-.space-messages
-{
+.space-messages {
   display:flex;
   flex-direction:column;
   gap:8px;
@@ -160,8 +132,7 @@
   overflow:auto;
   padding:8px 2px
 }
-.space-message
-{
+.space-message {
   max-width:88%;
   align-self:flex-start;
   padding:10px 12px;
@@ -171,28 +142,24 @@
   white-space:pre-wrap;
   overflow-wrap:anywhere
 }
-.space-message.mine
-{
+.space-message.mine {
   align-self:flex-end;
   background:var(--my-message-bg,#c6d2e8);
   color:var(--my-message-ink,#172237);
   border-radius:14px 14px 4px 14px
 }
-.space-message small
-{
+.space-message small {
   display:block;
   opacity:.7;
   font-size:10px;
   margin-top:5px
 }
-.space-composer
-{
+.space-composer {
   display:flex;
   gap:8px;
   margin-top:10px
 }
-.space-composer textarea
-{
+.space-composer textarea {
   flex:1;
   min-width:0;
   border:1px solid var(--line,#334155);
@@ -202,8 +169,7 @@
   color:var(--white,#f7f9fc);
   font:inherit
 }
-.space-dialog
-{
+.space-dialog {
   position:fixed;
   inset:0;
   z-index:10050;
@@ -213,12 +179,10 @@
   justify-content:center;
   padding:16px
 }
-.space-dialog[hidden]
-{
+.space-dialog[hidden] {
   display:none
 }
-.space-dialog-card
-{
+.space-dialog-card {
   width:min(520px,100%);
   max-height:85dvh;
   overflow:auto;
@@ -228,19 +192,14 @@
   color:var(--white,#f7f9fc);
   border:1px solid var(--line,#334155)
 }
-.space-dialog-card h3
-{
+.space-dialog-card h3 {
   margin-top:0
 }
-.space-dialog-card label
-{
+.space-dialog-card label {
   display:block;
   margin:12px 0 6px
 }
-.space-dialog-card input[type=text],
-.space-dialog-card textarea,
-.space-dialog-card select
-{
+.space-dialog-card input[type=text],.space-dialog-card textarea,.space-dialog-card select {
   width:100%;
   box-sizing:border-box;
   padding:11px;
@@ -250,131 +209,107 @@
   color:inherit;
   font:inherit
 }
-.space-dialog-card textarea
-{
+.space-dialog-card textarea {
   min-height:65px
 }
-.space-contact
-{
+.space-contact {
   display:flex!important;
   align-items:center;
   gap:10px;
   padding:8px
 }
-.space-contact input
-{
+.space-contact input {
   width:18px;
   height:18px
 }
-.space-dialog-actions
-{
+.space-dialog-actions {
   display:flex;
   gap:8px;
   justify-content:flex-end;
   margin-top:16px
 }
-#spacesPage
-{
+#spacesPage {
   box-sizing:border-box;
   width:100%;
   min-width:0;
   overflow-x:hidden
 }
-#spacesPage *,
-#spaceCreateDialog *,
-#spaceAddDialog *
-{
+#spacesPage *,#spaceCreateDialog *,#spaceAddDialog * {
   box-sizing:border-box
 }
-#spacesPage .spaces-head
-{
+#spacesPage .spaces-head {
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:12px;flex-wrap:nowrap;padding:4px 2px 12px;margin-bottom:14px;
   border-bottom:1px solid color-mix(in srgb,var(--border) 82%,transparent)
 }
-#spacesPage .page-heading
-{
+#spacesPage .page-heading {
   flex:1;
   min-width:0
 }
-#spacesPage .spaces-head .space-primary
-{
+#spacesPage .spaces-head .space-primary {
   flex-shrink:0;
   white-space:nowrap
 }
-#spacesPage .spaces-actions
-{
+#spacesPage .spaces-actions {
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   gap:8px;
   align-items:center
 }
-#spacesPage .spaces-actions input
-{
+#spacesPage .spaces-actions input {
   width:100%;
   min-width:0
 }
-#spacesPage .space-card
-{
+#spacesPage .space-card {
   box-sizing:border-box;
   min-width:0
 }
-#spacesPage .space-detail-head
-{
+#spacesPage .space-detail-head {
   width:100%;
   min-width:0;
   gap:8px
 }
-#spacesPage #backSpaces
-{
+#spacesPage #backSpaces {
   flex:0 0 auto;
   padding:8px 10px
 }
-#spacesPage .space-detail-head h3
-{
+#spacesPage .space-detail-head h3 {
   overflow-wrap:anywhere
 }
-#spacesPage .space-actions
-{
+#spacesPage .space-actions {
   display:flex;
   align-items:center;
   justify-content:flex-start;
   gap:8px;
   flex-wrap:wrap
 }
-#spacesPage .space-actions button
-{
+#spacesPage .space-actions button {
   max-width:100%;
   white-space:normal
 }
-#spacesPage .space-code
-{
+#spacesPage .space-code {
   min-width:0;
   overflow-wrap:anywhere
 }
-.app.spaces-chat-mode #chatPage .space-messages
-{
+.app.spaces-chat-mode #chatPage .space-messages {
   min-width:0;
   width:100%;
   overscroll-behavior:contain
 }
-.app.spaces-chat-mode #chatPage .space-message
-{
+.app.spaces-chat-mode #chatPage .space-message {
   box-sizing:border-box;
   min-width:0
 }
-#spacesPage .space-composer
-{
+#spacesPage .space-composer {
   display:flex;
   align-items:flex-end;
   gap:8px;
   width:100%;
   min-width:0
 }
-#spacesPage .space-composer textarea
-{
+#spacesPage .space-composer textarea {
   display:block;
   width:100%;
   min-height:44px;
@@ -382,148 +317,114 @@
   resize:vertical;
   min-width:0
 }
-#spacesPage .space-composer button[type=submit]
-{
+#spacesPage .space-composer button[type=submit] {
   flex:0 0 auto;
   min-width:68px;
   white-space:nowrap
 }
-#spaceCreateDialog .space-dialog-card,
-#spaceAddDialog .space-dialog-card
-{
+#spaceCreateDialog .space-dialog-card,#spaceAddDialog .space-dialog-card {
   position:relative;
   width:min(520px,100%);
   padding:calc(env(safe-area-inset-top, 0px) + 52px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px)
 }
-#spaceCreateDialog .space-dialog-card>.contact-search-close,
-#spaceAddDialog .space-dialog-card>.contact-search-close
-{
+#spaceCreateDialog .space-dialog-card>.contact-search-close,#spaceAddDialog .space-dialog-card>.contact-search-close {
   position:absolute;
   top:calc(env(safe-area-inset-top, 0px) + 10px);
   inset-inline-end:12px;left:auto;right:auto;
   margin:0;
   z-index:1
 }
-#spaceCreateForm .space-dialog-actions,
-#spaceAddDialog .space-dialog-actions
-{
+#spaceCreateForm .space-dialog-actions,#spaceAddDialog .space-dialog-actions {
   display:flex;
   gap:8px;
   flex-wrap:wrap;
   justify-content:flex-end
 }
-#spaceCreateForm .space-dialog-actions button,
-#spaceAddDialog .space-dialog-actions button
-{
+#spaceCreateForm .space-dialog-actions button,#spaceAddDialog .space-dialog-actions button {
   min-height:42px;
   white-space:nowrap
 }
-@media(max-width:380px){
-  #spacesPage .spaces-head
-{
+@media(max-width:380px) {
+  #spacesPage .spaces-head {
     align-items:flex-start
   }
-#spacesPage .spaces-head .space-primary
-{
+#spacesPage .spaces-head .space-primary {
     padding:9px 10px
   }
-#spacesPage .space-detail-head
-{
+#spacesPage .space-detail-head {
     gap:6px
   }
-#spacesPage .space-avatar
-{
+#spacesPage .space-avatar {
     width:38px;
     height:38px;
     font-size:19px
   }
-#spacesPage .space-composer button[type=submit]
-{
+#spacesPage .space-composer button[type=submit] {
     min-width:58px;
     padding:10px
   }
-#spacesPage .spaces-tabs button
-{
+#spacesPage .spaces-tabs button {
     padding:8px 10px
   }
 }
-/* Stable, explicit direction for the groups UI */#spacesPage
-{
+/* Stable, explicit direction for the groups UI */#spacesPage {
   direction:rtl;
   text-align:right
 }
-#spacesPage .spaces-head,
-#spacesPage .spaces-tabs,
-#spacesPage .spaces-actions,
-#spacesPage .space-actions
-{
+#spacesPage .spaces-head,#spacesPage .spaces-tabs,#spacesPage .spaces-actions,#spacesPage .space-actions {
   direction:rtl
 }
-.app.spaces-chat-mode #chatPage .space-messages
-{
+.app.spaces-chat-mode #chatPage .space-messages {
   direction:ltr;
   align-items:stretch;
   overflow-anchor:none;
   scroll-behavior:auto
 }
-.app.spaces-chat-mode #chatPage .space-message
-{
+.app.spaces-chat-mode #chatPage .space-message {
   direction:rtl;
   text-align:right;
   align-self:flex-start;
   margin-right:auto;
   margin-left:0
 }
-.app.spaces-chat-mode #chatPage .space-message.mine
-{
+.app.spaces-chat-mode #chatPage .space-message.mine {
   align-self:flex-end;
   margin-left:auto;
   margin-right:0
 }
-.app.spaces-chat-mode #chatPage .space-message small
-{
+.app.spaces-chat-mode #chatPage .space-message small {
   direction:rtl;
   text-align:left
 }
-#spacesPage .space-composer
-{
+#spacesPage .space-composer {
   direction:ltr
 }
-#spacesPage .space-composer textarea
-{
+#spacesPage .space-composer textarea {
   direction:rtl;
   text-align:right
 }
-#spacesPage .space-composer button[type=submit]
-{
+#spacesPage .space-composer button[type=submit] {
   direction:rtl
 }
-#spacesPage .space-card
-{
+#spacesPage .space-card {
   direction:rtl;
   text-align:right
 }
-#spacesPage .space-copy
-{
+#spacesPage .space-copy {
   text-align:right
 }
-#spacesPage .space-dialog-card
-{
+#spacesPage .space-dialog-card {
   direction:rtl;
   text-align:right
 }
-#spacesPage .space-dialog-actions
-{
+#spacesPage .space-dialog-actions {
   direction:rtl
 }
 /* Stable group/channel layout overrides */
-#chatPage .space-context-panel:not([hidden])
-{display:flex;flex-direction:column;gap:5px;flex:0 0 auto;min-width:0;padding:0 8px 6px}
-#chatPage .space-context-panel .space-actions
-{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#chatPage .space-context-panel:not([hidden]){display:flex;flex-direction:column;gap:5px;flex:0 0 auto;min-width:0;padding:0 8px 6px}
+#chatPage .space-context-panel .space-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 
-.app.spaces-chat-mode #chatPage #messageList
-{
+.app.spaces-chat-mode #chatPage #messageList {
   display:flex!important;
   flex:1 1 auto!important;
   flex-direction:column!important;
@@ -536,8 +437,7 @@
   overflow-anchor:none!important;
   scroll-behavior:auto
 }
-.app.spaces-chat-mode #chatPage #messageList>.space-message
-{
+.app.spaces-chat-mode #chatPage #messageList>.space-message {
   display:block!important;
   align-self:flex-start!important;
   width:fit-content!important;
@@ -550,60 +450,48 @@
   text-align:right!important;
   overflow-wrap:anywhere
 }
-.app.spaces-chat-mode #chatPage #messageList>.space-message.mine
-{
+.app.spaces-chat-mode #chatPage #messageList>.space-message.mine {
   align-self:flex-end!important
 }
-.app.spaces-chat-mode #chatPage .space-message-author
-{
+.app.spaces-chat-mode #chatPage .space-message-author {
   font-weight:700
 }
-#chatPage #sendMessageForm input[type=file]
-{
+#chatPage #sendMessageForm input[type=file] {
   display:none!important
 }
-.app.spaces-chat-mode #chatPage #messageList .space-message img
-{
+.app.spaces-chat-mode #chatPage #messageList .space-message img {
   display:block;
   max-width:100%;
   max-height:320px;
   object-fit:contain
 }
-#spacesPage .spaces-tabs
-{
+#spacesPage .spaces-tabs {
   flex-direction:row!important;
   direction:rtl!important
 }
-#spacesPage .spaces-head
-{
+#spacesPage .spaces-head {
   flex-direction:row!important;
   direction:rtl!important
 }
-#spacesPage .space-card
-{
+#spacesPage .space-card {
   direction:rtl!important;
   text-align:right!important
 }
-#spacesPage .space-copy
-{
+#spacesPage .space-copy {
   text-align:right!important
 }
-#spacesPage .space-dialog-card
-{
+#spacesPage .space-dialog-card {
   direction:rtl!important;
   text-align:right!important
 }
-#spacesPage .space-dialog-actions
-{
+#spacesPage .space-dialog-actions {
   direction:rtl!important
 }
-#spaceInfoDialog
-{
+#spaceInfoDialog {
   padding:0!important;
   align-items:stretch!important
 }
-#spaceInfoDialog .space-dialog-card
-{
+#spaceInfoDialog .space-dialog-card {
   position:relative;
   width:min(680px,100%)!important;
   height:100dvh!important;
@@ -611,34 +499,29 @@
   border-radius:0!important;
   padding:calc(env(safe-area-inset-top, 0px) + 52px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px)!important
 }
-@media(min-width:700px){
-  #spaceInfoDialog
-{
+@media(min-width:700px) {
+  #spaceInfoDialog {
     align-items:center!important;
     padding:16px!important
   }
-#spaceInfoDialog .space-dialog-card
-{
+#spaceInfoDialog .space-dialog-card {
     height:min(88dvh,900px)!important;
     max-height:88dvh!important;
     border-radius:20px!important
   }
 }
-#spaceMemberList
-{
+#spaceMemberList {
   display:flex;
   flex-direction:column;
   gap:5px
 }
-.space-member-row
-{
+.space-member-row {
   display:block!important;
   padding:0!important;
   border-bottom:1px solid var(--line,#334155);
   min-width:0
 }
-.space-member-trigger
-{
+.space-member-trigger {
   display:flex;
   align-items:center;
   gap:9px;
@@ -653,18 +536,15 @@
   cursor:pointer;
   border-radius:10px
 }
-.space-member-trigger:focus-visible
-{
+.space-member-trigger:focus-visible {
   outline:2px solid var(--accent,#50e3c2);
   outline-offset:2px
 }
-.space-member-trigger:disabled
-{
+.space-member-trigger:disabled {
   cursor:default;
   opacity:1
 }
-.space-member-trigger .space-avatar
-{
+.space-member-trigger .space-avatar {
   width:38px;
   height:38px;
   flex:0 0 38px;
@@ -672,104 +552,81 @@
   font-size:17px;
   overflow:hidden
 }
-.space-member-copy
-{
+.space-member-copy {
   flex:1;
   min-width:0;
   overflow-wrap:anywhere
 }
-.space-member-copy strong,
-.space-member-copy small
-{
+.space-member-copy strong,.space-member-copy small {
   display:block
 }
-.space-member-copy small
-{
+.space-member-copy small {
   opacity:.7;
   font-size:12px;
   margin-top:3px
 }
-.space-member-chevron
-{
+.space-member-chevron {
   margin-inline-start:auto;
   font-size:20px;
   opacity:.65
 }
-.space-member-tools
-{
+.space-member-tools {
   display:flex;
   gap:6px;
   flex-wrap:wrap;
   padding:0 8px 10px 46px
 }
-.space-member-tools[hidden]
-{
+.space-member-tools[hidden] {
   display:none!important
 }
-.space-member-tools button
-{
+.space-member-tools button {
   font-size:12px;
   padding:7px 9px;
   white-space:normal;
   max-width:100%
 }
-@media(max-width:390px){
-  .space-member-tools
-{
+@media(max-width:390px) {
+  .space-member-tools {
     padding-inline-start:4px
   }
-.space-member-tools button
-{
+.space-member-tools button {
     flex:1 1 auto
   }
 }
-#spaceName[role=button]
-{
+#spaceName[role=button] {
   cursor:pointer
 }
-#spaceInfoDialog .contact-search-close
-{
+#spaceInfoDialog .contact-search-close {
   position:absolute;
   top:calc(env(safe-area-inset-top, 0px) + 12px);
   inset-inline-end:14px;left:auto;right:auto;
   z-index:2
 }
-#spaceInfoDialog .space-dialog-card
-{
+#spaceInfoDialog .space-dialog-card {
   position:relative
 }
-#spaceInfoDialog .space-dialog-card,
-#spaceEditDialog .space-dialog-card
-{
+#spaceInfoDialog .space-dialog-card,#spaceEditDialog .space-dialog-card {
   box-sizing:border-box!important
 }
-#spaceInfoDialog *,
-#spaceEditDialog *
-{
+#spaceInfoDialog *,#spaceEditDialog * {
   box-sizing:border-box
 }
-#spaceEditDialog .space-dialog-card
-{
+#spaceEditDialog .space-dialog-card {
   position:relative;
   padding-top:calc(env(safe-area-inset-top, 0px) + 52px)
 }
-#spaceEditDialog .contact-search-close
-{
+#spaceEditDialog .contact-search-close {
   position:absolute;
   top:calc(env(safe-area-inset-top, 0px) + 12px);
   inset-inline-end:14px;left:auto;right:auto;
   z-index:2
 }
-.space-avatar,
-.space-info-avatar
-{
+.space-avatar,.space-info-avatar {
   position:relative;
   overflow:hidden;
   flex-shrink:0
 }
-.space-avatar img,
-.space-info-avatar img
-{
+.space-avatar img,.space-info-avatar img {
   display:block!important;
   width:100%!important;
   height:100%!important;
@@ -778,32 +635,27 @@
   object-fit:cover!important;
   border-radius:inherit!important
 }
-.space-info-avatar
-{
+.space-info-avatar {
   width:76px;
   height:76px;
   border-radius:20px;
   flex:0 0 76px
 }
-.space-edit-photo
-{
+.space-edit-photo {
   min-width:0;
   max-width:100%;
   overflow:hidden
 }
-.space-edit-photo input[type=file]
-{
+.space-edit-photo input[type=file] {
   display:block;
   max-width:100%;
   width:100%;
   font-size:14px
 }
-#spaceCropImage
-{
+#spaceCropImage {
   object-fit:fill!important
 }
-#spaceCropDialog
-{
+#spaceCropDialog {
   position:fixed;
   inset:0;
   z-index:11000;
@@ -813,12 +665,10 @@
   justify-content:center;
   padding:14px
 }
-#spaceCropDialog[hidden]
-{
+#spaceCropDialog[hidden] {
   display:none!important
 }
-#spaceCropDialog .space-crop-card
-{
+#spaceCropDialog .space-crop-card {
   width:min(100%,420px);
   max-height:calc(100dvh - 28px);
   overflow:auto;
@@ -828,12 +678,10 @@
   padding:18px;
   box-sizing:border-box
 }
-#spaceCropDialog *
-{
+#spaceCropDialog * {
   box-sizing:border-box
 }
-#spaceCropViewport
-{
+#spaceCropViewport {
   width:min(100%,300px);
   aspect-ratio:1;
   margin:14px auto;
@@ -844,38 +692,32 @@
   touch-action:none;
   user-select:none
 }
-#spaceCropImage
-{
+#spaceCropImage {
   position:absolute;
   max-width:none;
   max-height:none;
   pointer-events:none
 }
-#spaceCropDialog .space-crop-actions
-{
+#spaceCropDialog .space-crop-actions {
   display:flex;
   gap:10px;
   margin-top:16px
 }
-#spaceCropDialog .space-crop-actions button
-{
+#spaceCropDialog .space-crop-actions button {
   flex:1;
   min-height:44px
 }
-#spaceCropZoom
-{
+#spaceCropZoom {
   width:100%
 }
-#spaceInfoDialog .space-info-actions
-{
+#spaceInfoDialog .space-info-actions {
   display:flex!important;
   align-items:stretch!important;
   gap:12px!important;
   flex-wrap:wrap!important;
   margin:14px 0 18px!important
 }
-#spaceInfoDialog .space-info-actions button
-{
+#spaceInfoDialog .space-info-actions button {
   flex:1 1 135px!important;
   min-height:44px!important;
   border:0!important;
@@ -884,19 +726,16 @@
   font-weight:700!important;
   white-space:normal!important
 }
-#spaceInfoDialog .space-info-actions button.space-secondary
-{
+#spaceInfoDialog .space-info-actions button.space-secondary {
   background:var(--panel2)!important;
   color:var(--white)!important;
   border:1px solid var(--border)!important
 }
-#spaceInfoDialog .space-info-actions button.space-primary
-{
+#spaceInfoDialog .space-info-actions button.space-primary {
   background:#18a98e!important;
   color:#fff!important
 }
-.space-member-tools
-{
+.space-member-tools {
   display:flex!important;
   flex-wrap:nowrap!important;
   align-items:center!important;
@@ -908,38 +747,32 @@
   scrollbar-width:thin!important;
   -webkit-overflow-scrolling:touch!important
 }
-.space-member-tools button
-{
+.space-member-tools button {
   flex:0 0 auto!important;
   width:auto!important;
   max-width:none!important;
   white-space:nowrap!important;
   min-height:34px!important
 }
-.space-member-tools small
-{
+.space-member-tools small {
   flex:0 0 auto!important;
   white-space:nowrap!important
 }
-#spaceInfoDialog .space-info-avatar img
-{
+#spaceInfoDialog .space-info-avatar img {
   object-fit:cover!important
 }
-.app.spaces-chat-mode #chatPage .space-message
-{
+.app.spaces-chat-mode #chatPage .space-message {
   touch-action:pan-y;
   user-select:none;
   -webkit-user-select:none;
   -webkit-touch-callout:none;
   cursor:pointer
 }
-.app.spaces-chat-mode #chatPage .space-message-selected
-{
+.app.spaces-chat-mode #chatPage .space-message-selected {
   outline:2px solid var(--accent,#18a98e)!important;
   outline-offset:2px!important
 }
-.space-message-selection-bar
-{
+.space-message-selection-bar {
   display:flex;
   align-items:center;
   gap:8px;
@@ -951,25 +784,20 @@
   position:relative;
   z-index:3
 }
-.space-message-selection-bar[hidden]
-{
+.space-message-selection-bar[hidden] {
   display:none!important
 }
-.space-message-selection-bar button,
-.space-message-actions button
-{
+.space-message-selection-bar button,.space-message-actions button {
   border:1px solid var(--line,#475569);
   border-radius:8px;
   padding:7px 10px;
   background:var(--panel,#1f2937);
   color:var(--text,#f8fafc)
 }
-.space-message-selection-bar button:disabled
-{
+.space-message-selection-bar button:disabled {
   opacity:.45
 }
-.space-message-actions
-{
+.space-message-actions {
   position:fixed;
   z-index:12000;
   display:flex;
@@ -983,24 +811,19 @@
   background:var(--panel,#1f2937);
   box-shadow:0 10px 35px #0006
 }
-.space-message-actions strong
-{
+.space-message-actions strong {
   font-size:13px;
   padding:4px
 }
-.space-message-actions button
-{
+.space-message-actions button {
   text-align:right;
   min-height:38px
 }
-.space-message-actions button:disabled
-{
+.space-message-actions button:disabled {
   opacity:.45
 }
 /* Remove empty description/action rows; preserve rows only when they contain content. */
-#spacesPage #spaceDetail #spaceDescription[hidden],
-#spacesPage #spaceDetail #spaceActions[hidden]
-{
+#spacesPage #spaceDetail #spaceDescription[hidden],#spacesPage #spaceDetail #spaceActions[hidden] {
   display:none!important;
   margin:0!important;
   padding:0!important;
@@ -1009,80 +832,49 @@
 }
 
 /* Consistent default bubble palette and left-aligned one-row time/read status. */
-.app.spaces-chat-mode #chatPage .space-message-meta
-{display:flex;direction:ltr;align-items:center;justify-content:flex-start;gap:5px;margin-top:5px;font-size:10px;line-height:1.25;opacity:.82;white-space:nowrap}
-.app.spaces-chat-mode #chatPage .space-message-meta .space-message-time
-{display:inline!important;margin:0!important;font-size:10px;opacity:1}
-.app.spaces-chat-mode #chatPage .space-message-meta .space-message-read-status
-{display:inline-block;flex:0 0 auto;margin:0!important;line-height:1;font-size:12px}
+.app.spaces-chat-mode #chatPage .space-message-meta{display:flex;direction:ltr;align-items:center;justify-content:flex-start;gap:5px;margin-top:5px;font-size:10px;line-height:1.25;opacity:.82;white-space:nowrap}
+.app.spaces-chat-mode #chatPage .space-message-meta .space-message-time{display:inline!important;margin:0!important;font-size:10px;opacity:1}
+.app.spaces-chat-mode #chatPage .space-message-meta .space-message-read-status{display:inline-block;flex:0 0 auto;margin:0!important;line-height:1;font-size:12px}
 
 
 /* Refined group/channel surfaces follow the active app theme. */
-.app.spaces-chat-mode #chatPage .space-message
-{background:var(--their-message-bg,#ffffff)!important;color:var(--their-message-ink,#172237)!important}
-.app.spaces-chat-mode #chatPage .space-message.mine
-{background:var(--my-message-bg,#dce6f5)!important;color:var(--my-message-ink,#172237)!important}
-.app.spaces-chat-mode #chatPage .space-message-meta
-{color:inherit!important}
-.app.spaces-chat-mode #chatPage .space-message-meta .space-message-read-status
-{color:var(--accent)!important}
-#spacesPage .spaces-tabs button,
-#spacesPage .spaces-actions button,
-#spacesPage .space-call-button
-{background:var(--panel2)!important;color:var(--white)!important;border-color:var(--border)!important}
-#spacesPage #backSpaces,
-#spacesPage .space-secondary
-{background:var(--panel2)!important;color:var(--white)!important;border-color:var(--border)!important}
-#spacesPage .spaces-tabs button.active
-{background:color-mix(in srgb,var(--accent) 18%,var(--panel))!important;color:var(--accent)!important}
-#spacesPage .space-card
-{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
-#spacesPage .space-composer,
-#spacesPage .space-composer textarea
-{border-color:var(--border)!important;color:var(--white)!important}
-#spacesPage .space-dialog-card,
-.app.spaces-chat-mode #chatPage .space-message-actions
-{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
-body[data-theme="light"] #spacesPage .space-card
-{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
+.app.spaces-chat-mode #chatPage .space-message{background:var(--their-message-bg,#ffffff)!important;color:var(--their-message-ink,#172237)!important}
+.app.spaces-chat-mode #chatPage .space-message.mine{background:var(--my-message-bg,#dce6f5)!important;color:var(--my-message-ink,#172237)!important}
+.app.spaces-chat-mode #chatPage .space-message-meta{color:inherit!important}
+.app.spaces-chat-mode #chatPage .space-message-meta .space-message-read-status{color:var(--accent)!important}
+#spacesPage .spaces-tabs button,#spacesPage .spaces-actions button,#spacesPage .space-call-button{background:var(--panel2)!important;color:var(--white)!important;border-color:var(--border)!important}
+#spacesPage #backSpaces,#spacesPage .space-secondary{background:var(--panel2)!important;color:var(--white)!important;border-color:var(--border)!important}
+#spacesPage .spaces-tabs button.active{background:color-mix(in srgb,var(--accent) 18%,var(--panel))!important;color:var(--accent)!important}
+#spacesPage .space-card{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
+#spacesPage .space-composer,#spacesPage .space-composer textarea{border-color:var(--border)!important;color:var(--white)!important}
+#spacesPage .space-dialog-card,.app.spaces-chat-mode #chatPage .space-message-actions{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
+body[data-theme="light"] #spacesPage .space-card{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
 body[data-theme="light"] #spacesPage .spaces-tabs button,
 body[data-theme="light"] #spacesPage .spaces-actions button,
 body[data-theme="light"] #spacesPage #backSpaces,
 body[data-theme="light"] #spacesPage .space-secondary,
-body[data-theme="light"] #spacesPage .space-call-button
-{background:#edf1f7!important;color:#172237!important;border-color:#dce3ed!important}
-body[data-theme="light"] #spacesPage .spaces-tabs button.active
-{background:#dce6f5!important;color:#172237!important;border-color:#c7d5e8!important}
+body[data-theme="light"] #spacesPage .space-call-button{background:#edf1f7!important;color:#172237!important;border-color:#dce3ed!important}
+body[data-theme="light"] #spacesPage .spaces-tabs button.active{background:#dce6f5!important;color:#172237!important;border-color:#c7d5e8!important}
 
 
 /* Keep the add-members dialog above the full-screen group information dialog and ensure readable contact names in both themes. */
-#spaceAddDialog
-{z-index:10080!important}
-#spaceAddDialog .space-dialog-card
-{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
-#spaceAddContacts
-{color:var(--white)!important}
-#spaceAddContacts .space-contact
-{color:var(--white)!important;background:var(--panel2)!important;border:1px solid var(--border)!important;border-radius:10px;margin:5px 0}
-#spaceAddContacts .space-contact span
-{color:var(--white)!important}
-body[data-theme="light"] #spaceAddDialog .space-dialog-card
-{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
+#spaceAddDialog{z-index:10080!important}
+#spaceAddDialog .space-dialog-card{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
+#spaceAddContacts{color:var(--white)!important}
+#spaceAddContacts .space-contact{color:var(--white)!important;background:var(--panel2)!important;border:1px solid var(--border)!important;border-radius:10px;margin:5px 0}
+#spaceAddContacts .space-contact span{color:var(--white)!important}
+body[data-theme="light"] #spaceAddDialog .space-dialog-card{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
 body[data-theme="light"] #spaceAddContacts,
 body[data-theme="light"] #spaceAddContacts .space-contact,
-body[data-theme="light"] #spaceAddContacts .space-contact span
-{color:#172237!important}
-body[data-theme="light"] #spaceAddContacts .space-contact
-{background:#f4f6fa!important;border-color:#dce3ed!important}
+body[data-theme="light"] #spaceAddContacts .space-contact span{color:#172237!important}
+body[data-theme="light"] #spaceAddContacts .space-contact{background:#f4f6fa!important;border-color:#dce3ed!important}
 
 
 /* Robust light-theme contrast for group dialogs and member/contact names. */
 body[data-theme="light"] #spaceAddDialog,
-body[data-theme="light"] #spaceInfoDialog
-{color:#172237!important}
+body[data-theme="light"] #spaceInfoDialog{color:#172237!important}
 body[data-theme="light"] #spaceAddDialog .space-dialog-card,
-body[data-theme="light"] #spaceInfoDialog .space-dialog-card
-{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
+body[data-theme="light"] #spaceInfoDialog .space-dialog-card{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
 body[data-theme="light"] #spaceAddContacts .space-contact,
 body[data-theme="light"] #spaceAddContacts .space-contact span,
 body[data-theme="light"] #spaceMemberList,
@@ -1093,87 +885,49 @@ body[data-theme="light"] #spaceMemberList small
 
 
 /* Swipe actions for group and channel cards */
-#spacesPage .space-row-shell
-{position:relative;overflow:hidden;border-radius:15px;margin:8px 0;isolation:isolate}
-#spacesPage .space-row-shell .space-card
-{position:relative;z-index:2;box-sizing:border-box;margin:0;min-height:70px;touch-action:pan-y;transition:transform .22s ease}
-#spacesPage .space-row-shell.swiped .space-card
-{transform:translateX(-196px)}
-#spacesPage .space-card-actions
-{position:absolute;z-index:1;top:0;right:0;bottom:0;width:196px;display:flex;align-items:stretch;justify-content:space-evenly;gap:2px;padding:4px;background:var(--panel2,#202b3d);border:1px solid var(--border,#334155);border-radius:15px;box-sizing:border-box}
-#spacesPage .space-swipe-action
-{flex:1;min-width:0;padding:4px 2px;border:0;border-radius:9px;background:transparent;color:var(--white,#fff);font-size:10px;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
-#spacesPage .space-swipe-action:active
-{background:rgba(127,127,127,.22)}
-#spacesPage .space-swipe-action:disabled
-{opacity:.45}
-#spacesPage .space-copy strong
-{display:block;overflow-wrap:anywhere}
-#spacesPage .spaces-tabs
-{display:flex;gap:6px;flex-wrap:wrap}
-#spacesPage .spaces-tabs button
-{flex:0 0 auto}
-body[data-theme="light"] #spacesPage .space-card-actions
-{background:#edf1f7;border-color:#dce3ed}
-body[data-theme="light"] #spacesPage .space-swipe-action
-{color:#172237}
+#spacesPage .space-row-shell{position:relative;overflow:hidden;border-radius:15px;margin:8px 0;isolation:isolate}
+#spacesPage .space-row-shell .space-card{position:relative;z-index:2;box-sizing:border-box;margin:0;min-height:70px;touch-action:pan-y;transition:transform .22s ease}
+#spacesPage .space-row-shell.swiped .space-card{transform:translateX(-196px)}
+#spacesPage .space-card-actions{position:absolute;z-index:1;top:0;right:0;bottom:0;width:196px;display:flex;align-items:stretch;justify-content:space-evenly;gap:2px;padding:4px;background:var(--panel2,#202b3d);border:1px solid var(--border,#334155);border-radius:15px;box-sizing:border-box}
+#spacesPage .space-swipe-action{flex:1;min-width:0;padding:4px 2px;border:0;border-radius:9px;background:transparent;color:var(--white,#fff);font-size:10px;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
+#spacesPage .space-swipe-action:active{background:rgba(127,127,127,.22)}
+#spacesPage .space-swipe-action:disabled{opacity:.45}
+#spacesPage .space-copy strong{display:block;overflow-wrap:anywhere}
+#spacesPage .spaces-tabs{display:flex;gap:6px;flex-wrap:wrap}
+#spacesPage .spaces-tabs button{flex:0 0 auto}
+body[data-theme="light"] #spacesPage .space-card-actions{background:#edf1f7;border-color:#dce3ed}
+body[data-theme="light"] #spacesPage .space-swipe-action{color:#172237}
 
 
 /* A subtle left-arrow cue tells users group/channel rows can be swiped. */
-#spacesPage .space-row-shell .space-card
-{padding-left:34px}
-#spacesPage .space-swipe-hint
-{position:absolute;left:11px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:19px;height:28px;border-radius:8px;color:var(--accent,#50e3c2);font-size:21px;font-weight:700;line-height:1;opacity:.82;pointer-events:none;animation:spaceSwipeNudge 1.8s ease-in-out 2}
-body[data-theme="light"] #spacesPage .space-swipe-hint
-{color:#526f9d}
-#spacesPage .space-row-shell.swiped .space-swipe-hint
-{opacity:0;animation:none}
+#spacesPage .space-row-shell .space-card{padding-left:34px}
+#spacesPage .space-swipe-hint{position:absolute;left:11px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:19px;height:28px;border-radius:8px;color:var(--accent,#50e3c2);font-size:21px;font-weight:700;line-height:1;opacity:.82;pointer-events:none;animation:spaceSwipeNudge 1.8s ease-in-out 2}
+body[data-theme="light"] #spacesPage .space-swipe-hint{color:#526f9d}
+#spacesPage .space-row-shell.swiped .space-swipe-hint{opacity:0;animation:none}
 @keyframes spaceSwipeNudge{0%,100%{transform:translate(0,-50%);opacity:.58}50%{transform:translate(-3px,-50%);opacity:1}}
-@media (prefers-reduced-motion:reduce){#spacesPage .space-swipe-hint
-{animation:none}}
+@media (prefers-reduced-motion:reduce){#spacesPage .space-swipe-hint{animation:none}}
 
-.space-admin-settings
-{border:1px solid var(--border);border-radius:14px;padding:14px;margin:14px 0;background:var(--panel2)}
-.space-admin-settings h4
-{margin:8px 0 12px}
-.space-admin-settings>label:not(.space-setting-toggle)
-{display:block;margin:10px 0 5px;font-size:13px;color:var(--muted)}
-.space-admin-settings select
-{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--white)}
-.space-setting-toggle
-{display:flex;align-items:center;gap:9px;padding:9px 0;font-size:13px}
-.space-setting-toggle input
-{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto}
-.space-admin-settings>.space-primary
-{width:100%;margin-top:10px}
-.space-pending-message
-{border-top:1px solid var(--border);padding:10px 0;display:flex;gap:8px;align-items:center;justify-content:space-between}
-.space-pending-message p
-{margin:0;min-width:0;overflow-wrap:anywhere;font-size:13px}
-.privacy-toggle
-{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--border)}
-.privacy-toggle input
-{width:18px;height:18px;margin-top:3px;accent-color:var(--accent);flex:0 0 auto}
-.privacy-toggle span
-{display:flex;flex-direction:column;gap:4px}
-.privacy-toggle small
-{color:var(--muted);font-size:12px;line-height:1.5}
+.space-admin-settings{border:1px solid var(--border);border-radius:14px;padding:14px;margin:14px 0;background:var(--panel2)}
+.space-admin-settings h4{margin:8px 0 12px}
+.space-admin-settings>label:not(.space-setting-toggle){display:block;margin:10px 0 5px;font-size:13px;color:var(--muted)}
+.space-admin-settings select{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--white)}
+.space-setting-toggle{display:flex;align-items:center;gap:9px;padding:9px 0;font-size:13px}
+.space-setting-toggle input{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto}
+.space-admin-settings>.space-primary{width:100%;margin-top:10px}
+.space-pending-message{border-top:1px solid var(--border);padding:10px 0;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.space-pending-message p{margin:0;min-width:0;overflow-wrap:anywhere;font-size:13px}
+.privacy-toggle{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--border)}
+.privacy-toggle input{width:18px;height:18px;margin-top:3px;accent-color:var(--accent);flex:0 0 auto}
+.privacy-toggle span{display:flex;flex-direction:column;gap:4px}
+.privacy-toggle small{color:var(--muted);font-size:12px;line-height:1.5}
 
-.space-member-presence
-{font-size:11px;color:var(--muted)}.space-member-presence.is-online
-{color:#22a06b}.space-typing-indicator
-{font-size:12px;color:var(--accent);margin:4px 12px;padding:0;min-height:0}
-.space-message.space-system-notice
-{align-self:center!important;max-width:92%!important;width:fit-content!important;background:var(--panel2,#f1f4f8)!important;color:var(--muted,#6b7280)!important;border:1px solid var(--border,#d8dee8)!important;border-radius:999px!important;padding:6px 12px!important;margin:7px auto!important;text-align:center!important;box-shadow:none!important;font-size:12px!important;pointer-events:auto}.space-system-notice .space-message-meta
-{justify-content:center!important}.space-system-notice .space-message-time
-{font-size:10px!important}.space-system-notice .space-message-read-status
-{display:none!important}
+.space-member-presence{font-size:11px;color:var(--muted)}.space-member-presence.is-online{color:#22a06b}.space-typing-indicator{font-size:12px;color:var(--accent);margin:4px 12px;padding:0;min-height:0}
+.space-message.space-system-notice{align-self:center!important;max-width:92%!important;width:fit-content!important;background:var(--panel2,#f1f4f8)!important;color:var(--muted,#6b7280)!important;border:1px solid var(--border,#d8dee8)!important;border-radius:999px!important;padding:6px 12px!important;margin:7px auto!important;text-align:center!important;box-shadow:none!important;font-size:12px!important;pointer-events:auto}.space-system-notice .space-message-meta{justify-content:center!important}.space-system-notice .space-message-time{font-size:10px!important}.space-system-notice .space-message-read-status{display:none!important}
 
 
 /* Light-theme contrast for group/channel creation and form dialogs. */
 body[data-theme="light"] #spaceCreateDialog .space-dialog-card,
-body[data-theme="light"] #spaceAddDialog .space-dialog-card
-{
+body[data-theme="light"] #spaceAddDialog .space-dialog-card {
   background:#ffffff!important;
   color:#172237!important;
   border-color:#d5deea!important;
@@ -1187,8 +941,7 @@ body[data-theme="light"] #spaceAddDialog .space-dialog-card h3,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card label,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card p,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card small,
-body[data-theme="light"] #spaceAddDialog .space-dialog-card .space-muted
-{
+body[data-theme="light"] #spaceAddDialog .space-dialog-card .space-muted {
   color:#172237!important;
   opacity:1;
 }
@@ -1197,8 +950,7 @@ body[data-theme="light"] #spaceCreateDialog .space-dialog-card textarea,
 body[data-theme="light"] #spaceCreateDialog .space-dialog-card select,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card input,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card textarea,
-body[data-theme="light"] #spaceAddDialog .space-dialog-card select
-{
+body[data-theme="light"] #spaceAddDialog .space-dialog-card select {
   background:#f5f7fb!important;
   color:#172237!important;
   border-color:#cbd5e1!important;
@@ -1208,15 +960,13 @@ body[data-theme="light"] #spaceAddDialog .space-dialog-card select
 body[data-theme="light"] #spaceCreateDialog .space-dialog-card input::placeholder,
 body[data-theme="light"] #spaceCreateDialog .space-dialog-card textarea::placeholder,
 body[data-theme="light"] #spaceAddDialog .space-dialog-card input::placeholder,
-body[data-theme="light"] #spaceAddDialog .space-dialog-card textarea::placeholder
-{
+body[data-theme="light"] #spaceAddDialog .space-dialog-card textarea::placeholder {
   color:#667085!important;
   opacity:1;
   -webkit-text-fill-color:#667085!important;
 }
 body[data-theme="light"] #spaceCreateDialog .space-dialog-card select option,
-body[data-theme="light"] #spaceAddDialog .space-dialog-card select option
-{
+body[data-theme="light"] #spaceAddDialog .space-dialog-card select option {
   background:#ffffff!important;
   color:#172237!important;
 }
