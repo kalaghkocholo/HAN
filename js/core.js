@@ -739,10 +739,8 @@ function navigate(pageId,options={}){
   if(pageId==="chatPage"&&!currentChatUser&&window.FarnazConversationMode!=="space")return;
   const activePageId=document.querySelector(".page.active")?.id||null;
   if(activePageId!==pageId){
-    // Welcome/login is an auth boundary, not a navigable page in signed-in history.
-    if(pageId==="homePage"){swipePageHistory=[];swipePageHistoryIndex=-1;}
-    else if(swipePageHistoryIndex<0){
-      const safePreviousPage=activePageId&&activePageId!=="homePage"&&currentUser?activePageId:null;
+    if(swipePageHistoryIndex<0){
+      const safePreviousPage=activePageId&&currentUser?activePageId:null;
       swipePageHistory=safePreviousPage?[safePreviousPage,pageId]:[pageId];
       swipePageHistoryIndex=swipePageHistory.length-1;
     }else if(swipePageHistory[swipePageHistoryIndex-1]===pageId)swipePageHistoryIndex--;
@@ -755,10 +753,10 @@ function navigate(pageId,options={}){
   const brandHeader=document.querySelector(".app>header");
   if(brandHeader)brandHeader.hidden=pageId==="chatPage";
   const headerFButton=$("headerFButton");
-  if(headerFButton)headerFButton.hidden=pageId==="homePage"||pageId==="chatPage";
+  if(headerFButton)headerFButton.hidden=pageId==="chatPage";
   if(pageId!=="chatPage"){document.documentElement.style.removeProperty("--chat-viewport-offset");document.documentElement.style.removeProperty("--chat-viewport-height");}
   document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.page===pageId));
-  $("bottomNav").classList.toggle("visible",pageId!=="homePage"&&pageId!=="chatPage");
+  $("bottomNav").classList.toggle("visible",pageId!=="chatPage");
   if(pageId==="chatsPage")applyConversationSearch();
   if(options.refreshData!==false){
     if(pageId==="chatsPage")refreshConversationList();
@@ -769,7 +767,6 @@ function navigate(pageId,options={}){
 function backFromChat(){if(window.FarnazConversationMode==="space"&&typeof window.FarnazConversationBack==="function"){window.FarnazConversationBack();return;}dismissMessageMenus();exitMessageSelection();cancelReply();cancelMessageEdit();navigate(previousPage==="contactsPage"?"contactsPage":"chatsPage");}
 
 /* Bidirectional page swipes use the same history as ordinary navigation. */
-const SWIPE_PAGE_ORDER=["profilePage","chatsPage","spacesPage","contactsPage","settingsPage"];
 const FARNAZ_SWIPE_PAGE_ORDER=["settingsPage","contactsPage","chatsPage","profilePage"];
 function swipeNavigationBasePage(pageId){
   if(pageId==="callsPage"||pageId==="spacesPage")return "chatsPage";
@@ -853,7 +850,7 @@ function installFarnazSwipeNavigation(){
     if(event.touches.length!==1||swipeGesture||swipeTransitionTimer)return;
     if(document.body.classList.contains("keyboard-open")||document.body.classList.contains("chat-mode")&&document.activeElement?.matches?.("input,textarea,[contenteditable='true']")||messageSelectionMode)return;
     const app=event.target?.closest?.(".app"),page=app?.querySelector(".page.active");
-    if(!currentUser||!app||!page||page.id==="homePage"||app.classList.contains("farnaz-swipe-active"))return;
+    if(!currentUser||!app||!page||app.classList.contains("farnaz-swipe-active"))return;
     const appRect=app.getBoundingClientRect(),touch=event.touches[0];
     // Reserve a wider 44px strip on both sides for Safari back/forward gestures.
     // Farnaz only recognizes horizontal swipes that begin in the central content area.
@@ -1100,37 +1097,13 @@ function updateAuthTexts(){
   if(languageButton)languageButton.textContent=v?"فا":"EN";
   syncAuthPasswordToggle();
 }
-/* Keep one welcome language toggle globally; preserve the separate Settings language control. */
-function normalizeWelcomeLanguageButton(){
-  const home=document.getElementById("homePage");
-  if(!home)return;
-  const buttons=Array.from(document.querySelectorAll(".welcome-language-switch, #welcomeLanguageButton"));
-  let keep=home.querySelector(":scope > #welcomeLanguageButton")||home.querySelector(".welcome-language-switch");
-  if(!keep)return;
-  buttons.forEach(button=>{if(button!==keep)button.remove();});
-  keep.id="welcomeLanguageButton";
-  keep.classList.add("welcome-language-switch");
-  if(keep.parentElement!==home)home.prepend(keep);
-}
-document.addEventListener("DOMContentLoaded",normalizeWelcomeLanguageButton);
-window.addEventListener("pageshow",normalizeWelcomeLanguageButton);
-setTimeout(normalizeWelcomeLanguageButton,0);
-
 function toggleLanguage(){
   english=!english;
   document.documentElement.lang=english?"en":"fa";
   document.documentElement.dir=english?"ltr":"rtl";
   const labels={
-    brand:["فرناز","Farnaz"],subtitle:["ارتباطی نزدیک‌تر، در هر کجا","Closer, wherever you are"],
-    welcome:["خوش آمدی به فرناز","WELCOME TO FARNAZ"],
-    headline:["آدم‌های مهم زندگی‌ات، همیشه نزدیک تو","The people who matter, closer to you"],
-    description:["یک فضای ساده برای گفتگو و ارتباط با کسانی که برایت مهم‌اند.","A simple space to stay connected."],
-    start:["ورود / ثبت‌نام","Sign in / Sign up"],f1:["گفتگوی خصوصی","Private chat"],
-    f1d:["پیام‌هایت را مرتب دنبال کن.","Keep conversations organized."],
-    f2:["عکس و فایل","Photos & files"],f2d:["لحظه‌ها و فایل‌ها را به اشتراک بگذار.","Share moments and files."],
-    f3:["مخاطبان","Contacts"],f3d:["مخاطبان مهمت را ذخیره و سریع پیدا کن.","Save and find important contacts quickly."],
-    f4:["گروه‌ها و کانال‌ها","Groups & channels"],f4d:["گفت‌وگوهای جمعی و اطلاع‌رسانی در یک جا.","Group conversations and updates in one place."],
-    chatsHeading:["گفتگوها","Chats"],chatsIntro:["گفتگوهای اخیرت را اینجا می‌بینی.","Your recent conversations appear here."],
+    chatsHeading:["گفتگوها","Chats"],
+    chatsIntro:["گفتگوهای اخیرت را اینجا می‌بینی.","Your recent conversations appear here."],
     contactsHeading:["مخاطبان","Contacts"],
     phoneContactsImportTitle:["افزودن و همگام‌سازی مخاطبان","Add and sync contacts"],
     phoneContactsImportIntro:["می‌توانی مخاطب را دستی اضافه کنی یا از دفترچه تلفن انتخاب کنی. مخاطبان ذخیره‌شده فقط برای حساب خودت هستند.","Add a contact manually or choose one from your phone book. Saved contacts are private to your account."],
@@ -1147,29 +1120,38 @@ function toggleLanguage(){
     unmatchedPhoneContactsTitle:["مخاطبان گوشی که هنوز عضو فرناز نیستند","Phone contacts not on Farnaz yet"],
     contactsAllTab:["همه","All"],
     contactsMembersTab:["عضو فرناز","Farnaz members"],
-    contactsIntro:["مخاطبان ذخیره‌شده را انتخاب کن یا از جست‌وجوی پایین حساب جدیدی پیدا کن.","Choose a saved contact or find a new account using the search control below."],
     savedContactsStatus:["",""],
-    profilePhoneCountryLabel:["کد کشور شماره تلفن","Phone country code"],profilePhoneLabel:["شماره موبایل","Mobile number"],allowSpaceAdditionsLabel:["اجازه اضافه‌شدن من به گروه‌ها و کانال‌ها","Allow others to add me to groups and channels"],allowSpaceAdditionsHint:["اگر خاموش باشد، دیگران نمی‌توانند شما را مستقیماً اضافه کنند؛ خودتان همچنان می‌توانید عضو شوید.","When off, others cannot add you directly; you can still join spaces yourself."],
+    profilePhoneLabel:["شماره موبایل","Mobile number"],
+    allowSpaceAdditionsLabel:["اجازه اضافه‌شدن من به گروه‌ها و کانال‌ها","Allow others to add me to groups and channels"],
+    allowSpaceAdditionsHint:["اگر خاموش باشد، دیگران نمی‌توانند شما را مستقیماً اضافه کنند؛ خودتان همچنان می‌توانید عضو شوید.","When off, others cannot add you directly; you can still join spaces yourself."],
     showPhoneSettingLabel:["نمایش شماره موبایل به مخاطبان","Show my phone number to contacts"],
     showPhoneSettingHint:["اگر این گزینه خاموش باشد، شماره شما در اطلاعات مخاطب نمایش داده نمی‌شود.","When off, your number is hidden from contact information."],
-    profileHeading:["پروفایل من","My profile"],profileIntro:["اطلاعات حساب خود را مدیریت کن.","Manage your account information."],
-    profileIdentityTitle:["اطلاعات هویتی","Identity"],profileContactTitle:["راه ارتباطی و حریم خصوصی","Contact & privacy"],profilePhotoTitle:["تصویر پروفایل","Profile photo"],
-    profileNameLabel:["نام نمایشی","Display name"],profileNameHint:["این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.","This name is shown to your contacts."],
-    profileUsernameLabel:["نام کاربری","Username"],profileUsernameHint:["شناسه یکتای شما؛ ۳ تا ۲۴ نویسه، فقط حروف کوچک انگلیسی، عدد و زیرخط. اختیاری است.","Your unique ID; 3–24 characters, lowercase letters, numbers and underscores. Optional."],
-    profileAboutLabel:["درباره من","About me"],profileAboutHint:["حداکثر ۱۶۰ نویسه؛ این متن در اطلاعات پروفایل شما نمایش داده می‌شود.","Up to 160 characters; shown in your profile information."],
-    profilePhoneLabel:["شماره موبایل","Mobile number"],profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
-    avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
-    saveProfileButton:["ذخیره تغییرات","Save changes"],logoutButton:["خروج از حساب","Sign out"],
-    navChats:["گفتگوها","Chats"],navContacts:["مخاطبان","Contacts"],navProfile:["پروفایل","Profile"],navSettings:["تنظیمات","Settings"],
-    messagePrivacyNote:["",""],homeLogin:["ورود یا ثبت‌نام","Sign in or sign up"]
-  };
+    profileHeading:["پروفایل من","My profile"],
+    profileIntro:["اطلاعات حساب خود را مدیریت کن.","Manage your account information."],
+    profileIdentityTitle:["اطلاعات هویتی","Identity"],
+    profileContactTitle:["راه ارتباطی و حریم خصوصی","Contact & privacy"],
+    profilePhotoTitle:["تصویر پروفایل","Profile photo"],
+    profileNameLabel:["نام نمایشی","Display name"],
+    profileNameHint:["این نام برای معرفی شما به مخاطبان نمایش داده می‌شود.","This name is shown to your contacts."],
+    profileUsernameLabel:["نام کاربری","Username"],
+    profileUsernameHint:["شناسه یکتای شما؛ ۳ تا ۲۴ نویسه، فقط حروف کوچک انگلیسی، عدد و زیرخط. اختیاری است.","Your unique ID; 3–24 characters, lowercase letters, numbers and underscores. Optional."],
+    profileAboutLabel:["درباره من","About me"],
+    profileAboutHint:["حداکثر ۱۶۰ نویسه؛ این متن در اطلاعات پروفایل شما نمایش داده می‌شود.","Up to 160 characters; shown in your profile information."],
+    profilePhoneLabel:["شماره موبایل","Mobile number"],
+    profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
+    avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],
+    avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
+    saveProfileButton:["ذخیره تغییرات","Save changes"],
+    logoutButton:["خروج از حساب","Sign out"],
+    navChats:["گفتگوها","Chats"],
+    navContacts:["مخاطبان","Contacts"],
+    navProfile:["پروفایل","Profile"],
+    navSettings:["تنظیمات","Settings"]
+  };;
   Object.entries(labels).forEach(([id,pair])=>{if($(id))$(id).textContent=pair[english?1:0];});
-  if($("language"))$("language").textContent=english?"فا":"EN";
-  if($("welcomeLanguageButton")){$("welcomeLanguageButton").textContent=english?"فا":"EN";$("welcomeLanguageButton").setAttribute("aria-label",english?"Switch to Persian":"Switch to English");}
   const authLanguageButton=$("authLanguageButton");
   if(authLanguageButton){authLanguageButton.textContent=english?"فا":"EN";authLanguageButton.setAttribute("aria-label",english?"تغییر زبان به فارسی":"Switch language to English");authLanguageButton.title=authLanguageButton.getAttribute("aria-label");}
   if($("contactsImportToggle"))$("contactsImportToggle").textContent=$("phoneContactsImport")&&!$("phoneContactsImport").hidden?"×":"＋";
-  if($("start"))$("start").textContent=english?"Sign in to Farnaz →":"ورود به فرناز ←";
   ["profilePhoneCountry"].forEach(id=>{
     const select=$(id);if(!select)return;
     const names=english?["Iran","Germany","United States / Canada","United Kingdom","Turkey"]:["ایران","آلمان","آمریکا / کانادا","بریتانیا","ترکیه"];
@@ -1393,9 +1375,8 @@ function showGuest(){
   // leave the previous user’s imported names or quick-chat results visible.
   $("unmatchedPhoneContactsList").replaceChildren();setStatus("unmatchedPhoneContactsStatus","");
   $("messageList").replaceChildren();
-  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="homePage"));
-  // Returning to the guest page must also reveal the authentication panel;
-  // activating homePage alone leaves a hidden authBox after an in-app logout.
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  swipePageHistory=[];swipePageHistoryIndex=-1;
   openSignup();
 }
 
