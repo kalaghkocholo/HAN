@@ -607,7 +607,7 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 
 /* One shared header layout for private chats, groups and channels. */
 .app.chat-mode #chatPage .chat-header{
-  display:flex!important;flex-direction:row!important;direction:rtl!important;
+  display:flex!important;flex-direction:row!important;direction:inherit!important;
   align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;
   gap:7px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
   padding:7px 4px 10px!important;margin:0 0 10px!important;position:relative!important;top:auto!important;
@@ -622,6 +622,10 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 .app.chat-mode #chatPage .conversation-back-button svg{
   display:block!important;width:20px!important;height:20px!important;fill:none!important;
   stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
+  transform:none!important;
+}
+html[dir="ltr"] .app.chat-mode #chatPage .conversation-back-button svg{
+  transform:scaleX(-1)!important;
 }
 .app.chat-mode #chatPage .chat-heading{
   order:0!important;display:flex!important;flex-direction:row!important;direction:rtl!important;
