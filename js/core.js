@@ -1143,7 +1143,6 @@ function toggleLanguage(){
     profilePhoneLabel:["شماره موبایل","Mobile number"],
     profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
     avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],
-    changeAvatarButton:["ویرایش عکس پروفایل","Edit profile photo"],
     avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
     saveProfileButton:["ذخیره تغییرات","Save changes"],
     logoutButton:["خروج از حساب","Sign out"],
@@ -1153,6 +1152,7 @@ function toggleLanguage(){
     navSettings:["تنظیمات","Settings"]
   };;
   Object.entries(labels).forEach(([id,pair])=>{if($(id))$(id).textContent=pair[english?1:0];});
+  const changeAvatarButton=$("changeAvatarButton");if(changeAvatarButton){const label=english?"Edit profile photo":"ویرایش عکس پروفایل";changeAvatarButton.setAttribute("aria-label",label);changeAvatarButton.title=label;}
   const authLanguageButton=$("authLanguageButton");
   if(authLanguageButton){authLanguageButton.textContent=english?"فا":"EN";authLanguageButton.setAttribute("aria-label",english?"تغییر زبان به فارسی":"Switch language to English");authLanguageButton.title=authLanguageButton.getAttribute("aria-label");}
   if($("contactsImportToggle"))$("contactsImportToggle").textContent=$("phoneContactsImport")&&!$("phoneContactsImport").hidden?"×":"＋";
