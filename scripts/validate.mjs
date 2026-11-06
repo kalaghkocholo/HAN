@@ -223,7 +223,7 @@ if (sources["styles.css"].includes("/* Conversation layout —") ||
 }
 
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v264"') || !sources["service-worker.js"].includes('styles.css?v=20261106-profile4') || !sources["service-worker.js"].includes('core.js?v=20261106-logout-screen1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v265"') || !sources["service-worker.js"].includes('styles.css?v=20261106-profile5') || !sources["service-worker.js"].includes('core.js?v=20261106-profile-tools1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -254,7 +254,7 @@ for (const [passed, message] of safeUpdateChecks) { if (!passed) errors.push(mes
 const loaderChecks = [
   [html.includes('script.src="./js/supabase-sdk.js"') && html.includes("watchScript(script,()=>{") && html.includes("loadLocalScripts();"),
     "index.html must wait for the local Supabase SDK before loading the app core"],
-  [html.includes('core.src="./js/core.js?v=20261106-logout-screen1"') && html.includes("watchScript(core,()=>{") && html.includes("بارگذاری هستهٔ برنامه ناموفق بود یا بیش از حد طول کشید"),
+  [html.includes('core.src="./js/core.js?v=20261106-profile-tools1"') && html.includes("watchScript(core,()=>{") && html.includes("بارگذاری هستهٔ برنامه ناموفق بود یا بیش از حد طول کشید"),
     "index.html must handle successful, failed, and stalled core-script loading"],
   [html.includes("watchScript(script,loadNextFeature,()=>{") && html.includes("featureScripts[featureIndex++]") && html.includes('if(typeof window.FarnazBoot==="function")window.FarnazBoot();'),
     "index.html must load feature scripts sequentially and boot only after the loader sequence"],
@@ -526,7 +526,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v264"')) {
+    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v265"')) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 
