@@ -1281,3 +1281,18 @@ body[data-theme="light"] .farnaz-livekit-actions button:not(.is-accept):not(.is-
 .profile-preview-about{margin:0;line-height:1.7;overflow-wrap:anywhere}
 .profile-preview-close{position:absolute;top:8px;inset-inline-end:10px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--white);font-size:25px}
 .profile-preview-card [hidden]{display:none!important}
+
+/* Profile header alignment: enforce centered layout for every item under avatar. */
+#profilePage .profile-top{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+#profilePage .profile-top>.avatar{align-self:center!important;margin-left:auto!important;margin-right:auto!important}
+#profilePage .profile-top>.profile-phone,
+#profilePage .profile-top>.profile-info,
+#profilePage .profile-info h2,
+#profilePage .profile-info .profile-email-line,
+#profilePage .profile-info .profile-email,
+#profilePage .profile-info .profile-verification,
+#profilePage .profile-info .profile-username,
+#profilePage .profile-info .profile-about{display:block;width:100%;margin-left:auto!important;margin-right:auto!important;text-align:center!important}
+#profilePage .profile-info .profile-email-line{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important}
+#profilePage .profile-info .profile-verification{display:inline-flex!important;width:auto!important}
+#profilePage .profile-info .profile-username{direction:ltr!important;unicode-bidi:plaintext!important}
