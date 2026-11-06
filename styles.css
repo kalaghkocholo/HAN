@@ -603,34 +603,33 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 .app.spaces-chat-mode #chatPage #messageList>.space-message.mine{align-self:flex-end!important;margin-left:auto!important;margin-right:0!important}
 .app.spaces-chat-mode #chatPage #messageList>.space-message:not(.mine){align-self:flex-start!important;margin-left:0!important;margin-right:auto!important}
 
-/* One shared header layout for private chats, groups and channels. */
+/* Shared RTL conversation header: back on the right, identity in the center, calls on the left. */
 .app.chat-mode #chatPage .chat-header{
-  display:flex!important;flex-direction:row!important;direction:ltr!important;
-  align-items:center!important;justify-content:flex-start!important;flex-wrap:nowrap!important;
-  gap:5px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
-  padding:7px 6px 10px!important;margin:0 0 10px!important;position:relative!important;top:auto!important;
+  display:flex!important;flex-direction:row!important;direction:rtl!important;
+  align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;
+  gap:7px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
+  padding:7px 4px 10px!important;margin:0 0 10px!important;position:relative!important;top:auto!important;
   border-bottom:1px solid var(--border)!important;
 }
 .app.chat-mode #chatPage .conversation-back-button{
-  order:1!important;display:inline-flex!important;flex:0 0 auto!important;width:auto!important;
-  min-width:max-content!important;max-width:none!important;height:36px!important;min-height:36px!important;
-  align-items:center!important;justify-content:center!important;gap:4px!important;margin:0!important;
-  padding:7px 10px!important;white-space:nowrap!important;box-sizing:border-box!important;line-height:1!important;
+  order:0!important;display:grid!important;place-items:center!important;flex:0 0 40px!important;
+  width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;
+  max-width:40px!important;margin:0!important;padding:0!important;border-radius:12px!important;
+  white-space:nowrap!important;box-sizing:border-box!important;line-height:1!important;
 }
-.app.chat-mode #chatPage .call-actions{
-  order:2!important;display:flex!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;
-  align-items:center!important;justify-content:flex-start!important;direction:ltr!important;
-  gap:4px!important;margin:0!important;padding:0!important;
+.app.chat-mode #chatPage .conversation-back-button svg{
+  display:block!important;width:20px!important;height:20px!important;fill:none!important;
+  stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
 }
 .app.chat-mode #chatPage .chat-heading{
-  order:3!important;display:flex!important;flex-direction:row!important;direction:rtl!important;
-  align-items:center!important;gap:5px!important;flex:1 1 0!important;width:0!important;
-  min-width:0!important;max-width:none!important;margin-left:auto!important;overflow:hidden!important;
+  order:0!important;display:flex!important;flex-direction:row!important;direction:rtl!important;
+  align-items:center!important;gap:8px!important;flex:1 1 auto!important;width:auto!important;
+  min-width:0!important;max-width:none!important;margin:0!important;overflow:hidden!important;
 }
 .app.chat-mode #chatPage :is(#chatAvatar,#spaceIcon){
-  display:grid!important;place-items:center!important;position:relative!important;flex:0 0 36px!important;
-  width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;
-  max-width:36px!important;max-height:36px!important;overflow:hidden!important;margin:0!important;
+  display:grid!important;place-items:center!important;position:relative!important;flex:0 0 40px!important;
+  width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+  max-width:40px!important;max-height:40px!important;overflow:hidden!important;margin:0!important;
 }
 .app.chat-mode #chatPage .chat-person{
   display:block!important;flex:1 1 auto!important;min-width:0!important;max-width:100%!important;
@@ -641,28 +640,32 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
   display:block!important;max-width:100%!important;overflow:hidden!important;
   text-overflow:ellipsis!important;white-space:nowrap!important;
 }
+.app.chat-mode #chatPage .call-actions{
+  order:0!important;display:flex!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;
+  align-items:center!important;justify-content:flex-start!important;direction:ltr!important;
+  gap:5px!important;margin:0!important;padding:0!important;
+}
 .app.chat-mode #chatPage .call-button{
-  width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;
-  flex:0 0 36px!important;border-radius:10px!important;
+  width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+  flex:0 0 40px!important;border-radius:12px!important;
 }
 .app.chat-mode #chatPage .call-button svg{
   display:block!important;width:19px!important;height:19px!important;fill:none!important;
   stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;
 }
 @media(max-width:380px){
-  .app.chat-mode #chatPage .chat-header{gap:3px!important;padding:6px 3px!important}
-  .app.chat-mode #chatPage .conversation-back-button{padding:6px 8px!important;font-size:13px!important}
+  .app.chat-mode #chatPage .chat-header{gap:4px!important;padding:6px 2px!important}
+  .app.chat-mode #chatPage .conversation-back-button,
+  .app.chat-mode #chatPage .call-button{
+    flex-basis:36px!important;width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
+  }
   .app.chat-mode #chatPage :is(#chatAvatar,#spaceIcon){
-    flex-basis:30px!important;width:30px!important;height:30px!important;min-width:30px!important;
-    min-height:30px!important;max-width:30px!important;max-height:30px!important;
+    flex-basis:34px!important;width:34px!important;height:34px!important;min-width:34px!important;
+    min-height:34px!important;max-width:34px!important;max-height:34px!important;
   }
   .app.chat-mode #chatPage .call-actions{gap:2px!important}
-  .app.chat-mode #chatPage .call-button{
-    width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;flex-basis:34px!important;
-  }
-  .app.chat-mode #chatPage .chat-heading{gap:3px!important}
+  .app.chat-mode #chatPage .chat-heading{gap:5px!important}
 }
-
 
 /* Private call buttons use the same surface and border as group call buttons. */
 .app.chat-mode #chatPage .call-button{
