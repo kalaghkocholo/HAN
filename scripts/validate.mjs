@@ -298,7 +298,7 @@ const networkChecks = [
     "js/core.js must avoid overlapping inner retries for REST reads already bounded by retryRead"],
   [coreSource.includes('$("unmatchedPhoneContactsList").replaceChildren();setStatus("unmatchedPhoneContactsStatus","");') &&
    !coreSource.includes('newChatPopover') && !coreSource.includes('newChatContactsList') &&
-   !html.includes('id="newChatPopover"') && !sources["styles.css"].includes(".new-chat-popover") && coreSource.includes('normalizeContactSearchText(name).includes(query)'),
+   !html.includes('id="newChatPopover"') && !sources["styles.css"].includes(".new-chat-popover") && coreSource.includes("function contactMatchesSearch(shell,query)") && coreSource.includes("function filterSavedFarnazContacts()"),
     "private-chat creation must use one saved-contact list with name-only search and no duplicate popover"],
 ];
 for (const [passed, message] of networkChecks) {
@@ -425,7 +425,7 @@ const authChecks = [
    sources["js/spaces.js"].includes('const sameSpace=()=>sameAccount()&&String(active?.id||"")===spaceId;'),
     "js/spaces.js must bind group/channel message writes and UI updates to the initiating account/space"],
   [coreSource.includes('function startNewChat()') &&
-    coreSource.includes('normalizeContactSearchText(name).includes(query)') &&
+    coreSource.includes("function contactMatchesSearch(shell,query)") && coreSource.includes("function filterSavedFarnazContacts()") &&
     coreSource.includes('async function addManualPhoneContact(event)') &&
     coreSource.includes('const userId=String(currentUser.id),name=$("manualContactName").value.trim();') &&
     coreSource.includes('if(String(currentUser?.id)!==userId)return;'),
