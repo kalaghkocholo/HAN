@@ -732,11 +732,13 @@ document.addEventListener("click",event=>{
   const menu=$("attachmentMenu"),button=$("attachmentMenuButton");
   if(menu&&!menu.hidden&&!menu.contains(event.target)&&!button.contains(event.target))toggleAttachmentMenu(false);
 });
+const FarnazConversationController=(()=>{let current={type:"none",id:null,returnTo:"chatsPage"};let closeSpace=()=>{};return Object.freeze({get(){return {...current};},openPrivate(id,returnTo="chatsPage"){current={type:"private",id:String(id||""),returnTo:returnTo==="contactsPage"?"contactsPage":"chatsPage"};},openSpace(type,id,returnTo="chatsPage"){if(type!=="group"&&type!=="channel")throw new TypeError("Invalid conversation type");current={type:"space",spaceType:type,id:String(id),returnTo:returnTo==="contactsPage"?"contactsPage":"chatsPage"};},registerSpaceCloser(fn){closeSpace=typeof fn==="function"?fn:()=>{};},back(){const destination=current.returnTo||"chatsPage";if(current.type==="space")closeSpace();current={type:"none",id:null,returnTo:"chatsPage"};return destination;},reset(){current={type:"none",id:null,returnTo:"chatsPage"};}});})();
+window.FarnazConversationController=FarnazConversationController;
 function navigate(pageId,options={}){
   if(!currentUser){openAuth();return;}
   if(profileCompletionRequired&&pageId!=="profilePage")pageId="profilePage";
   if(!$(pageId))return;
-  if(pageId==="chatPage"&&!currentChatUser&&window.FarnazConversationMode!=="space")return;
+  if(pageId==="chatPage"&&!currentChatUser&&FarnazConversationController.get().type!=="space")return;
   const activePageId=document.querySelector(".page.active")?.id||null;
   if(activePageId!==pageId){
     if(swipePageHistoryIndex<0){
@@ -763,8 +765,9 @@ function navigate(pageId,options={}){
     if(pageId==="contactsPage")refreshSavedContacts();
   }
   window.scrollTo({top:0,behavior:"instant"});
+  window.dispatchEvent(new CustomEvent("farnaz:navigate",{detail:{pageId}}));
 }
-function backFromChat(){if(window.FarnazConversationMode==="space"&&typeof window.FarnazConversationBack==="function"){window.FarnazConversationBack();return;}dismissMessageMenus();exitMessageSelection();cancelReply();cancelMessageEdit();navigate(previousPage==="contactsPage"?"contactsPage":"chatsPage");}
+function backFromChat(){const state=FarnazConversationController.get();if(state.type==="space"){navigate(FarnazConversationController.back());return;}dismissMessageMenus();exitMessageSelection();cancelReply();cancelMessageEdit();navigate(state.returnTo||(previousPage==="contactsPage"?"contactsPage":"chatsPage"));}
 
 /* Bidirectional page swipes use the same history as ordinary navigation. */
 const FARNAZ_SWIPE_PAGE_ORDER=["settingsPage","contactsPage","chatsPage","profilePage"];
@@ -781,7 +784,7 @@ function swipeHistoryTarget(direction){
   if(direction>0&&activePage.id==="chatPage"){
     // Group/channel chats should not exit on an incidental horizontal drag.
     // Their explicit back button remains the reliable way to return to the spaces list.
-    if(window.FarnazConversationMode==="space")return null;
+    if(FarnazConversationController.get().type==="space")return null;
     const targetId=$(previousPage)&&previousPage!=="chatPage"?previousPage:"chatsPage";
     return {kind:"privateBack",targetId};
   }
@@ -820,7 +823,7 @@ function finishSwipeNavigation(commit){
             dismissMessageMenus();exitMessageSelection();cancelReply();cancelMessageEdit();
             navigate(g.targetId);
           }else if(g.action==="spaceBack"){
-            window.FarnazConversationBack?.();
+            navigate(FarnazConversationController.back());
           }else navigate(g.targetId);
         }
       }catch(error){
@@ -2064,7 +2067,7 @@ function openChat(contact,fromPage="chatsPage"){
     window.FarnazLocalStore?.saveDraft(currentUser.id,previousContactId,draftInput.value).catch(cacheError=>console.warn("Could not preserve previous draft:",cacheError));
   }
   const switchingContacts=previousContactId!==nextContactId;
-  currentChatUser=contact;previousPage=fromPage;startPrivateTypingChannel(contact.user_id).catch(()=>{});
+  currentChatUser=contact;previousPage=fromPage;FarnazConversationController.openPrivate(contact.user_id,fromPage);startPrivateTypingChannel(contact.user_id).catch(()=>{});
   if(switchingContacts&&draftInput){
     draftInput.value="";draftInput.style.height="auto";
     const draftUserId=currentUser?.id,draftContactId=nextContactId;
@@ -2818,16 +2821,7 @@ async function refreshConversationList(){
   document.addEventListener("click",event=>{
     if(event.target.closest("#backToChats,#backSpaces,.nav-button"))requestAnimationFrame(syncViewport);
   });
-  const originalNavigate=window.navigate;
-  if(typeof originalNavigate==="function"&&!originalNavigate.__keyboardViewportWrapped){
-    const wrapped=function(id){
-      originalNavigate(id);
-      if(id==="chatPage"||id==="spacesPage")requestAnimationFrame(syncViewport);
-      else syncViewport();
-    };
-    wrapped.__keyboardViewportWrapped=true;
-    window.navigate=wrapped;
-  }
+  window.addEventListener("farnaz:navigate",()=>requestAnimationFrame(syncViewport));
   requestAnimationFrame(syncViewport);
   
   // Prevent repeated signup submissions for the same pending email on this device.
