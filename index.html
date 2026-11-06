@@ -30,7 +30,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 </style>
 
 <link rel="stylesheet" href="./styles.css?v=20261107-shared-menu3">
-<link rel="stylesheet" href="./spaces.css?v=20261107-conversation-spaces-css1" media="print" onload="this.onload=null;this.media='all'">
+<link rel="stylesheet" href="./spaces.css?v=20261107-profile-avatar1" media="print" onload="this.onload=null;this.media='all'">
 <link rel="stylesheet" href="./chat-viewport.css?v=20261107-css-cleanup1">
 </head>
 <body data-auth-state="guest">
@@ -103,7 +103,10 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   <div class="page-heading" hidden><h2 id="profileHeading">پروفایل من</h2><p id="profileIntro">اطلاعات حساب خود را مدیریت کن.</p></div>
   <div class="panel profile-panel">
     <div class="profile-top">
-      <div class="avatar large" id="userAvatar" aria-label="تصویر پروفایل">F</div>
+      <div class="profile-avatar-control">
+        <div class="avatar large" id="userAvatar" aria-label="تصویر پروفایل">F</div>
+        <button class="profile-avatar-edit" id="changeAvatarButton" type="button" aria-label="ویرایش عکس پروفایل" title="ویرایش عکس پروفایل"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h3l1.5-2h7l1.5 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+      </div>
       <div class="profile-details">
         <div class="profile-phone" id="userPhone"></div>
         <div class="profile-info">
@@ -161,7 +164,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         <h3 class="profile-section-title" id="profilePhotoTitle">تصویر پروفایل</h3>
         <div class="profile-field">
           <label for="avatarFile" id="avatarFileLabel">انتخاب تصویر پروفایل</label>
-          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="avatarNote">
+          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="avatarNote" hidden>
           <p class="profile-help" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.</p>
         </div>
       </section>
