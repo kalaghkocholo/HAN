@@ -407,7 +407,7 @@ window.FarnazMountMessageMenu=function(menu,item,onClose){
   window.addEventListener("resize",position);
   window.addEventListener("scroll",position,true);
   if(window.visualViewport){visualViewport.addEventListener("resize",position);visualViewport.addEventListener("scroll",position);}
-  return ()=>{
+  const cleanup=()=>{
     if(disposed)return;disposed=true;
     menu.removeEventListener("keydown",onKey);
     window.removeEventListener("resize",position);
