@@ -790,7 +790,9 @@ function swipeHistoryTarget(direction){
 
   // Shared chatPage hosts both private and group/channel conversations.
   if(direction>0&&activePage.id==="chatPage"){
-    if(window.FarnazConversationMode==="space")return {kind:"spaceBack",targetId:"spacesPage"};
+    // Group/channel chats should not exit on an incidental horizontal drag.
+    // Their explicit back button remains the reliable way to return to the spaces list.
+    if(window.FarnazConversationMode==="space")return null;
     const targetId=$(previousPage)&&previousPage!=="chatPage"?previousPage:"chatsPage";
     return {kind:"privateBack",targetId};
   }
