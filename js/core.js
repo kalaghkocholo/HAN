@@ -11,6 +11,7 @@ let currentChatUser=null,messageSubscription=null,reconnectTimer=null,reconnectA
 let profileRequestNumber=0,chatRequestNumber=0,previousPage="chatsPage";
 let swipePageHistory=[],swipePageHistoryIndex=-1,swipeGesture=null,swipeTransitionTimer=null;
 let conversationView="active",conversationPrefs=new Map(),messageLoadedCount=50,messageHasMore=false;
+let inboxFilter="all";
 let contactsCategory="all";
 let selectedMessageIds=new Set(),replyTarget=null,editingMessageId=null,messageSelectionMode=false,preEditDraft="";
 let recordedVoiceFile=null,recordedVoiceUrl=null,mediaRecorder=null,recordedAudioChunks=[],recordingStream=null;
@@ -701,8 +702,8 @@ function filterSavedFarnazContacts(){
 function applyConversationSearch(){
   const query=normalizeContactSearchText($("conversationSearch")?.value||"");
   $("conversationList")?.querySelectorAll(".conversation-card").forEach(card=>{
-    const name=card.dataset.searchName||"";
-    card.hidden=!!query&&!normalizeContactSearchText(name).includes(query);
+    const searchable=(card.dataset.searchName||"")+" "+(card.dataset.searchPreview||"");
+    card.hidden=!!query&&!normalizeContactSearchText(searchable).includes(query);
   });
 }
 function toggleContactsImport(force){
@@ -905,6 +906,12 @@ function installFarnazSwipeNavigation(){
 installFarnazSwipeNavigation();
 
 function setConversationView(view){conversationView=view;refreshConversationList();}
+function setInboxFilter(filter){
+  inboxFilter=["all","private","group","channel"].includes(filter)?filter:"all";
+  document.querySelectorAll("[data-inbox-filter]").forEach(button=>{const active=button.dataset.inboxFilter===inboxFilter;button.classList.toggle("is-active",active);button.setAttribute("aria-pressed",String(active));});
+  if(currentUser)refreshConversationList();
+}
+document.querySelectorAll("[data-inbox-filter]").forEach(button=>button.addEventListener("click",()=>setInboxFilter(button.dataset.inboxFilter)));
 $("conversationSearch")?.addEventListener("input",applyConversationSearch);
 $("savedFarnazContactFilter")?.addEventListener("input",filterSavedFarnazContacts);
 function prefFor(id){return conversationPrefs.get(id)||{pinned:false,archived:false,hidden_at:null};}
@@ -2668,20 +2675,38 @@ function initPhoneContactsImport(){
 let conversationListRequestNumber=0;
 function renderConversationSnapshot(snapshot,myId){
   const list=$("conversationList");if(!list||!Array.isArray(snapshot))return;
-  const visible=snapshot.filter(c=>conversationView==="archived"?!!c.pref?.archived:!c.pref?.archived)
-    .sort((a,b)=>Number(!!b.pref?.pinned)-Number(!!a.pref?.pinned)||new Date(b.created_at)-new Date(a.created_at));
+  const visible=snapshot.filter(c=>{
+    const archived=!!c.pref?.archived;
+    if(conversationView==="archived"?!archived:archived)return false;
+    if(inboxFilter!=="all"&&(c.kind==="space"?c.space_type:c.kind||"private")!==inboxFilter)return false;
+    return true;
+  }).sort((a,b)=>Number(!!b.pref?.pinned)-Number(!!a.pref?.pinned)||new Date(b.created_at)-new Date(a.created_at));
   list.replaceChildren();
   if(!visible.length){
-    setStatus("inboxStatus",conversationView==="archived"?(english?"No archived conversations.":"گفتگوی آرشیوشده‌ای وجود ندارد."):(english?"No conversations yet. Start one from Contacts.":"هنوز گفتگویی نداری؛ از بخش مخاطبان گفتگوی جدید بساز."));
+    setStatus("inboxStatus",conversationView==="archived"?(english?"No archived conversations.":"گفتگوی آرشیوشده‌ای وجود ندارد."):(english?"No conversations match this filter.":"گفتگویی با این فیلتر پیدا نشد."));
     return;
   }
   for(const c of visible){
-    const p=c.profile||{},pref=c.pref||{};
+    const pref=c.pref||{};
+    if(c.kind==="space"){
+      const card=document.createElement("div");card.className="conversation-card"+(pref.pinned?" pinned":"")+(pref.archived?" archived":"");
+      card.dataset.searchName=String(c.name||"");card.dataset.searchPreview=String(c.lastMessage||"");
+      const btn=document.createElement("button");btn.type="button";btn.className="list-item";
+      const avatar=document.createElement("span");avatar.className="avatar medium";avatar.textContent=c.space_type==="group"?"👥":"📣";avatar.setAttribute("aria-hidden","true");
+      const details=document.createElement("span");details.className="list-details";
+      const name=document.createElement("span");name.className="list-name";name.textContent=(pref.pinned?"📌 ":"")+(c.name||(english?"Group or channel":"گروه یا کانال"));
+      const preview=document.createElement("span");preview.className="list-preview";preview.textContent=(c.lastSender===myId?(english?"You: ":"شما: "):"")+String(c.lastMessage||"");
+      const time=document.createElement("span");time.className="list-time";time.textContent=new Date(c.created_at).toLocaleString(english?"en":"fa-IR");
+      details.append(name,preview,time);btn.append(avatar,details);
+      btn.addEventListener("click",()=>window.FarnazOpenSpace?.(c.space_id));
+      card.appendChild(btn);list.appendChild(card);continue;
+    }
+    const p=c.profile||{};
     const name=pref.display_name||c.local_contact_name||p.display_name||(english?"Farnaz user":"مخاطب فرناز");
     const preview=(c.lastSender===myId?(english?"You: ":"شما: "):"")+(pref.pinned?"📌 ":"")+(pref.archived?"🗄 ":"")+c.lastMessage;
     const contact={user_id:c.user_id,display_name:name,profile_display_name:p.display_name||"",avatar_url:p.avatar_url||""};
     const card=document.createElement("div");card.className="conversation-card"+(pref.pinned?" pinned":"")+(pref.archived?" archived":"");
-    card.dataset.searchName=String(pref.display_name||c.local_contact_name||"");
+    card.dataset.searchName=String(pref.display_name||c.local_contact_name||name);card.dataset.searchPreview=String(c.lastMessage||"");
     const btn=makeContactButton(contact,preview,new Date(c.created_at).toLocaleString(english?"en":"fa-IR"));
     btn.addEventListener("contextmenu",e=>{e.preventDefault();showConversationActions(card,c.user_id);});
     let hold;btn.addEventListener("pointerdown",()=>{hold=setTimeout(()=>{btn.dataset.suppressOpen="1";showConversationActions(card,c.user_id);},550);});
@@ -2690,8 +2715,7 @@ function renderConversationSnapshot(snapshot,myId){
     btn.addEventListener("touchend",e=>{if(Math.abs(e.changedTouches[0].clientX-sx)>65){btn.dataset.suppressOpen="1";showConversationActions(card,c.user_id);}},{passive:true});
     card.appendChild(btn);list.appendChild(card);
   }
-  setStatus("inboxStatus","");
-  applyConversationSearch();
+  setStatus("inboxStatus","");applyConversationSearch();
 }
 async function refreshConversationList(){
   if(!currentUser)return;
@@ -2747,7 +2771,11 @@ async function refreshConversationList(){
         if(id&&!importedPhoneNames.has(id)&&String(item.display_name||"").trim())importedPhoneNames.set(id,String(item.display_name).trim());
       }
     }catch(phoneNameError){console.warn("Conversation local contact names:",phoneNameError);}
-    const snapshot=entries.map(c=>({...c,pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:profilesById.get(String(c.user_id))||{}}));
+    const privateSnapshot=entries.map(c=>({...c,kind:"private",pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:profilesById.get(String(c.user_id))||{}}));
+    let spaceSnapshot=[];
+    try{spaceSnapshot=await window.FarnazGetUnifiedSpaceInboxSnapshot?.()||[];}catch(spaceInboxError){console.warn("Unified group and channel inbox:",spaceInboxError);setConnectionBanner(english?"Groups and channels could not be refreshed.":"به‌روزرسانی گروه‌ها و کانال‌ها انجام نشد؛ دوباره تلاش می‌کنیم.");}
+    if(currentUser?.id!==myId||request!==conversationListRequestNumber)return;
+    const snapshot=[...privateSnapshot,...spaceSnapshot];
     renderConversationSnapshot(snapshot,myId);
     if(profilesLoaded){try{await window.FarnazLocalStore?.saveSnapshot(myId,"inbox",snapshot);}catch(cacheError){console.warn("Cached inbox save:",cacheError);}}
     // The visible inbox may be usable with cached data, but recovery is complete only
