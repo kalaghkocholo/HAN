@@ -464,13 +464,13 @@ function showMessageActions(m,item){
   detachMenu=window.FarnazMountMessageMenu(menu,item,closeMenu);
 }
 function setReplyTarget(m){
-  replyTarget=m;const preview=$("replyPreview");preview.replaceChildren();preview.hidden=false;
+  replyTarget=m;const preview=$("replyPreview");if(!preview)return;preview.replaceChildren();preview.hidden=false;
   const text=document.createElement("span");text.className="message-quote-text";
   text.textContent=(english?"Replying to: ":"در پاسخ به: ")+(m.body||m.attachment_name||(english?"Photo":"عکس"));
   const close=document.createElement("button");close.type="button";close.className="message-quote-cancel";close.textContent="×";close.setAttribute("aria-label",english?"Cancel reply":"لغو پاسخ");close.onclick=cancelReply;
   preview.append(text,close);$("messageText").focus();
 }
-function cancelReply(){replyTarget=null;$("replyPreview").hidden=true;$("replyPreview").replaceChildren();}
+function cancelReply(){replyTarget=null;const preview=$("replyPreview");if(preview){preview.hidden=true;preview.replaceChildren();}}
 function editMessage(m){
   if(m.sender_id!==currentUser.id)return;
   cancelReply();preEditDraft=$("messageText").value;editingMessageId=m.id;$("messageText").value=m.body||"";
