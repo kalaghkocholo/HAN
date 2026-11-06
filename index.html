@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
 <meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
 <title>فرناز | Farnaz</title>
-<link rel="preload" href="./js/core.js?v=20261106-compose-menu2" as="script">
+<link rel="preload" href="./js/core.js?v=20261106-chat-composer1" as="script">
 <link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
 <style>
 :root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
@@ -38,10 +38,10 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 .welcome-secondary{width:100%;max-width:300px;margin-top:9px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--white);font-size:13px}
 @media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:74px;height:74px}.welcome-mark img{width:68px;height:68px}}
 </style>
-<link rel="stylesheet" href="./styles.css?v=20261106-compose-menu2" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link rel="stylesheet" href="./styles.css?v=20261106-logout-red1"></noscript>
+<link rel="stylesheet" href="./styles.css?v=20261106-chat-composer1" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link rel="stylesheet" href="./styles.css?v=20261106-chat-composer1"></noscript>
 <link rel="stylesheet" href="./spaces.css?v=20261106-logout-guard1" media="print" onload="this.onload=null;this.media='all'">
-<link rel="stylesheet" href="./chat-viewport.css?v=20261106-logout-guard1">
+<link rel="stylesheet" href="./chat-viewport.css?v=20261106-chat-composer1">
 </head>
 <body data-auth-state="guest">
 <main class="app">
@@ -327,25 +327,26 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         <audio id="voicePreviewPlayer" controls preload="metadata"></audio>
         <span class="voice-preview-size" id="voicePreviewSize"></span>
       </div>
+      <div class="attachment-preview" id="attachmentPreview" aria-live="polite" hidden></div>
       <div class="send-row">
         <textarea id="messageText" maxlength="5000" rows="1" placeholder="پیامت را بنویس..." aria-label="متن پیام"></textarea>
       </div>
       <div class="composer-actions">
         <div class="composer-left">
-          <button class="composer-icon" id="attachmentMenuButton" type="button" onclick="toggleAttachmentMenu()" aria-label="افزودن پیوست" title="افزودن پیوست" aria-haspopup="menu" aria-expanded="false">＋</button>
+          <button class="composer-icon" id="attachmentMenuButton" type="button" onclick="toggleAttachmentMenu()" aria-label="افزودن پیوست" title="افزودن پیوست" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
         <div class="attachment-menu" id="attachmentMenu" role="menu" aria-label="گزینه‌های پیوست" hidden>
-          <button class="attachment-option" id="attachmentPhotoOption" type="button" role="menuitem" onclick="chooseAttachment('photo')"><span class="attachment-option-icon">🖼</span><span>انتخاب عکس</span></button>
-          <button class="attachment-option" id="attachmentCameraOption" type="button" role="menuitem" onclick="chooseAttachment('camera')"><span class="attachment-option-icon">📷</span><span>گرفتن عکس با دوربین</span></button>
-          <button class="attachment-option" id="attachmentFileOption" type="button" role="menuitem" onclick="chooseAttachment('file')"><span class="attachment-option-icon">📎</span><span>انتخاب فایل</span></button>
+          <button class="attachment-option" id="attachmentPhotoOption" type="button" role="menuitem" onclick="chooseAttachment('photo')"><span class="attachment-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></span><span>عکس و ویدئو</span></button>
+          <button class="attachment-option" id="attachmentCameraOption" type="button" role="menuitem" onclick="chooseAttachment('camera')"><span class="attachment-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span>گرفتن عکس با دوربین</span></button>
+          <button class="attachment-option" id="attachmentFileOption" type="button" role="menuitem" onclick="chooseAttachment('file')"><span class="attachment-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 12.5 7.8-7.8a3.2 3.2 0 0 1 4.5 4.5L10 19.5a5 5 0 0 1-7.1-7.1l10-10"/></svg></span><span>انتخاب فایل</span></button>
         </div></div>
         
         <div class="composer-right">
           <button class="mini-button" id="cancelEditButton" type="button" onclick="cancelMessageEdit()" hidden>لغو ویرایش</button><span class="muted-note" id="attachmentHint">فایل تا ۲۰ مگابایت</span>
-          <button class="composer-icon" id="recordAudioButton" type="button" onclick="toggleAudioRecording()" aria-label="ضبط پیام صوتی" title="پیام صوتی">🎙</button>
-          <button class="composer-icon send" id="sendMessageButton" type="submit" aria-label="ارسال پیام" title="ارسال پیام">➤</button>
+          <button class="composer-icon" id="recordAudioButton" type="button" onclick="toggleAudioRecording()" aria-label="ضبط پیام صوتی" title="پیام صوتی"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg></button>
+          <button class="composer-icon send" id="sendMessageButton" type="submit" aria-label="ارسال پیام" title="ارسال پیام" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z"/><path d="M10.2 13.8 21 3"/></svg></button>
         </div>
       </div>
-      <div id="messageComposerTools"><input id="photoFile" type="file" accept="image/*"><input id="attachmentFile" type="file"><input id="cameraFile" type="file" accept="image/*" capture="environment"></div>
+      <div id="messageComposerTools"><input id="photoFile" type="file" accept="image/*,video/*"><input id="attachmentFile" type="file"><input id="cameraFile" type="file" accept="image/*" capture="environment"></div>
     </div>
   </form>
   <p id="sendMessageStatus" class="status" role="status"></p>
@@ -511,7 +512,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   });
   function loadLocalScripts(){
     const core=document.createElement("script");
-    core.src="./js/core.js?v=20261106-compose-menu2";
+    core.src="./js/core.js?v=20261106-chat-composer1";
     watchScript(core,()=>{
       // A script's load event can still fire after a runtime exception.
       // Verify the core boot contract before loading features or attempting
@@ -521,8 +522,8 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         return;
       }
       const featureScripts=[
-        "./js/chat-menu-v5.js?v=20261106-logout-guard1",
-        "./js/spaces.js?v=20261106-compose-menu2",
+        "./js/chat-menu-v5.js?v=20261106-chat-composer1",
+        "./js/spaces.js?v=20261106-chat-composer1",
         "./js/calls.js?v=20261106-logout-guard1"
       ];
       if(window.FARNAZ_LIVEKIT_CALLS_ENABLED===true){

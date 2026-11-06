@@ -1188,7 +1188,7 @@ function toggleLanguage(){
   $("messageText").placeholder=english?"Write a message...":"پیامت را بنویس...";
   $("showActiveChats").textContent=english?"Chats":"گفتگوها";$("showArchivedChats").textContent=english?"Archive":"آرشیو";
   $("attachmentMenuButton").title=english?"Add attachment":"افزودن پیوست";
-  $("attachmentPhotoOption").lastElementChild.textContent=english?"Choose photo":"انتخاب عکس";
+  $("attachmentPhotoOption").lastElementChild.textContent=english?"Photos & videos":"عکس و ویدئو";
   $("attachmentCameraOption").lastElementChild.textContent=english?"Take a photo":"گرفتن عکس با دوربین";
   $("attachmentFileOption").lastElementChild.textContent=english?"Choose file":"انتخاب فایل";
   const newChatButton=$("topNewChatButton")||document.querySelector(".chats-new-button");
@@ -2097,7 +2097,7 @@ function openChat(contact,fromPage="chatsPage"){
     const draftUserId=currentUser?.id,draftContactId=nextContactId;
     window.FarnazLocalStore?.getDraft(draftUserId,draftContactId).then(draft=>{
       if(currentUser?.id===draftUserId&&String(currentChatUser?.user_id)===draftContactId&&draftInput&&!draftInput.value){
-        draftInput.value=draft||"";draftInput.style.height="auto";draftInput.style.height=Math.min(draftInput.scrollHeight,112)+"px";
+        draftInput.value=draft||"";draftInput.style.height="auto";draftInput.style.height=Math.min(draftInput.scrollHeight,112)+"px";window.FarnazUpdateComposerControls?.();
       }
     }).catch(cacheError=>console.warn("Could not restore draft:",cacheError));
   }
@@ -2800,8 +2800,8 @@ async function refreshConversationList(){
   function syncChatAnchors(){
     const privatePage=document.getElementById("chatPage");
     const spaceDetail=document.getElementById("spaceDetail");
-    const header=document.querySelector("body.chat-mode #chatPage>.chat-header");
-    const composer=document.querySelector("body.chat-mode #chatPage>#sendMessageForm");
+    const header=document.querySelector("body.chat-mode #chatPage>.chat-header,body.spaces-chat-mode #chatPage>.chat-header");
+    const composer=document.querySelector("body.chat-mode #chatPage>#sendMessageForm,body.spaces-chat-mode #chatPage>#sendMessageForm");
     const page=privatePage;
     if(!page||!header||!composer)return;
     page.style.setProperty("--chat-header-height",Math.ceil(header.getBoundingClientRect().height||56)+"px");

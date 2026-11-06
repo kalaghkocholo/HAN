@@ -216,7 +216,7 @@ if (!coreSource.includes("function installFarnazSwipeNavigation()") ||
 const viewportCss = sources["chat-viewport.css"];
 if (sources["styles.css"].includes("/* Conversation layout —") ||
     sources["styles.css"].includes("/* FINAL OVERRIDE: flex message stacks") ||
-    !viewportCss.includes("padding:14px 2px 112px!important;gap:8px!important;") ||
+    !viewportCss.includes("padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important;") ||
     !viewportCss.includes("body.chat-mode .app.chat-mode>#chatPage #sendMessageForm") ||
     !viewportCss.includes("body.chat-mode .app.chat-mode>#chatPage #messageList")) {
   errors.push("private, group, and channel viewport sizing must have one shared chat-viewport.css authority");
@@ -226,7 +226,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v270"') || !sources["service-worker.js"].includes('styles.css?v=20261106-logout-red1') || !sources["service-worker.js"].includes('core.js?v=20261106-compose-menu1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-compose-menu1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v272"') || !sources["service-worker.js"].includes('styles.css?v=20261106-chat-composer1') || !sources["service-worker.js"].includes('core.js?v=20261106-chat-composer1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-chat-composer1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-chat-composer1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-chat-composer1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -257,7 +257,7 @@ for (const [passed, message] of safeUpdateChecks) { if (!passed) errors.push(mes
 const loaderChecks = [
   [html.includes('script.src="./js/supabase-sdk.js"') && html.includes("watchScript(script,()=>{") && html.includes("loadLocalScripts();"),
     "index.html must wait for the local Supabase SDK before loading the app core"],
-  [html.includes('core.src="./js/core.js?v=20261106-compose-menu1"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
+  [html.includes('core.src="./js/core.js?v=20261106-chat-composer1"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
     "index.html must handle successful, failed, and stalled core-script loading"],
   [html.includes("watchScript(script,loadNextFeature,()=>{") && html.includes("featureScripts[featureIndex++]") && html.includes('if(typeof window.FarnazBoot==="function")window.FarnazBoot();'),
     "index.html must load feature scripts sequentially and boot only after the loader sequence"],
@@ -517,7 +517,7 @@ const conversationChecks = [
     "spaces.css must not retain competing group-only header/composer layout overrides"],
   [sources["chat-viewport.css"].includes("body.chat-mode .app.chat-mode>#chatPage #sendMessageForm") &&
    sources["chat-viewport.css"].includes("position:absolute!important;left:13px!important;right:13px!important;bottom:0!important") &&
-   sources["chat-viewport.css"].includes("overflow-y:auto!important;") && sources["chat-viewport.css"].includes("padding:14px 2px 112px!important;gap:8px!important"),
+   sources["chat-viewport.css"].includes("overflow-y:auto!important;") && sources["chat-viewport.css"].includes("padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important"),
     "chat-viewport.css must anchor the group/channel composer and preserve message scroll space"],
   [coreSource.includes('DOMContentLoaded",()=>{if(isChatActive())syncViewport();}') &&
    !coreSource.includes('DOMContentLoaded",()=>{if(activeChat())syncViewport();}'),
@@ -547,6 +547,16 @@ if (!html.includes('onclick="openComposeMenu()"') ||
   errors.push("New-message entry must use the notebook-and-pencil icon and one compose menu for private chats, groups, and channels; no separate group button.");
 }
 
+if (!html.includes('id="attachmentPreview"') || !html.includes('accept="image/*,video/*"') ||
+    !sources["js/chat-menu-v5.js"].includes("function showAttachmentPreview(file)") ||
+    !sources["js/chat-menu-v5.js"].includes('startsWith("video/")') ||
+    !sources["js/spaces.js"].includes('startsWith("video/")') ||
+    !sources["styles.css"].includes(".attachment-preview-media") ||
+    !sources["styles.css"].includes(".app.spaces-chat-mode>#chatPage .composer-shell") ||
+    !sources["chat-viewport.css"].includes("body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #sendMessageForm")) {
+  errors.push("Shared private/group/channel composer must support attachment previews, video playback, and a fixed mobile composer.");
+}
+
 if (!html.includes('id="profileUsernameInput"') || !html.includes('id="profileAboutInput"') ||
     !coreSource.includes('username:username||null') || !coreSource.includes('about:about||null') ||
     !coreSource.includes('get_farnaz_user_profile_details') ||
@@ -559,7 +569,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v270"')) {
+    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v272"')) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 

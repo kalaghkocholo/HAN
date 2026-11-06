@@ -25,7 +25,7 @@ body.chat-mode .app.chat-mode>#chatPage #replyPreview{flex:0 0 auto!important}
 body.chat-mode .app.chat-mode>#chatPage #messageList{
  position:relative!important;z-index:1!important;display:flex!important;flex:1 1 0!important;
  min-height:0!important;height:auto!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;
- padding-bottom:112px!important;padding:14px 2px 112px!important;gap:8px!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;margin:0!important
+ padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;margin:0!important
 }
 /* Absolute anchoring prevents iOS Home Screen focus auto-scrolling the composer
    into the middle of the chat when the on-screen keyboard appears. */
@@ -42,6 +42,37 @@ body.chat-mode.keyboard-open .app.chat-mode>#chatPage>.chat-header{
  display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;
  z-index:100!important;flex:0 0 auto!important;min-height:56px!important;transform:none!important
 }
+
+
+/* Group and channel chats share the fixed composer and scroll-only message region. */
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage{
+ position:relative!important;display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+ min-width:0!important;min-height:0!important;height:100%!important;max-height:100%!important;
+ margin:0!important;padding:0 13px!important;overflow:hidden!important;gap:0!important
+}
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage>.chat-header{
+ position:relative!important;inset:auto!important;z-index:3!important;display:flex!important;
+ flex:0 0 auto!important;width:100%!important;min-height:56px!important;margin:0!important;
+ background:var(--bg)!important;opacity:1!important;transform:none!important
+}
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #selectionToolbar,
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #loadOlderButton,
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #replyPreview,
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage .space-context-panel{flex:0 0 auto!important}
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #messageList{
+ position:relative!important;z-index:1!important;display:flex!important;flex:1 1 0!important;
+ min-height:0!important;height:auto!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;
+ padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important;
+ overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;margin:0!important
+}
+body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #sendMessageForm{
+ position:absolute!important;left:13px!important;right:13px!important;bottom:0!important;inset-block-start:auto!important;
+ z-index:10!important;display:block!important;flex:0 0 auto!important;width:auto!important;min-height:0!important;
+ margin:0!important;padding:0 0 max(3px,env(safe-area-inset-bottom,0px))!important;
+ background:var(--bg)!important;transform:none!important
+}
+body.spaces-chat-mode.keyboard-open .app.spaces-chat-mode>#chatPage #sendMessageForm{bottom:0!important;margin:0!important;padding:0!important;transform:none!important}
+body.spaces-chat-mode.keyboard-open .app.spaces-chat-mode>#chatPage>.chat-header{visibility:visible!important;opacity:1!important;z-index:100!important}
 
 body.spaces-chat-mode .app.spaces-chat-mode #chatPage #sendMessageStatus:not(:empty){display:block!important;position:absolute!important;left:13px!important;right:13px!important;bottom:calc(var(--chat-composer-height,76px) + 4px)!important;z-index:9!important;max-height:30px!important;min-height:0!important;margin:0!important;padding:3px 8px!important;overflow:hidden!important;text-align:center!important;background:var(--panel)!important;color:var(--white)!important;border-radius:9px!important;pointer-events:none!important}
 body.spaces-chat-mode .app.spaces-chat-mode #chatPage #sendMessageStatus:empty{display:none!important}

@@ -1,4 +1,5 @@
 let pendingPrivateSend=null;
+let attachmentPreviewUrl=null;
 let readReceiptMessageIds=new Set();
 let messageReactionMap=new Map(),pinnedMessageIds=new Set(),currentPinnedMessage=null;
 const MESSAGE_REACTION_CHOICES=["👍","❤️","😂","😮","😢","🙏"];
@@ -246,7 +247,8 @@ async function makeMessageElement(m,myId,fromCache=false){
   }else if(m.attachment_path){
     const {data,error}=await getClient().storage.from("chat-attachments").createSignedUrl(m.attachment_path,3600);
     if(!error&&data?.signedUrl){
-      if((m.message_type||"image")==="image"){const img=document.createElement("img");img.src=data.signedUrl;img.alt=m.attachment_name||"Photo";img.loading="lazy";item.appendChild(img);}
+      if((m.message_type||"image")==="image"||(m.attachment_mime||"").startsWith("image/")){const img=document.createElement("img");img.src=data.signedUrl;img.alt=m.attachment_name||"Photo";img.loading="lazy";item.appendChild(img);}
+      else if((m.attachment_mime||"").startsWith("video/")){const video=document.createElement("video");video.src=data.signedUrl;video.controls=true;video.playsInline=true;video.preload="metadata";video.style.display="block";video.style.maxWidth="min(100%,320px)";video.style.maxHeight="360px";video.style.borderRadius="12px";item.appendChild(video);}
       else if((m.attachment_mime||"").startsWith("audio/")){const audio=document.createElement("audio");audio.controls=true;audio.preload="metadata";audio.src=data.signedUrl;audio.setAttribute("aria-label",m.attachment_name||"Voice message");audio.style.display="block";audio.style.maxWidth="240px";item.appendChild(audio);}
       else{const link=document.createElement("a");link.href=data.signedUrl;link.target="_blank";link.rel="noopener";link.download=m.attachment_name||"";link.textContent="📎 "+(m.attachment_name||"Download file");item.appendChild(link);}
     }else{const n=document.createElement("small");n.textContent=english?"Attachment unavailable":"پیوست در دسترس نیست";item.appendChild(n);}
@@ -734,6 +736,57 @@ if(window.visualViewport){
   document.addEventListener("focusin",event=>{if(["messageText","spaceText"].includes(event.target?.id))setTimeout(syncChatViewport,100);});
   document.addEventListener("focusout",()=>setTimeout(syncChatViewport,150));
 }
+const COMPOSER_MIC_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg>';
+const COMPOSER_STOP_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+function setComposerRecordingState(button,recording){
+ if(!button)return;
+ button.innerHTML=recording?COMPOSER_STOP_ICON:COMPOSER_MIC_ICON;
+ button.classList.toggle("recording",!!recording);
+ button.title=recording?(english?"Stop recording":"پایان ضبط"):(english?"Voice message":"پیام صوتی");
+ button.setAttribute("aria-label",recording?(english?"Stop recording":"پایان ضبط"):(english?"Record voice message":"ضبط پیام صوتی"));
+}
+function updateComposerControls(){
+ const input=$("messageText"),voice=$("recordAudioButton"),send=$("sendMessageButton");
+ if(!input||!voice||!send)return;
+ const recording=voice.classList.contains("recording");
+ const hasFile=!!($("attachmentFile")?.files?.length||$("photoFile")?.files?.length||$("cameraFile")?.files?.length);
+ const hasVoice=!!($("voicePreview")&&!$("voicePreview").hidden);
+ const hasContent=!!input.value.trim()||hasFile||hasVoice;
+ send.hidden=recording||!hasContent;voice.hidden=hasContent&&!recording;
+}
+function clearAttachmentPreview(){
+ if(attachmentPreviewUrl){URL.revokeObjectURL(attachmentPreviewUrl);attachmentPreviewUrl=null;}
+ const panel=$("attachmentPreview");if(panel){panel.replaceChildren();panel.hidden=true;}
+ updateComposerControls();
+}
+function showAttachmentPreview(file){
+ clearAttachmentPreview();
+ const panel=$("attachmentPreview");if(!panel||!file)return;
+ const media=document.createElement("span");media.className="attachment-preview-media";
+ const isImage=(file.type||"").startsWith("image/"),isVideo=(file.type||"").startsWith("video/");
+ if(isImage||isVideo){
+  attachmentPreviewUrl=URL.createObjectURL(file);
+  const preview=document.createElement(isVideo?"video":"img");preview.src=attachmentPreviewUrl;preview.alt=isImage?file.name:"";
+  if(isVideo){preview.muted=true;preview.playsInline=true;preview.preload="metadata";}
+  media.appendChild(preview);
+ }else{
+  const glyph=document.createElement("span");glyph.className="attachment-preview-file-icon";
+  glyph.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>';
+  media.appendChild(glyph);
+ }
+ const copy=document.createElement("span");copy.className="attachment-preview-copy";
+ const name=document.createElement("strong");name.textContent=file.name||(english?"Selected attachment":"پیوست انتخاب‌شده");
+ const size=document.createElement("small");
+ size.textContent=(isImage?(english?"Photo":"عکس"):isVideo?(english?"Video":"ویدئو"):(english?"File":"فایل"))+" · "+(file.size>=1048576?(file.size/1048576).toFixed(1)+" MB":Math.max(1,Math.ceil(file.size/1024))+" KB");
+ copy.append(name,size);
+ const remove=document.createElement("button");remove.type="button";remove.className="attachment-preview-remove";remove.textContent="×";
+ remove.setAttribute("aria-label",english?"Remove attachment":"حذف پیوست");
+ remove.addEventListener("click",()=>{["attachmentFile","photoFile","cameraFile"].forEach(id=>{const field=$(id);if(field)field.value="";});clearAttachmentPreview();setStatus("sendMessageStatus","");});
+ panel.append(media,copy,remove);panel.hidden=false;updateComposerControls();
+}
+window.FarnazClearAttachmentPreview=clearAttachmentPreview;
+window.FarnazUpdateComposerControls=updateComposerControls;
+window.FarnazSetComposerRecordingState=setComposerRecordingState;
 function showRecordedVoicePreview(){
   const panel=$("voicePreview"),player=$("voicePreviewPlayer");
   if(!recordedVoiceFile||!panel||!player)return;
@@ -743,6 +796,7 @@ function showRecordedVoicePreview(){
   $("voicePreviewLabel").textContent=english?"Voice message ready to send":"پیام صوتی آماده ارسال";
   $("voicePreviewSize").textContent=Math.ceil(recordedVoiceFile.size/1024)+" KB";
   panel.hidden=false;
+  updateComposerControls();
 }
 function discardRecordedVoice(){
   const player=$("voicePreviewPlayer"),panel=$("voicePreview");
@@ -750,6 +804,7 @@ function discardRecordedVoice(){
   if(recordedVoiceUrl){URL.revokeObjectURL(recordedVoiceUrl);recordedVoiceUrl=null;}
   recordedVoiceFile=null;
   if(panel)panel.hidden=true;
+  updateComposerControls();
 }
 async function toggleAudioRecording(){
   if(mediaRecorder&&mediaRecorder.state==="recording"){
@@ -763,6 +818,8 @@ async function toggleAudioRecording(){
   }
   try{
     discardRecordedVoice();
+    ["attachmentFile","photoFile","cameraFile"].forEach(id=>{const field=$(id);if(field)field.value="";});
+    clearAttachmentPreview();
     recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
     const preferred=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"];
     const mimeType=preferred.find(type=>MediaRecorder.isTypeSupported?.(type));
@@ -774,7 +831,7 @@ async function toggleAudioRecording(){
       stopAudioRecordingTracks();mediaRecorder=null;
       $("recordAudioButton").disabled=false;
       $("recordAudioButton").classList.remove("recording");
-      $("recordAudioButton").textContent="🎙";
+      setComposerRecordingState($("recordAudioButton"),false);updateComposerControls();
       setStatus("sendMessageStatus",english?"Could not record audio. Please try again.":"ضبط صدا ناموفق بود؛ دوباره تلاش کن.",true);
     };
     mediaRecorder.onstop=()=>{
@@ -784,9 +841,10 @@ async function toggleAudioRecording(){
       recordedVoiceFile=blob.size?new File([blob],"voice-message."+ext,{type:actualType}):null;
       stopAudioRecordingTracks();mediaRecorder=null;
       $("recordAudioButton").disabled=false;
-      $("recordAudioButton").classList.remove("recording");$("recordAudioButton").textContent="🎙";
+      $("recordAudioButton").classList.remove("recording");setComposerRecordingState($("recordAudioButton"),false);updateComposerControls();
       if(recordedVoiceFile){
         $("attachmentFile").value="";$("cameraFile").value="";$("photoFile").value="";
+        clearAttachmentPreview();
         showRecordedVoicePreview();
         setStatus("sendMessageStatus",(english?"Voice message ready. Review it, then tap Send.":"صدای ضبط‌شده آماده است؛ گوش بده و سپس دکمهٔ ارسال را بزن."));
       }else{
@@ -795,7 +853,7 @@ async function toggleAudioRecording(){
       }
     };
     mediaRecorder.start();
-    $("recordAudioButton").classList.add("recording");$("recordAudioButton").textContent="■";
+    $("recordAudioButton").classList.add("recording");setComposerRecordingState($("recordAudioButton"),true);updateComposerControls();
     setStatus("sendMessageStatus",english?"Recording… Tap stop when finished.":"در حال ضبط… برای پایان، دوباره دکمه را بزن.");
   }catch(e){
     stopAudioRecordingTracks();
@@ -887,6 +945,7 @@ async function sendMessage(event){
     if(String(currentUser?.id||"")!==senderId)return;
     if(String(currentChatUser?.user_id||"")===receiverId){
       input.value="";input.style.height="auto";$("attachmentFile").value="";$("cameraFile").value="";$("photoFile").value="";
+      clearAttachmentPreview();updateComposerControls();
       if(window.farnazDraftSaveTimer)clearTimeout(window.farnazDraftSaveTimer);
       window.FarnazLocalStore?.clearDraft(senderId,receiverId).catch(cacheError=>console.warn("Could not clear sent draft:",cacheError));
       setStatus("sendMessageStatus",english?"Message sent.":"پیام ارسال شد.");
@@ -922,9 +981,11 @@ document.addEventListener("keydown",event=>{
    a private conversation during touch interactions on iPhone. */
 $("sendMessageForm").addEventListener("submit",sendMessage);
 function handleAttachmentChange(input){
-  const file=input.files[0];if(!file)return;
-  recordedVoiceFile=null;
-  if(file.size>20*1024*1024){input.value="";setStatus("sendMessageStatus",english?"Choose a file up to 20 MB.":"حجم فایل باید حداکثر ۲۰ مگابایت باشد.",true);return;}
+  const file=input?.files?.[0];if(!file){clearAttachmentPreview();return;}
+  if(recordedVoiceFile)discardRecordedVoice();
+  if(file.size>20*1024*1024){["attachmentFile","photoFile","cameraFile"].forEach(id=>{const field=$(id);if(field)field.value="";});clearAttachmentPreview();setStatus("sendMessageStatus",english?"Choose a file up to 20 MB.":"حجم فایل باید حداکثر ۲۰ مگابایت باشد.",true);return;}
+  ["attachmentFile","photoFile","cameraFile"].forEach(id=>{const field=$(id);if(field&&field!==input)field.value="";});
+  showAttachmentPreview(file);
   setStatus("sendMessageStatus",(english?"Ready to send: ":"آماده ارسال: ")+file.name+" · "+Math.ceil(file.size/1024)+" KB");
 }
 $("attachmentFile").addEventListener("change",()=>handleAttachmentChange($("attachmentFile")));
@@ -935,6 +996,7 @@ $("authBox").addEventListener("click",e=>{if(e.target.id==="authBox")closeAuth()
 $("authBox").addEventListener("keydown",e=>{if(e.key==="Escape")closeAuth();});
 $("messageText").addEventListener("input",()=>{
   const el=$("messageText");el.style.height="auto";el.style.height=Math.min(el.scrollHeight,112)+"px";
+  updateComposerControls();
   if(window.farnazDraftSaveTimer)clearTimeout(window.farnazDraftSaveTimer);
   const userId=currentUser?.id,contactId=currentChatUser?.user_id,value=el.value;
   if(userId&&contactId){
