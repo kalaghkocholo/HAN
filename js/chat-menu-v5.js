@@ -359,6 +359,61 @@ async function loadOlderMessages(){
   $("loadOlderButton").hidden=true;
   await loadPrivateMessages(true);
 }
+window.FarnazMountMessageMenu=function(menu,item,onClose){
+  const label=english?"Message actions":"عملیات پیام";
+  menu.setAttribute("role","dialog");menu.setAttribute("aria-modal","true");
+  menu.setAttribute("aria-label",label);menu.setAttribute("tabindex","-1");
+  let disposed=false;
+  const position=()=>{
+    if(!menu.isConnected||!item.isConnected)return;
+    const rect=item.getBoundingClientRect(),vv=window.visualViewport,margin=10,gap=8;
+    const leftEdge=vv?vv.offsetLeft:0,topEdge=vv?vv.offsetTop:0;
+    const width=vv?vv.width:window.innerWidth,height=vv?vv.height:window.innerHeight;
+    const header=document.querySelector("#chatPage .chat-header");
+    const composer=document.querySelector("#chatPage .conversation-composer");
+    const headerBottom=header?header.getBoundingClientRect().bottom:topEdge+44;
+    const composerTop=composer?composer.getBoundingClientRect().top:topEdge+height;
+    const safeTop=Math.max(topEdge+8,headerBottom+6,44);
+    const safeBottom=Math.min(topEdge+height-8,composerTop-8);
+    const above=Math.max(0,rect.top-safeTop-gap),below=Math.max(0,safeBottom-rect.bottom-gap);
+    const natural=menu.scrollHeight;
+    const useAbove=above>=natural||above>=below;
+    const available=Math.max(above,below);
+    menu.style.maxHeight=Math.max(100,available-4)+"px";
+    menu.style.overflowY="auto";
+    const box=menu.getBoundingClientRect();
+    const maxLeft=leftEdge+width-box.width-margin;
+    const left=Math.max(leftEdge+margin,Math.min(rect.left+(rect.width-box.width)/2,maxLeft));
+    const top=useAbove?rect.top-box.height-gap:rect.bottom+gap;
+    menu.style.left=left+"px";
+    menu.style.top=Math.max(safeTop,Math.min(top,safeBottom-box.height))+"px";
+    menu.dataset.position=useAbove?"above":"below";
+  };
+  const onKey=e=>{
+    if(e.key==="Escape"){e.preventDefault();onClose();return;}
+    if(e.key!=="Tab")return;
+    const controls=[...menu.querySelectorAll("button:not(:disabled),[href],input:not(:disabled),[tabindex]:not([tabindex='-1'])")].filter(el=>el.getClientRects().length);
+    if(!controls.length){e.preventDefault();menu.focus();return;}
+    const first=controls[0],last=controls[controls.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  };
+  menu.addEventListener("keydown",onKey);
+  position();
+  const first=menu.querySelector("button:not(:disabled)");
+  (first||menu).focus({preventScroll:true});
+  window.addEventListener("resize",position);
+  window.addEventListener("scroll",position,true);
+  if(window.visualViewport){visualViewport.addEventListener("resize",position);visualViewport.addEventListener("scroll",position);}
+  return ()=>{
+    if(disposed)return;disposed=true;
+    menu.removeEventListener("keydown",onKey);
+    window.removeEventListener("resize",position);
+    window.removeEventListener("scroll",position,true);
+    if(window.visualViewport){visualViewport.removeEventListener("resize",position);visualViewport.removeEventListener("scroll",position);}
+    if(item?.isConnected)item.focus?.({preventScroll:true});
+  };
+};
 function clearMessageActionOverlay(){
   document.querySelectorAll(".message-action-backdrop,.message-action-clone").forEach(node=>node.remove());
   document.querySelectorAll(".message.context-active").forEach(node=>{node.style.visibility="";node.classList.remove("context-active");});
@@ -378,49 +433,27 @@ function showMessageActions(m,item){
   const rect=item.getBoundingClientRect();
   const backdrop=document.createElement("div");backdrop.className="message-action-backdrop";backdrop.setAttribute("aria-hidden","true");
   backdrop.addEventListener("click",()=>dismissMessageMenus());document.body.appendChild(backdrop);
-  const clone=item.cloneNode(true);clone.className=item.className+" message-action-clone";
-  clone.style.left=rect.left+"px";clone.style.top=rect.top+"px";clone.style.width=rect.width+"px";clone.style.height=rect.height+"px";
-  clone.style.borderRadius=getComputedStyle(item).borderRadius;document.body.appendChild(clone);
-  item.classList.add("context-active");item.style.visibility="hidden";
-  const restoreItem=()=>{item.style.visibility="";item.classList.remove("context-active");};
+  item.classList.add("context-active");
+  const restoreItem=()=>{item.classList.remove("context-active");};
   const menu=document.createElement("div");menu.className="message-tools message-tools-floating";
-  const closeMenu=()=>{menu.remove();restoreItem();clearMessageActionOverlay();};
+  let detachMenu=()=>{};
+  const closeMenu=()=>{menu.remove();restoreItem();detachMenu();clearMessageActionOverlay();};
   const add=(label,fn,cls="mini-button")=>{const b=document.createElement("button");b.type="button";b.className=cls;b.textContent=label;b.onclick=()=>{closeMenu();fn();};menu.appendChild(b);};
   const quickReactions=document.createElement("div");quickReactions.className="message-quick-reactions";
   quickReactions.setAttribute("role","group");quickReactions.setAttribute("aria-label",english?"React to message":"واکنش به پیام");
   Object.assign(quickReactions.style,{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"5px",padding:"5px 2px 9px",borderBottom:"1px solid var(--border-color,rgba(128,128,128,.2))",marginBottom:"5px"});
   for(const emoji of MESSAGE_REACTION_CHOICES){const reaction=document.createElement("button");reaction.type="button";reaction.className="message-quick-reaction";reaction.textContent=emoji;reaction.setAttribute("aria-label",(english?"React with ":"واکنش ")+emoji);Object.assign(reaction.style,{width:"36px",height:"36px",minWidth:"36px",padding:"0",border:"0",borderRadius:"10px",background:"var(--surface-secondary,rgba(128,128,128,.12))",fontSize:"20px",cursor:"pointer"});reaction.onclick=()=>{closeMenu();toggleMessageReaction(m.id,emoji);};quickReactions.appendChild(reaction);}
   menu.appendChild(quickReactions);
-  add("📌  "+(pinnedMessageIds.has(String(m.id))?(english?"Unpin message":"برداشتن سنجاق"):(english?"Pin message":"سنجاق پیام")),()=>toggleMessagePin(m.id),"mini-button message-pin-action");
-  add("↩  "+(english?"Reply":"پاسخ"),()=>setReplyTarget(m));
-  add("➦  "+(english?"Forward":"فوروارد"),()=>{selectedMessageIds.clear();selectedMessageIds.add(m.id);messageSelectionMode=true;updateSelectionToolbar();forwardSelectedMessages();});
-  add("⬇  "+(english?"Download attachment":"دانلود فایل"),()=>downloadMessage(m),"mini-button download-message-action");
-  add("☑  "+(english?"Select":"انتخاب"),()=>{messageSelectionMode=true;toggleMessageSelection(m.id,item);updateSelectionToolbar();});
-  if(m.sender_id===currentUser.id)add("✎  "+(english?"Edit":"ویرایش"),()=>editMessage(m));
-  add("🗑  "+(english?"Delete":"حذف"),()=>deleteMessage(m),"mini-button danger");
+  add(pinnedMessageIds.has(String(m.id))?(english?"Unpin":"برداشتن سنجاق"):(english?"Pin":"سنجاق"),()=>toggleMessagePin(m.id),"mini-button message-pin-action");
+  add(english?"Reply":"پاسخ",()=>setReplyTarget(m));
+  add(english?"Forward":"فوروارد",()=>{selectedMessageIds.clear();selectedMessageIds.add(m.id);messageSelectionMode=true;updateSelectionToolbar();forwardSelectedMessages();});
+  if(m.attachment_path)add(english?"Download attachment":"دانلود فایل",()=>downloadMessage(m),"mini-button download-message-action");
+  add(english?"Select":"انتخاب",()=>{messageSelectionMode=true;toggleMessageSelection(m.id,item);updateSelectionToolbar();});
+  if(String(m.sender_id)===String(currentUser?.id))add(english?"Edit":"ویرایش",()=>editMessage(m));
+  add(english?"Delete":"حذف",()=>deleteMessage(m),"mini-button danger");
   const close=document.createElement("button");close.type="button";close.className="message-tools-dismiss";close.textContent="×";close.setAttribute("aria-label",english?"Close":"بستن");close.onclick=closeMenu;menu.appendChild(close);
   document.body.appendChild(menu);
-  const vv=window.visualViewport,margin=10,gap=8;
-  const viewLeft=vv?vv.offsetLeft:0,viewTop=vv?vv.offsetTop:0;
-  const viewWidth=vv?vv.width:window.innerWidth,viewHeight=vv?vv.height:window.innerHeight;
-  const header=document.querySelector("#chatPage .chat-header");
-  const headerBottom=header?header.getBoundingClientRect().bottom:viewTop+44;
-  // Reserve the complete chat header/status-bar area; the menu must never sit beneath the iPhone clock.
-  const safeTop=Math.max(viewTop+8,headerBottom+6,48);
-  const viewBottom=viewTop+viewHeight-8;
-  const aboveSpace=Math.max(0,rect.top-safeTop-gap);
-  const belowSpace=Math.max(0,viewBottom-rect.bottom-gap);
-  const naturalHeight=menu.scrollHeight;
-  const useAbove=aboveSpace>=naturalHeight||aboveSpace>=belowSpace;
-  const availableSpace=Math.max(aboveSpace,belowSpace);
-  menu.style.maxHeight=Math.max(110,availableSpace-4)+"px";
-  const menuRect=menu.getBoundingClientRect();
-  const minLeft=viewLeft+margin,maxLeft=viewLeft+viewWidth-menuRect.width-margin;
-  const left=Math.max(minLeft,Math.min(rect.left+(rect.width-menuRect.width)/2,maxLeft));
-  let top=useAbove?rect.top-menuRect.height-gap:rect.bottom+gap;
-  top=Math.max(safeTop,Math.min(top,viewBottom-menuRect.height));
-  menu.style.left=left+"px";menu.style.top=top+"px";
-  menu.dataset.position=useAbove?"above":"below";
+  detachMenu=window.FarnazMountMessageMenu(menu,item,closeMenu);
 }
 function setReplyTarget(m){
   replyTarget=m;const preview=$("replyPreview");preview.replaceChildren();preview.hidden=false;
