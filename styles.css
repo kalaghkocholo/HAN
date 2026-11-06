@@ -952,18 +952,6 @@ body[data-theme="light"] .message-tools-floating>.mini-button:active{background:
 .phone-contact-details span,.phone-contact-details small{color:var(--muted);font-size:12px}
 .phone-contact-account-choices{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .phone-contact-account-choice{width:auto;min-width:0;max-width:100%;padding:7px 10px;white-space:normal;text-align:start}
-
-
-/* Farnaz conversation-first home refresh */
-.welcome-shell{position:relative;min-height:min(68dvh,620px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 20px 22px;border:0;border-radius:0;background:transparent}
-.welcome-shell:before{content:"";position:absolute;z-index:-1;width:230px;height:230px;border:1px solid color-mix(in srgb,var(--accent,#7896c5) 18%,transparent);border-radius:50%;top:-115px;inset-inline-start:-90px}
-.welcome-mark{width:82px;height:82px;display:grid;place-items:center;margin-bottom:16px;border:0;border-radius:0;background:transparent;box-shadow:none}
-.welcome-mark img{width:84px;height:84px;object-fit:contain}
-.welcome-kicker{font-size:10px;letter-spacing:3px;font-weight:800;color:var(--accent,#7896c5);direction:ltr}
-.welcome-shell h2{max-width:290px;font-size:25px;line-height:1.7;margin:13px 0 4px}
-.welcome-shell>p{max-width:280px;margin:0 0 20px;color:var(--muted);font-size:13px}
-.welcome-shell .primary{max-width:300px;min-height:48px;border-radius:15px;background:var(--accent,#7896c5);color:#fff}
-.welcome-secondary{width:100%;max-width:300px;margin-top:9px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--white);font-size:13px;font-weight:650}
 .chats-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 2px 12px;border-bottom:1px solid color-mix(in srgb,var(--border) 82%,transparent)}
 .chats-topline .chats-new-button{margin-inline-start:auto;flex:0 0 42px}
 .chats-topline .page-heading{margin:0;min-width:0;flex:1}
@@ -986,8 +974,7 @@ body[data-theme="light"] .message-tools-floating>.mini-button:active{background:
 #conversationList .list-name{font-size:13px}
 #conversationList .list-preview{font-size:11px;max-width:100%}
 #conversationList .list-time{white-space:nowrap}
-body[data-theme="light"] .welcome-shell{background:radial-gradient(ellipse at 50% 5%,color-mix(in srgb,var(--accent,#7896c5) 13%,transparent),transparent 55%),linear-gradient(155deg,#fff,#f3f6fb)}
-@media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:86px;height:86px;border-radius:25px}.welcome-mark img{width:73px;height:73px}}/* Header F mark is a compact
+@media(max-width:360px){}/* Header F mark is a compact
 {border:0;padding:0;cursor:pointer;font-family:inherit;line-height:1}.app>header #brand,
 .app>header #subtitle
 {display:none!important}/* Keep the global F mark on app pages,
