@@ -2682,4 +2682,423 @@ async function refreshConversationList(){
 }
 
 /* One viewport controller shared by private and group conversations. */
-()();
+(function installChatKeyboardLayout(){
+  const viewport=window.visualViewport;
+  let keyboardWasOpen=false;
+  let layoutObserver=null;
+  function syncChatAnchors(){
+    const privatePage=document.getElementById("chatPage");
+    const spaceDetail=document.getElementById("spaceDetail");
+    const header=document.querySelector("body.chat-mode #chatPage>.chat-header,body.spaces-chat-mode #chatPage>.chat-header");
+    const composer=document.querySelector("body.chat-mode #chatPage>#sendMessageForm,body.spaces-chat-mode #chatPage>#sendMessageForm");
+    const page=privatePage;
+    if(!page||!header||!composer)return;
+    page.style.setProperty("--chat-header-height",Math.ceil(header.getBoundingClientRect().height||56)+"px");
+    page.style.setProperty("--chat-composer-height",Math.ceil(composer.getBoundingClientRect().height||76)+"px");
+    if(layoutObserver){layoutObserver.disconnect();layoutObserver=null;}
+    if(typeof ResizeObserver==="function"){
+      layoutObserver=new ResizeObserver(()=>{
+        if(!page.isConnected)return;
+        page.style.setProperty("--chat-header-height",Math.ceil(header.getBoundingClientRect().height||56)+"px");
+        page.style.setProperty("--chat-composer-height",Math.ceil(composer.getBoundingClientRect().height||76)+"px");
+      });
+      layoutObserver.observe(header);layoutObserver.observe(composer);
+    }
+  }
+  const isChatActive=()=>document.body.classList.contains("chat-mode")||
+    document.body.classList.contains("spaces-chat-mode");
+  const messageList=()=>document.getElementById("messageList");
+  function syncViewport(){
+    if(!isChatActive()){
+      document.documentElement.style.removeProperty("--chat-viewport-height");
+      document.documentElement.style.removeProperty("--chat-viewport-offset");
+      document.body.classList.remove("keyboard-open");
+      keyboardWasOpen=false;
+      if(layoutObserver){layoutObserver.disconnect();layoutObserver=null;}
+      return;
+    }
+    const height=Math.max(1,viewport?.height||window.innerHeight);
+    // In iOS home-screen standalone mode, visualViewport.offsetTop can change
+    // during keyboard focus/animation and drag the entire chat shell under the status bar.
+    // Keep the shell anchored to the physical top; only its height follows the visual viewport.
+    const offset=0;
+    const keyboardOpen=!!viewport&&(window.innerHeight-height>120);
+    document.documentElement.style.setProperty("--chat-viewport-height",height+"px");
+    document.documentElement.style.setProperty("--chat-viewport-offset",offset+"px");
+    syncChatAnchors();
+    document.body.classList.toggle("keyboard-open",keyboardOpen);
+    if(keyboardOpen&&!keyboardWasOpen){
+      requestAnimationFrame(()=>{
+        const list=messageList();
+        if(list)list.scrollTop=list.scrollHeight;
+      });
+    }
+    keyboardWasOpen=keyboardOpen;
+  }
+  function resyncAfterViewportTransition(){
+    requestAnimationFrame(syncViewport);
+    // iOS Safari and installed PWAs can publish the final visualViewport size
+    // in stages during keyboard animation; remeasure without forcing a scroll.
+    [80,180,320,500].forEach(delay=>setTimeout(syncViewport,delay));
+  }
+  document.addEventListener("focusin",event=>{
+    if(event.target?.matches("#messageText,#spaceText"))resyncAfterViewportTransition();
+  });
+  document.addEventListener("focusout",event=>{
+    if(!event.target?.matches("#messageText,#spaceText"))return;
+    [160,320,500].forEach(delay=>setTimeout(()=>{
+      if(!document.activeElement?.matches("#messageText,#spaceText"))syncViewport();
+    },delay));
+  });
+  viewport?.addEventListener("resize",syncViewport);
+  viewport?.addEventListener("scroll",syncViewport);
+  window.addEventListener("resize",syncViewport);
+  document.addEventListener("click",event=>{
+    if(event.target.closest("#backToChats,#backSpaces,.nav-button"))requestAnimationFrame(syncViewport);
+  });
+  const originalNavigate=window.navigate;
+  if(typeof originalNavigate==="function"&&!originalNavigate.__keyboardViewportWrapped){
+    const wrapped=function(id){
+      originalNavigate(id);
+      if(id==="chatPage"||id==="spacesPage")requestAnimationFrame(syncViewport);
+      else syncViewport();
+    };
+    wrapped.__keyboardViewportWrapped=true;
+    window.navigate=wrapped;
+  }
+  requestAnimationFrame(syncViewport);
+  
+  // Prevent repeated signup submissions for the same pending email on this device.
+  // Supabase Auth remains the source of truth and enforces unique email identities server-side.
+  const PENDING_SIGNUP_KEY="farnaz.pendingSignup.v1";
+  function readPendingSignup(){
+    try{
+      const value=JSON.parse(localStorage.getItem(PENDING_SIGNUP_KEY)||"null");
+      return value&&typeof value.email==="string"&&Number.isFinite(Number(value.sentAt))
+        ?{email:value.email,sentAt:Number(value.sentAt)}:null;
+    }catch(_){return null;}
+  }
+  function savePendingSignup(email){
+    try{localStorage.setItem(PENDING_SIGNUP_KEY,JSON.stringify({email,sentAt:Date.now()}));}catch(_){}
+  }
+  function clearPendingSignup(email){
+    try{
+      const pending=readPendingSignup();
+      if(!email||pending?.email===email)localStorage.removeItem(PENDING_SIGNUP_KEY);
+    }catch(_){}
+  }
+  function updateAuthResendButton(email){
+    const resend=$("authResendConfirmation");
+    if(!resend)return;
+    const pending=readPendingSignup();
+    if(!pending||pending.email!==email){resend.hidden=true;resend.disabled=false;return;}
+    resend.hidden=false;
+    const remaining=Math.max(0,60000-(Date.now()-pending.sentAt));
+    resend.disabled=remaining>0;
+    resend.textContent=english
+      ?(remaining>0?"Resend available in "+Math.ceil(remaining/1000)+"s":"Resend confirmation email")
+      :(remaining>0?"ارسال مجدد تا "+Math.ceil(remaining/1000)+" ثانیه دیگر":"ارسال دوباره ایمیل تأیید");
+    if(remaining>0)setTimeout(()=>updateAuthResendButton(email),Math.min(remaining,1000));
+  }
+  const authEmailInput=$("authEmail");
+  if(authEmailInput)authEmailInput.addEventListener("input",()=>updateAuthResendButton(authEmailInput.value.trim().toLowerCase()));
+  const authResendButton=$("authResendConfirmation");
+  if(authResendButton)authResendButton.addEventListener("click",async()=>{
+    const email=authEmailInput?.value.trim().toLowerCase()||"";
+    const pending=readPendingSignup();
+    if(!email||!pending||pending.email!==email)return;
+    const remaining=60000-(Date.now()-pending.sentAt);
+    if(remaining>0){updateAuthResendButton(email);return;}
+    authResendButton.disabled=true;
+    try{
+      const {error}=await getClient().auth.resend({
+        type:"signup",email,
+        options:{emailRedirectTo:getAuthRedirectUrl()}
+      });
+      if(error)throw error;
+      savePendingSignup(email);
+      setStatus("authStatus",english
+        ?"A new confirmation email was requested. Check your inbox and spam folder."
+        :"درخواست ارسال دوباره ایمیل تأیید ثبت شد؛ صندوق ورودی و هرزنامه را بررسی کن.");
+    }catch(error){
+      const code=String(error?.code||"").toLowerCase();
+      const message=String(error?.message||"");
+      setStatus("authStatus",code==="over_email_send_rate_limit"||/rate limit|too many/i.test(message)
+        ?(english?"Please wait before requesting another confirmation email.":"برای درخواست ایمیل تأیید بعدی کمی صبر کن.")
+        :(english?"The confirmation email could not be resent. Please try again later.":"ارسال دوباره ایمیل تأیید انجام نشد؛ کمی بعد دوباره تلاش کن."),true);
+    }finally{
+      updateAuthResendButton(email);
+    }
+  });
+
+  // Keep email sign-up/sign-in wired to the active core script loaded by index.html.
+  const authForm=$("authForm");
+  if(authForm){
+    authForm.addEventListener("submit",async event=>{
+      event.preventDefault();
+      const button=$("authSubmit"),email=($("authEmail").value||"").trim().toLowerCase();
+      const password=$("authPassword").value;
+      $("authEmail").value=email;
+      if(authMode==="signup"){
+        const pending=readPendingSignup();
+        if(pending?.email===email){
+          updateAuthResendButton(email);
+          setStatus("authStatus",english
+            ?"A confirmation request is already pending for this email. Check your inbox, or use the resend button after the short cooldown."
+            :"برای این ایمیل قبلاً درخواست تأیید ثبت شده است. صندوق ورودی را بررسی کن یا پس از پایان زمان انتظار از دکمه ارسال دوباره استفاده کن.",true);
+          return;
+        }
+      }
+      const phone="";
+      if(!button||button.disabled)return;
+      button.disabled=true;
+      const authStartedAt=performance.now();
+      setStatus("authStatus",english?"Connecting to server…":"در حال اتصال به سرور…");
+      const slowAuthTimer=setTimeout(()=>{
+        if(button.disabled)setStatus("authStatus",english
+          ?"The connection is taking longer than expected. Keep this page open…"
+          :"اتصال بیشتر از حد معمول طول کشیده؛ صفحه را باز نگه دار…");
+      },5000);
+      try{
+        const client=getClient();
+        let result;
+        if(authMode==="recovery"){
+          result=await client.auth.updateUser({password});
+          if(result.error)throw result.error;
+          // Remove the one-time recovery marker only after Supabase accepts the new password.
+          try{history.replaceState({},document.title,getAuthRedirectUrl());}catch(_){}
+        }else if(authMode==="signup"){
+          result=await client.auth.signUp({
+            email,password,
+            options:{
+              emailRedirectTo:getAuthRedirectUrl(),
+            }
+          });
+          if(result.error)throw result.error;
+          if(!result.data.session){
+            const identities=result.data?.user?.identities;
+            if(Array.isArray(identities)&&identities.length===0){
+              clearPendingSignup(email);
+              setStatus("authStatus",english
+                ?"This email is already associated with an account. Sign in or use password recovery."
+                :"این ایمیل از قبل به یک حساب متصل است؛ وارد شو یا از بازیابی رمز عبور استفاده کن.",true);
+              return;
+            }
+            savePendingSignup(email);
+            updateAuthResendButton(email);
+            setStatus("authStatus",english
+              ?"Your confirmation request was received. Check your inbox and spam folder. To avoid duplicate requests, use the resend button if needed."
+              :"درخواست تأیید ثبت شد. صندوق ورودی و هرزنامه را بررسی کن؛ برای جلوگیری از درخواست تکراری، در صورت نیاز از دکمه ارسال دوباره استفاده کن.");
+            return;
+          }
+        }else{
+          result=await client.auth.signInWithPassword({email,password});
+          if(result.error)throw result.error;
+        }
+        console.info("Farnaz auth response time (ms):",Math.round(performance.now()-authStartedAt));
+        if(result.data.session)clearPendingSignup(email);
+        if(!result.data.user)throw new Error("اطلاعات حساب دریافت نشد.");
+        // Authentication succeeded: enter the app before loading optional profile/chat data.
+        // A later conversation or realtime failure must not be reported as a failed login.
+        const authenticatedUser=result.data.user;
+        // Set the authenticated user before navigating. navigate() deliberately
+        // opens the auth form when currentUser is empty; navigating first used to
+        // reopen the form and erase the email/password immediately after login.
+        currentUser=authenticatedUser;
+        profileCompletionRequired=true;
+        closeAuth();
+        navigate("chatsPage",{refreshData:false});
+        // Authentication has succeeded. Keep profile and inbox initialization
+        // outside the authentication error path so they cannot undo a valid login.
+        setStatus("authStatus","");
+        setConnectionBanner(english?"Signed in. Loading your conversations…":"ورود موفق بود؛ در حال بارگذاری گفتگوها…");
+        // Profile data is independent from authentication. Do not let a slow
+        // profile query block realtime or other screens after successful sign-in.
+        void showUser(authenticatedUser);
+        try{
+          await subscribeToMessages();
+          // Reconcile inbox and contacts after auth and realtime setup. The
+          // navigation-triggered refresh may have been superseded during startup.
+          const initialDataResults=await Promise.allSettled([refreshConversationList(),refreshSavedContacts()]);
+          const initialDataFailure=initialDataResults.find(result=>result.status==="rejected"||result.value===false);
+          if(initialDataFailure)throw initialDataFailure.reason;
+          setConnectionBanner("",false);
+        }catch(connectionError){
+          console.error("Post-login realtime initialization:",connectionError);
+          setConnectionBanner(english
+            ?"You are signed in, but live updates could not start. Farnaz will retry."
+            :"ورود موفق است، اما اتصال زنده برقرار نشد؛ فرناز دوباره تلاش می‌کند.");
+          scheduleReconnect();
+        }
+      }catch(error){
+        console.error("Farnaz authentication error:",error);
+        const message=String(error?.message||error||"Unknown error");
+        const code=String(error?.code||"").toLowerCase();
+        const status=Number(error?.status||error?.statusCode||0);
+        const isExistingEmail=code==="email_exists"||code==="user_already_exists"||/user already registered|email.*already exists/i.test(message);
+        const isCredentialsError=code==="invalid_credentials"||/invalid login credentials|invalid email or password/i.test(message);
+        const isWeakPassword=code==="weak_password"||/password.*(weak|short)|weak password/i.test(message);
+        const isNetwork=error?.name==="TypeError"||error?.name==="TimeoutError"||
+          /failed to fetch|fetch failed|network|load failed|timeout|connection|did not respond|request could not reach|aborted/i.test(message);
+        const safeMessage=isExistingEmail
+          ?(english?"This email is already registered. Sign in or use password recovery.":"این ایمیل قبلاً ثبت شده است؛ وارد شو یا از بازیابی رمز عبور استفاده کن.")
+          :isCredentialsError
+            ?(english?"Email or password is incorrect. Check both and try again.":"ایمیل یا رمز عبور درست نیست؛ هر دو را بررسی کن و دوباره تلاش کن.")
+            :isWeakPassword
+            ?(english?"Choose a stronger password with at least 8 characters.":"رمز عبور قوی‌تری با حداقل ۸ کاراکتر انتخاب کن.")
+            :isNetwork
+              ?(english?"Could not complete the request to Supabase. Check your connection and retry.":"درخواست به سوپابیس کامل نشد؛ اتصال را بررسی کن و دوباره تلاش کن.")
+              :(status===429
+                ?(english?"Too many attempts. Wait a little and try again.":"تعداد تلاش‌ها زیاد بوده؛ کمی صبر کن و دوباره تلاش کن.")
+                :(english?"The request could not be completed. Please check your details and try again.":"درخواست انجام نشد؛ اطلاعات را بررسی کن و دوباره تلاش کن."));
+        const failureLabel=authMode==="recovery"
+          ?(english?"Password update failed: ":"به‌روزرسانی رمز ناموفق بود: ")
+          :(english?"Sign-up/sign-in failed: ":"ثبت‌نام یا ورود ناموفق بود: ");
+        setStatus("authStatus",failureLabel+safeMessage,true);
+      }finally{
+        clearTimeout(slowAuthTimer);
+        button.disabled=false;
+      }
+    });
+  }
+  // Restore the persisted Supabase session on app launch. Persisting a session is
+  // not enough by itself: currentUser starts as null on every page reload.
+  let sessionRestorePromise=null;
+  let sessionRestoreNeedsRetry=false;
+  async function restoreSavedSession(attempt=0){
+    if(currentUser)return;
+    if(sessionRestorePromise)return sessionRestorePromise;
+    sessionRestorePromise=(async()=>{
+      try{return await restoreSavedSessionAttempt(attempt);}
+      finally{sessionRestorePromise=null;}
+    })();
+    return sessionRestorePromise;
+  }
+  async function restoreSavedSessionAttempt(attempt=0){
+    // A single boot-time timeout must not permanently strand a valid local session
+    // behind the guest screen. A manual sign-in takes precedence over this retry.
+    if(currentUser)return;
+    let client=null;
+    try{
+      client=getClient();
+      // Keep this longer than the fetch wrapper's 15-second auth-request deadline.
+      // A shorter outer timeout abandons a still-running refresh-token request; retrying
+      // getSession concurrently can race token rotation when Safari is waking from sleep.
+      const {data,error}=await withTimeout(client.auth.getSession(),18000,"saved session restore");
+      if(error)throw error;
+      // A user may finish manual sign-in while this boot-time read is pending.
+      // Never let a late restore overwrite the newer authenticated identity.
+      if(currentUser)return;
+      const session=data?.session;
+      if(!session?.user){
+        sessionRestoreNeedsRetry=false;
+        document.body.dataset.authState="guest";
+        setConnectionBanner("",false);
+        setStatus("profileStatus","");
+        if(isAuthRecoveryCallback()){
+          openLogin();
+          setStatus("authStatus",english
+            ?"This recovery link is invalid or expired. Request a new one."
+            :"پیوند بازیابی نامعتبر یا منقضی شده است؛ دوباره درخواست بازیابی بده.",true);
+        }else{
+          // Guests land directly on the login/register screen; there is no welcome page.
+          openSignup();
+        }
+        return;
+      }
+      sessionRestoreNeedsRetry=false;
+      if(isAuthRecoveryCallback()){
+        currentUser=session.user;
+        profileCompletionRequired=true;
+        document.body.dataset.authState="authenticated";
+        authMode="recovery";
+        openAuth();
+        setAuthMode("recovery");
+        setStatus("authStatus",english
+          ?"Choose a new password to finish recovering your account."
+          :"برای تکمیل بازیابی حساب، رمز عبور جدیدی انتخاب کن.");
+        return;
+      }
+      currentUser=session.user;
+      profileCompletionRequired=true;
+      document.body.dataset.authState="authenticated";
+      closeAuth();
+      navigate("chatsPage",{refreshData:false});
+      setConnectionBanner(english?"Restoring your session…":"در حال بازیابی نشست ورود…");
+      // Profile loading is independent; it must not hold session restoration.
+      void showUser(session.user);
+      try{
+        await subscribeToMessages();
+        // Reconcile inbox and contacts after restoring the saved session.
+        const initialDataResults=await Promise.allSettled([refreshConversationList(),refreshSavedContacts()]);
+        const initialDataFailure=initialDataResults.find(result=>result.status==="rejected"||result.value===false);
+        if(initialDataFailure)throw initialDataFailure.reason;
+        setConnectionBanner("",false);
+      }catch(connectionError){
+        console.error("Restored-session initialization:",connectionError);
+        setConnectionBanner(english
+          ?"You are signed in, but some account data could not load. Check your connection; Farnaz will retry."
+          :"نشست ورود بازیابی شد، اما بارگذاری بخشی از اطلاعات حساب ناموفق بود. اتصال را بررسی کن؛ فرناز دوباره تلاش می‌کند.");
+        scheduleReconnect();
+      }
+    }catch(error){
+      // A manual sign-in may have completed while getSession() was pending.
+      // In that case this stale boot-time failure must not switch the UI back to guest.
+      if(currentUser)return;
+      // Retry transient startup failures before falling back to the guest screen.
+      // getSession() can time out while Safari is waking a suspended PWA.
+      const transientRestoreFailure=error?.name==="TimeoutError"||error?.name==="TypeError"||isTransientError(error);
+      if(transientRestoreFailure&&attempt<2&&!currentUser){
+        console.warn("Retrying saved-session restoration:",attempt+1);
+        setConnectionBanner(english
+          ?"Waking up your saved session… retrying connection."
+          :"در حال بازیابی نشست ذخیره‌شده؛ اتصال دوباره بررسی می‌شود…");
+        await recoveryDelay(700*(attempt+1));
+        if(!currentUser)await restoreSavedSessionAttempt(attempt+1);
+        return;
+      }
+      // Do not erase a potentially valid session on a transient network failure.
+      // A later explicit sign-in can still use the existing credentials.
+      sessionRestoreNeedsRetry=transientRestoreFailure;
+      console.warn("Farnaz saved-session restore failed:",{
+        name:error?.name||"Error",
+        status:error?.status||error?.statusCode||null,
+        code:error?.code||null,
+        message:String(error?.message||error||"Unknown error")
+      });
+      document.body.dataset.authState="guest";
+      setConnectionBanner(english
+        ?"Farnaz could not restore your saved session. Check your connection and try signing in again."
+        :"بازیابی نشست ورود کامل نشد. اتصال را بررسی کن و دوباره برای ورود تلاش کن.");
+      // Keep the authentication screen available even when session restoration fails.
+      openSignup();
+      if(/refresh token.*(invalid|not found|expired)|invalid refresh token|session not found/i.test(String(error?.message||""))){
+        try{if(client)await client.auth.signOut({scope:"local"});}catch(_){}
+      }
+    }
+  }
+  // The HTML loader calls this only after all required feature modules are ready.
+  // This prevents the restored-session event from firing before spaces/calls listeners exist.
+  let farnazBootStarted=false;
+  window.FarnazBoot=()=>{
+    if(farnazBootStarted)return;
+    farnazBootStarted=true;
+    void restoreSavedSession();
+  };
+  // Safari may suspend a standalone PWA while the network is unavailable.
+  // If the bounded boot retries failed transiently, retry once the app is visible
+  // or connectivity returns; share one in-flight restore to avoid overlapping reads.
+  const retryDeferredSessionRestore=()=>{
+    if(sessionRestoreNeedsRetry&&!currentUser&&document.visibilityState!=="hidden"){
+      void restoreSavedSession();
+    }
+  };
+  document.addEventListener("visibilitychange",retryDeferredSessionRestore);
+  window.addEventListener("online",retryDeferredSessionRestore);
+  window.addEventListener("offline",()=>{
+    const message=english?"You are offline. Reconnect to continue.":"اتصال اینترنت قطع شده؛ برای ادامه دوباره متصل شو.";
+    if(currentUser)setConnectionBanner(message);
+    else setStatus("authStatus",message,true);
+  });
+  document.addEventListener("DOMContentLoaded",()=>{if(isChatActive())syncViewport();});
+})();
