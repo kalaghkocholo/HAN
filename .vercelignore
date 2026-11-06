@@ -1,0 +1,16 @@
+# Project documentation and development-only material
+.github/
+README.md
+docs/
+infra/
+scripts/
+tests/
+
+# Supabase CLI configuration, migrations, and Edge Function source are
+# deployed to Supabase separately, not served by the HAN web application.
+supabase/
+*.sql
+
+# Build-time SDK version marker; the license notices remain distributed.
+js/supabase-sdk-version.txt
+vendor/livekit/README.md
