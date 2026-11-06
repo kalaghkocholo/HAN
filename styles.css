@@ -1276,3 +1276,14 @@ body[data-theme="light"] .farnaz-livekit-card{background:#fff;color:#25354b;bord
 body[data-theme="light"] .farnaz-livekit-card p{color:#526074}
 body[data-theme="light"] .farnaz-livekit-avatar{background:#edf2f8;color:#526f9d}
 body[data-theme="light"] .farnaz-livekit-actions button:not(.is-accept):not(.is-danger){background:#f5f7fb;color:#25354b;border-color:#d8e0ea}
+
+.profile-account-tools{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--border)}
+.profile-account-tools .secondary-button{width:100%;min-height:42px;margin:0}
+.profile-preview-dialog{position:fixed;inset:0;z-index:100020;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.68)}
+.profile-preview-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(100%,360px);padding:28px 20px 20px;border:1px solid var(--border);border-radius:18px;background:var(--panel);color:var(--white);text-align:center}
+.profile-preview-card .avatar{width:84px;height:84px}
+.profile-preview-card h2{margin:0;font-size:18px;overflow-wrap:anywhere}
+.profile-preview-username{margin:0;color:var(--accent);direction:ltr}
+.profile-preview-about{margin:0;line-height:1.7;overflow-wrap:anywhere}
+.profile-preview-close{position:absolute;top:8px;inset-inline-end:10px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--white);font-size:25px}
+.profile-preview-card [hidden]{display:none!important}
