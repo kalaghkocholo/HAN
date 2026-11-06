@@ -222,8 +222,11 @@ if (sources["styles.css"].includes("/* Conversation layout —") ||
   errors.push("private, group, and channel viewport sizing must have one shared chat-viewport.css authority");
 }
 
+if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.dataset.page="spacesPage"')) {
+  errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
+}
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v268"') || !sources["service-worker.js"].includes('styles.css?v=20261106-logout-red1') || !sources["service-worker.js"].includes('core.js?v=20261106-unified-inbox1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-unified-inbox1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v269"') || !sources["service-worker.js"].includes('styles.css?v=20261106-logout-red1') || !sources["service-worker.js"].includes('core.js?v=20261106-unified-inbox1') || !sources["service-worker.js"].includes('spaces.js?v=20261106-unified-inbox2') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -536,7 +539,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v268"')) {
+    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v269"')) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 
