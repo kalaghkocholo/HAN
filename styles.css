@@ -605,7 +605,7 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 .app.spaces-chat-mode #chatPage #messageList>.space-message.mine{align-self:flex-end!important;margin-left:auto!important;margin-right:0!important}
 .app.spaces-chat-mode #chatPage #messageList>.space-message:not(.mine){align-self:flex-start!important;margin-left:0!important;margin-right:auto!important}
 
-/* Shared RTL conversation header: back on the right, identity in the center, calls on the left. */
+/* One shared header layout for private chats, groups and channels. */
 .app.chat-mode #chatPage .chat-header{
   display:flex!important;flex-direction:row!important;direction:rtl!important;
   align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;
