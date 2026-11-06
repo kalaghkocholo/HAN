@@ -527,6 +527,15 @@ for (const [passed, message] of [...authChecks, ...authLayoutChecks, ...conversa
   if (!passed) errors.push(message);
 }
 
+if (!sources["js/spaces.js"].includes('aria-describedby="composeMenuDescription"') ||
+    !sources["js/spaces.js"].includes('class="compose-menu-cancel"') ||
+    !sources["js/spaces.js"].includes('class="compose-menu-chevron"') ||
+    !sources["styles.css"].includes(".compose-menu-option:active") ||
+    !sources["styles.css"].includes(".compose-menu-option:focus-visible") ||
+    !sources["styles.css"].includes(".compose-menu-icon svg")) {
+  errors.push("Compose actions must use accessible, consistent SVG action buttons with touch, focus, and pressed states.");
+}
+
 if (!html.includes('onclick="openComposeMenu()"') ||
     !html.includes('M14.5 16.5 20 11l2 2-5.5 5.5-3 .8z') ||
     !sources["js/spaces.js"].includes("function openComposeMenu()") ||
