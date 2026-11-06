@@ -90,6 +90,12 @@ input[type=file]{font-size:11px;padding:9px}
 }
 .avatar img{width:100%;height:100%;object-fit:cover}
 .avatar.large{width:76px;height:76px;font-size:27px}
+.profile-avatar-control{position:relative;width:84px;height:84px;flex:0 0 84px;margin:0 auto 8px}
+#profilePage .profile-avatar-control>#userAvatar{width:84px;height:84px;margin:0!important}
+.profile-avatar-edit{position:absolute;inset-inline-end:-3px;bottom:-3px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:2px solid var(--panel);border-radius:50%;background:var(--accent);color:var(--accent-ink,#111);box-shadow:0 3px 12px #0003;z-index:2}
+.profile-avatar-edit svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.profile-avatar-edit:active{transform:scale(.94)}
+.profile-avatar-edit:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .avatar.medium{width:45px;height:45px;font-size:17px}
 .avatar.small{width:39px;height:39px;font-size:15px}
 .profile-panel{display:flex;flex-direction:column;gap:14px}
