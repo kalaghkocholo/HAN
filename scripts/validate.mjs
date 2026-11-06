@@ -223,7 +223,7 @@ if (sources["styles.css"].includes("/* Conversation layout —") ||
 }
 
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v264"') || !sources["service-worker.js"].includes('styles.css?v=20261106-profile4') || !sources["service-worker.js"].includes('core.js?v=20261106-profile3') || !sources["service-worker.js"].includes('spaces.js?v=20261105-matin-shared2') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261105-matin-shared2') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261105-matin-shared2') || !html.includes('calls.js?v=20261105-matin-shared2') || !html.includes('chat-menu-v5.js?v=20261105-matin-shared2')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v264"') || !sources["service-worker.js"].includes('styles.css?v=20261106-profile4') || !sources["service-worker.js"].includes('core.js?v=20261106-profile3') || !sources["service-worker.js"].includes('spaces.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261106-logout-guard1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261106-logout-guard1') || !html.includes('calls.js?v=20261106-logout-guard1') || !html.includes('chat-menu-v5.js?v=20261106-logout-guard1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
