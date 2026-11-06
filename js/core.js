@@ -1231,6 +1231,48 @@ function renderUser(user,name){
   if(aboutEl){aboutEl.textContent=currentAbout;aboutEl.hidden=!currentAbout;}
   renderAvatar($("userAvatar"),currentAvatarUrl,$("userName").textContent);
 }
+
+function openProfilePreview(){
+  if(!currentUser)return;
+  document.getElementById("profilePreviewDialog")?.remove();
+  const modal=document.createElement("div");modal.id="profilePreviewDialog";modal.className="profile-preview-dialog";
+  modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-labelledby","profilePreviewTitle");
+  const card=document.createElement("section");card.className="profile-preview-card";
+  const close=document.createElement("button");close.type="button";close.className="profile-preview-close";close.textContent="×";
+  close.setAttribute("aria-label",english?"Close":"بستن");close.addEventListener("click",()=>modal.remove());
+  const avatar=document.createElement("div");avatar.className="avatar large";
+  if(currentAvatarUrl){const img=document.createElement("img");img.src=currentAvatarUrl;img.alt="";avatar.appendChild(img);}
+  else avatar.textContent=(currentProfileName||"F").trim().charAt(0).toUpperCase();
+  const title=document.createElement("h2");title.id="profilePreviewTitle";title.textContent=currentProfileName||(english?"Farnaz user":"کاربر فرناز");
+  const username=document.createElement("p");username.className="profile-preview-username";username.textContent=currentUsername?"@"+currentUsername:"";username.hidden=!currentUsername;
+  const about=document.createElement("p");about.className="profile-preview-about";about.textContent=currentAbout;about.hidden=!currentAbout;
+  const note=document.createElement("p");note.className="profile-help";note.textContent=english?"Private details such as email and phone are not shown.":"اطلاعات خصوصی مانند ایمیل و شماره موبایل در این پیش‌نمایش نمایش داده نمی‌شوند.";
+  card.append(close,avatar,title,username,about,note);modal.appendChild(card);
+  modal.addEventListener("click",event=>{if(event.target===modal)modal.remove();});
+  document.body.appendChild(modal);close.focus();
+}
+async function exportProfileData(){
+  if(!currentUser)return;
+  const button=$("exportProfileButton");if(button)button.disabled=true;
+  try{
+    const {data,error}=await getClient().from("profiles").select("display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count,allow_space_additions").eq("id",currentUser.id).maybeSingle();
+    if(error)throw error;
+    const payload={exported_at:new Date().toISOString(),account:{id:currentUser.id,email:currentUser.email||null,email_verified:!!(currentUser.email_confirmed_at||currentUser.confirmed_at)},profile:data||{display_name:currentProfileName,username:currentUsername,about:currentAbout,avatar_url:currentAvatarUrl,phone:currentPhone},note:english?"Profile data only; messages and contacts are not included.":"این فایل فقط اطلاعات پروفایل را دارد و شامل پیام‌ها و مخاطبان نیست."};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8"}),url=URL.createObjectURL(blob),link=document.createElement("a");
+    link.href=url;link.download="han-profile-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    setStatus("profileStatus",english?"Profile information exported.":"فایل اطلاعات پروفایل آماده شد.");
+  }catch(error){setStatus("profileStatus",(english?"Export failed: ":"دریافت اطلاعات ناموفق بود: ")+(error?.message||String(error)),true);}
+  finally{if(button)button.disabled=false;}
+}
+async function signOutOtherSessions(){
+  if(!currentUser)return;
+  if(!window.confirm(english?"Sign out all other devices? This device will stay signed in.":"از حساب در همه دستگاه‌های دیگر خارج شود؟ این دستگاه وارد حساب باقی می‌ماند."))return;
+  const button=$("signOutOtherSessionsButton");if(button)button.disabled=true;
+  try{const {error}=await getClient().auth.signOut({scope:"others"});if(error)throw error;setStatus("profileStatus",english?"Other sessions signed out.":"نشست‌های دیگر از حساب خارج شدند.");}
+  catch(error){setStatus("profileStatus",(english?"Could not sign out other sessions: ":"خروج از نشست‌های دیگر ناموفق بود: ")+(error?.message||String(error)),true);}
+  finally{if(button)button.disabled=false;}
+}
+
 async function showUser(user){
   profileCompletionRequired=true;
   const request=++profileRequestNumber;
