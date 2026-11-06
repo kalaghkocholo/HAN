@@ -364,6 +364,8 @@ window.FarnazMountMessageMenu=function(menu,item,onClose){
   menu.setAttribute("role","dialog");menu.setAttribute("aria-modal","true");
   menu.setAttribute("aria-label",label);menu.setAttribute("tabindex","-1");
   let disposed=false;
+  const originalTabIndex=item.getAttribute("tabindex");
+  if(!item.hasAttribute("tabindex"))item.setAttribute("tabindex","-1");
   const position=()=>{
     if(!menu.isConnected||!item.isConnected)return;
     const rect=item.getBoundingClientRect(),vv=window.visualViewport,margin=10,gap=8;
@@ -412,13 +414,19 @@ window.FarnazMountMessageMenu=function(menu,item,onClose){
     window.removeEventListener("scroll",position,true);
     if(window.visualViewport){visualViewport.removeEventListener("resize",position);visualViewport.removeEventListener("scroll",position);}
     if(item?.isConnected)item.focus?.({preventScroll:true});
+    if(item?.isConnected&&originalTabIndex===null)item.removeAttribute("tabindex");
+    else if(item?.isConnected)item.setAttribute("tabindex",originalTabIndex);
+    if(window.FarnazActiveMessageMenuCleanup===cleanup)window.FarnazActiveMessageMenuCleanup=null;
   };
+  window.FarnazActiveMessageMenuCleanup=cleanup;
+  return cleanup;
 };
 function clearMessageActionOverlay(){
   document.querySelectorAll(".message-action-backdrop,.message-action-clone").forEach(node=>node.remove());
   document.querySelectorAll(".message.context-active").forEach(node=>{node.style.visibility="";node.classList.remove("context-active");});
 }
 function dismissMessageMenus(except=null){
+  if(!except&&typeof window.FarnazActiveMessageMenuCleanup==="function")window.FarnazActiveMessageMenuCleanup();
   document.querySelectorAll(".message-tools").forEach(menu=>{if(!except||!except.contains(menu))menu.remove();});
   if(!except)clearMessageActionOverlay();
 }
