@@ -338,7 +338,22 @@ async function prependMessages(messages,myId){
   for(const m of messages)frag.appendChild(await makeMessageElement(m,myId));
   list.prepend(frag);list.scrollTop=oldTop+(list.scrollHeight-oldHeight);
 }
-()();
+(function enableOlderMessagesAtTop(){
+  const list=$("messageList"),button=$("loadOlderButton");
+  if(!list||!button||list.dataset.olderScrollBound==="1")return;
+  list.dataset.olderScrollBound="1";
+  let previousScrollTop=list.scrollTop;
+  button.hidden=true;
+  list.addEventListener("scroll",()=>{
+    const currentScrollTop=list.scrollTop;
+    if(currentScrollTop>8){
+      button.hidden=true;
+    }else if(previousScrollTop>8&&currentScrollTop<=8){
+      button.hidden=!messageHasMore;
+    }
+    previousScrollTop=currentScrollTop;
+  },{passive:true});
+})();
 async function loadOlderMessages(){
   if(!messageHasMore)return;
   $("loadOlderButton").hidden=true;
