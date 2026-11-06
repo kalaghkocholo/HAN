@@ -772,7 +772,7 @@ function backFromChat(){const state=FarnazConversationController.get();if(state.
 /* Bidirectional page swipes use the same history as ordinary navigation. */
 const FARNAZ_SWIPE_PAGE_ORDER=["settingsPage","contactsPage","chatsPage","profilePage"];
 function swipeNavigationBasePage(pageId){
-  if(pageId==="callsPage"||pageId==="spacesPage")return "chatsPage";
+  if(pageId==="callsPage")return "chatsPage";
   return FARNAZ_SWIPE_PAGE_ORDER.includes(pageId)?pageId:null;
 }
 function swipeHistoryTarget(direction){
