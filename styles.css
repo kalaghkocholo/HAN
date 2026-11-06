@@ -628,7 +628,7 @@ html[dir="ltr"] .app.chat-mode #chatPage .conversation-back-button svg{
   transform:scaleX(-1)!important;
 }
 .app.chat-mode #chatPage .chat-heading{
-  order:0!important;display:flex!important;flex-direction:row!important;direction:rtl!important;
+  order:0!important;display:flex!important;flex-direction:row!important;direction:inherit!important;
   align-items:center!important;gap:8px!important;flex:1 1 auto!important;width:auto!important;
   min-width:0!important;max-width:none!important;margin:0!important;overflow:hidden!important;
 }
@@ -639,7 +639,7 @@ html[dir="ltr"] .app.chat-mode #chatPage .conversation-back-button svg{
 }
 .app.chat-mode #chatPage .chat-person{
   display:block!important;flex:1 1 auto!important;min-width:0!important;max-width:100%!important;
-  margin:0!important;overflow:hidden!important;direction:rtl!important;text-align:right!important;
+  margin:0!important;overflow:hidden!important;direction:inherit!important;text-align:start!important;
 }
 .app.chat-mode #chatPage .chat-person h3,
 .app.chat-mode #chatPage .chat-person small{
