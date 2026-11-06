@@ -2389,7 +2389,6 @@ async function runContactSwipeAction(contactId,action,button){
     setStatus("savedContactsStatus",(english?"Action failed: ":"عملیات ناموفق بود: ")+error.message,true);
   }finally{if(button)button.disabled=false;}
 }
-async 
 function renderSavedContactsSnapshot(entries){
   const list=$("savedContactsList");if(!list)return;
   list.replaceChildren();
