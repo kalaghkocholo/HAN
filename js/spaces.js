@@ -174,6 +174,29 @@ function renderSpacesList(spaceRows,mm,fromCache){
 }
   q("spacesStatus").textContent="";
 }
+async function getUnifiedSpaceInboxSnapshot(){
+ if(!currentUser)return [];
+ const myId=String(currentUser.id);
+ const {data:spaceRows,error:spaceError}=await withTimeout(getClient().from("spaces").select("id,type,name,avatar_url,is_public,created_at").order("created_at",{ascending:false}).limit(200),9000,"فهرست گروه‌ها و کانال‌ها");
+ if(spaceError)throw spaceError;
+ const rows=spaceRows||[];
+ if(!rows.length)return [];
+ const {data:memberships,error:membershipError}=await withTimeout(getClient().from("space_members").select("space_id,role").eq("user_id",myId),9000,"عضویت‌های گروه‌ها");
+ if(membershipError)throw membershipError;
+ const roles=new Map((memberships||[]).map(item=>[String(item.space_id),item.role]));
+ const ids=rows.map(item=>item.id);
+ const {data:messages,error:messagesError}=await withTimeout(getClient().from("space_messages").select("id,space_id,sender_id,body,created_at,message_type,attachment_name").in("space_id",ids).order("created_at",{ascending:false}).limit(1000),9000,"آخرین پیام گروه‌ها و کانال‌ها");
+ if(messagesError)throw messagesError;
+ const latest=new Map();
+ for(const message of messages||[])if(!latest.has(String(message.space_id)))latest.set(String(message.space_id),message);
+ return rows.map(space=>{
+  const id=String(space.id),message=latest.get(id),archived=isSpaceArchived(id),hidden=isSpaceHidden(id);
+  const preview=message?.body||((message?.message_type||"text")==="image"?(english?"📷 Photo":"📷 عکس"):message?.attachment_name||"");
+  return {kind:"space",space_id:id,space_type:space.type,name:space.name,avatar_url:space.avatar_url||"",lastMessage:preview|| (english?"No messages yet":"هنوز پیامی ارسال نشده"),created_at:message?.created_at||space.created_at,lastSender:message?.sender_id||"",role:roles.get(id)||null,pref:{pinned:isSpacePinned(id),archived,hidden_at:hidden?"1":null},is_public:!!space.is_public};
+ }).filter(item=>!item.pref.hidden_at);
+}
+window.FarnazGetUnifiedSpaceInboxSnapshot=getUnifiedSpaceInboxSnapshot;
+window.FarnazOpenSpace=id=>open(id);
 async function open(id){
  if(!currentUser)return;
  const myId=String(currentUser.id),token=++spaceOpenToken;
