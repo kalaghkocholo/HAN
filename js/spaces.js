@@ -868,19 +868,27 @@ function openCreateSpaceDialog(type){
 function openComposeMenu(){
  if(!currentUser){openAuth();return;}
  document.getElementById("composeMenuDialog")?.remove();
+ const opener=document.activeElement;
  const overlay=document.createElement("div");
  overlay.className="space-dialog compose-menu-overlay";
  overlay.id="composeMenuDialog";
  overlay.setAttribute("role","presentation");
- overlay.innerHTML='<section class="space-dialog-card compose-menu-card" role="dialog" aria-modal="true" aria-labelledby="composeMenuTitle"><button type="button" class="contact-search-close" data-compose-close aria-label="بستن">×</button><h3 id="composeMenuTitle">پیام جدید</h3><button type="button" class="compose-menu-option" data-compose-action="private"><span class="compose-menu-icon">✉</span><span><strong>گفتگوی خصوصی</strong><small>شروع گفتگو با یک مخاطب</small></span></button><button type="button" class="compose-menu-option" data-compose-action="group"><span class="compose-menu-icon">👥</span><span><strong>گروه جدید</strong><small>گفتگو با چند نفر</small></span></button><button type="button" class="compose-menu-option" data-compose-action="channel"><span class="compose-menu-icon">📣</span><span><strong>کانال جدید</strong><small>انتشار پیام برای اعضا</small></span></button></section>';
- const close=()=>overlay.remove();
+ overlay.innerHTML='<section class="space-dialog-card compose-menu-card" role="dialog" aria-modal="true" aria-labelledby="composeMenuTitle" aria-describedby="composeMenuDescription"><header class="compose-menu-heading"><h3 id="composeMenuTitle">پیام جدید</h3><p id="composeMenuDescription">نوع گفتگوی موردنظرت را انتخاب کن</p></header><div class="compose-menu-actions"><button type="button" class="compose-menu-option" data-compose-action="private"><span class="compose-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1.5 2v-5.2A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8 10h8M8 13h5"/></svg></span><span class="compose-menu-copy"><strong>گفتگوی خصوصی جدید</strong><small>شروع گفتگو با یک مخاطب</small></span><svg class="compose-menu-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg></button><button type="button" class="compose-menu-option" data-compose-action="group"><span class="compose-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"/><circle cx="9.5" cy="7" r="3.5"/><path d="M17 11a3.5 3.5 0 1 0-1-6.9M21 20v-1.5a4 4 0 0 0-3-3.87"/></svg></span><span class="compose-menu-copy"><strong>گروه جدید</strong><small>گفتگو و تبادل پیام با چند نفر</small></span><svg class="compose-menu-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg></button><button type="button" class="compose-menu-option" data-compose-action="channel"><span class="compose-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 11 18-5-5 18-4-8-9-5Z"/><path d="m12 16 5-6"/></svg></span><span class="compose-menu-copy"><strong>کانال جدید</strong><small>انتشار پیام برای دنبال‌کنندگان</small></span><svg class="compose-menu-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg></button></div><button type="button" class="compose-menu-cancel" data-compose-close>انصراف</button></section>';
+ const close=()=>{if(!overlay.isConnected)return;overlay.remove();if(opener&&typeof opener.focus==="function")opener.focus({preventScroll:true});};
  overlay.addEventListener("click",event=>{if(event.target===overlay||event.target.closest("[data-compose-close]"))close();});
  overlay.querySelectorAll("[data-compose-action]").forEach(button=>button.addEventListener("click",()=>{
   const action=button.dataset.composeAction;close();
   if(action==="private")startNewChat();
   else openCreateSpaceDialog(action);
  }));
- overlay.addEventListener("keydown",event=>{if(event.key==="Escape")close();});
+ overlay.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){event.preventDefault();close();return;}
+  if(event.key!=="Tab")return;
+  const controls=[...overlay.querySelectorAll("button:not([disabled])")];
+  const first=controls[0],last=controls[controls.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+ });
  document.body.appendChild(overlay);
  overlay.querySelector("[data-compose-action]")?.focus({preventScroll:true});
 }
