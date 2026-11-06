@@ -536,7 +536,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v265"')) {
+    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v267"')) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 
