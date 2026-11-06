@@ -942,7 +942,7 @@ function showConversationActions(card,contactId){
   card.appendChild(menu);
 }
 function openSignup(){authMode="signup";openAuth();}
-function openLogin(){authMode="login";openAuth();}
+
 function openAuth(){
   const signup=authMode==="signup";
   $("nameField").style.display="none";
@@ -967,9 +967,7 @@ function getAuthRecoveryRedirectUrl(){
   url.searchParams.set("auth","recovery");
   return url.href;
 }
-function isAuthRecoveryCallback(){
-  return new URLSearchParams(window.location.search).get("auth")==="recovery";
-}
+
 async function requestPasswordRecovery(){
   const email=$("authEmail")?.value.trim()||"";
   const button=$("authForgotPassword");
@@ -1274,90 +1272,7 @@ async function signOutOtherSessions(){
   finally{if(button)button.disabled=false;}
 }
 
-async function showUser(user){
-  profileCompletionRequired=true;
-  const request=++profileRequestNumber;
-  currentUser=user;currentUsername="";currentAbout="";currentAvatarUrl="";currentPhone="";renderUser(user,user.user_metadata?.display_name||"");
-  if(!window.__farnazPersistenceRequested){window.__farnazPersistenceRequested=true;void window.FarnazLocalStore?.requestPersistentStorage().catch(error=>console.warn("Persistent storage request:",error));}
-  window.dispatchEvent(new CustomEvent("farnaz-auth-user",{detail:{userId:user.id}}));
-  setStatus("profileStatus",english?"Loading profile...":"در حال بارگذاری پروفایل...");
-  let cachedProfile=null;
-  try{cachedProfile=await window.FarnazLocalStore?.getSnapshot(user.id,"profile");}catch(cacheError){console.warn("Cached profile read:",cacheError);}
-  if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
-  if(cachedProfile){
-    privacySettings={presence_visibility:cachedProfile.presence_visibility||"contacts",last_seen_visibility:cachedProfile.last_seen_visibility||"contacts",show_typing:cachedProfile.show_typing!==false,show_read_receipts:cachedProfile.show_read_receipts!==false,show_space_online_count:cachedProfile.show_space_online_count!==false,allow_space_additions:cachedProfile.allow_space_additions!==false};
-    applyPrivacySettings();
-    currentProfileName=cachedProfile.display_name||user.user_metadata?.display_name||"";
-    currentUsername=cachedProfile.username||"";currentAbout=cachedProfile.about||"";
-    currentAvatarUrl=cachedProfile.avatar_url||"";currentPhone=cachedProfile.phone||"";
-    renderUser(user,currentProfileName);
-    if($("profileNameInput"))$("profileNameInput").value=currentProfileName;
-    if($("profileUsernameInput"))$("profileUsernameInput").value=currentUsername;
-    if($("profileAboutInput"))$("profileAboutInput").value=currentAbout;
-    setPhoneCountry("profilePhoneCountry",currentPhone);
-    if($("profilePhoneInput"))$("profilePhoneInput").value=formatContactPhone(currentPhone);
-    if($("showPhoneSetting"))$("showPhoneSetting").checked=cachedProfile.show_phone!==false;
-    setStatus("profileStatus",english?"Showing saved profile while refreshing…":"نمایش پروفایل ذخیره‌شده؛ در حال همگام‌سازی…");
-  }
-  try{
-    const {data,error}=await retryRead("current user profile",()=>getClient().from("profiles")
-      .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count,allow_space_additions").eq("id",user.id).maybeSingle(),2,18000);
-    if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
-    if(error)throw error;
-    let profile=data;
-    if(!profile){
-      const fallbackName=(user.user_metadata?.display_name||user.email?.split("@")[0]||"Farnaz user").trim();
-      const created=await retryRead("create current user profile",()=>getClient().from("profiles")
-        .upsert({id:user.id,display_name:fallbackName,phone:user.phone||null,show_phone:true},{onConflict:"id"})
-        .select("id,display_name,username,about,avatar_url,phone,show_phone,presence_visibility,last_seen_visibility,show_typing,show_read_receipts,show_space_online_count,allow_space_additions").single(),2,18000);
-      if(created.error)throw created.error;
-      // Logout/account switching may happen while profile creation is pending.
-      if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
-      profile=created.data;
-    }
-    privacySettings={presence_visibility:profile?.presence_visibility||"contacts",last_seen_visibility:profile?.last_seen_visibility||"contacts",show_typing:profile?.show_typing!==false,show_read_receipts:profile?.show_read_receipts!==false,show_space_online_count:profile?.show_space_online_count!==false,allow_space_additions:profile?.allow_space_additions!==false};
-    applyPrivacySettings();
-    startFarnazPresence().catch(e=>console.warn("Farnaz presence:",e));
-    currentProfileName=profile?.display_name||user.user_metadata?.display_name||"";
-    currentUsername=profile?.username||"";currentAbout=profile?.about||"";
-    currentAvatarUrl=profile?.avatar_url||"";currentPhone=profile?.phone||"";
-    renderUser(user,currentProfileName);
-    $("profileNameInput").value=currentProfileName;
-    $("profileUsernameInput").value=currentUsername;
-    $("profileAboutInput").value=currentAbout;
-    setPhoneCountry("profilePhoneCountry",currentPhone);
-    $("profilePhoneInput").value=formatContactPhone(currentPhone);
-    $("showPhoneSetting").checked=profile?.show_phone!==false;
-    try{await window.FarnazLocalStore?.saveSnapshot(user.id,"profile",profile);}catch(cacheError){console.warn("Cached profile save:",cacheError);}
-    // A completed cache write must not let a stale profile request update the UI after logout.
-    if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
-    profileCompletionRequired=!(String(profile?.display_name||"").trim()&&String(profile?.phone||"").trim());
-    if(profileCompletionRequired){
-      $("profileIntro").textContent=english
-        ?"Complete your profile to continue. Your mobile number helps friends find you on Farnaz; it is not SMS-verified."
-        :"برای ادامه، تکمیل پروفایل الزامی است. شماره موبایل برای پیدا کردن مخاطبان در فرناز استفاده می‌شود و تأیید پیامکی نمی‌شود.";
-      $("profileHeading").textContent=english?"Complete your profile":"تکمیل پروفایل";
-      navigate("profilePage",{refreshData:false});
-      setStatus("profileStatus",english?"Add your name and mobile number, then save to continue.":"نام و شماره موبایل را وارد کن و ذخیره را بزن تا وارد فرناز شوی.");
-    }else{
-      $("profileHeading").textContent=english?"My profile":"پروفایل من";
-      $("profileIntro").textContent=english?"Manage your account information.":"اطلاعات حساب خود را مدیریت کن.";
-      if(document.querySelector(".page.active")?.id==="profilePage")navigate("chatsPage",{refreshData:false});
-      setStatus("profileStatus",english?"Profile loaded.":"پروفایل بارگذاری شد.");
-    }
-  }catch(e){
-    // Ignore a late profile failure after logout or a newer account/profile request.
-    // Otherwise it can overwrite the cleared guest UI with a stale loading/error status.
-    if(request!==profileRequestNumber||currentUser?.id!==user.id)return;
-    console.error("Profile read:",e);
-    if(cachedProfile){
-      setStatus("profileStatus",english?"Showing saved profile; server refresh failed.":"پروفایل ذخیره‌شده نمایش داده می‌شود؛ به‌روزرسانی سرور ناموفق بود.");
-      return;
-    }
-    navigate("profilePage",{refreshData:false});
-    setStatus("profileStatus",(english?"Could not load profile: ":"بارگذاری پروفایل ناموفق بود: ")+e.message,true);
-  }
-}
+async 
 function showGuest(){
   swipePageHistory=[];swipePageHistoryIndex=-1;clearSwipeTransition();
   profileCompletionRequired=false;
