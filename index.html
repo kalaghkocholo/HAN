@@ -177,6 +177,11 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       <div class="profile-actions"><button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button></div>
     </form>
     <p id="profileStatus" class="status profile-status" role="status" aria-live="polite"></p>
+    <div class="profile-account-tools" aria-label="ابزارهای حساب">
+      <button class="secondary-button" id="profilePreviewButton" type="button" onclick="openProfilePreview()">پیش‌نمایش پروفایل</button>
+      <button class="secondary-button" id="exportProfileButton" type="button" onclick="exportProfileData()">دریافت اطلاعات پروفایل</button>
+      <button class="secondary-button" id="signOutOtherSessionsButton" type="button" onclick="signOutOtherSessions()">خروج از نشست‌های دیگر</button>
+    </div>
     <div class="profile-account-actions"><button class="secondary-button" id="logoutButton" type="button" onclick="logout()">خروج از حساب</button></div>
   </div>
 </section>
