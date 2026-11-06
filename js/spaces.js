@@ -567,6 +567,7 @@ async function toggleSpaceMessageReaction(message,emoji){
 }
 let spaceMessageMenuDetach=()=>{};
 function closeSpaceMessageMenu(){
+ if(typeof window.FarnazActiveMessageMenuCleanup==="function")window.FarnazActiveMessageMenuCleanup();
  const cleanup=spaceMessageMenuDetach;spaceMessageMenuDetach=()=>{};cleanup();
  document.querySelectorAll(".space-message-actions,.space-message-action-backdrop,.space-message-action-clone,.message-tools,.message-action-backdrop,.message-action-clone").forEach(n=>n.remove());
  document.querySelectorAll(".space-message.context-active").forEach(n=>n.classList.remove("context-active"));
