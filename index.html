@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
 <meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
 <title>فرناز | Farnaz</title>
-<link rel="preload" href="./js/core.js?v=20261106-unified-inbox1" as="script">
+<link rel="preload" href="./js/core.js?v=20261106-compose-menu1" as="script">
 <link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
 <style>
 :root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
@@ -49,7 +49,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 
 <!-- صفحه گفتگوها -->
 <section class="page" id="chatsPage">
-  <div class="chats-topline"><div class="page-heading"><h2 id="chatsHeading">گفتگوها</h2><p id="chatsIntro">گفتگوهای اخیرت را اینجا می‌بینی.</p></div><button class="chats-new-button" type="button" onclick="startNewChat()" aria-label="گفتگوی جدید" title="گفتگوی جدید"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+  <div class="chats-topline"><div class="page-heading"><h2 id="chatsHeading">گفتگوها</h2><p id="chatsIntro">گفتگوهای اخیرت را اینجا می‌بینی.</p></div><button class="chats-new-button" type="button" onclick="openComposeMenu()" aria-label="پیام جدید" title="پیام جدید"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15M8 7h7M8 10h5M14.5 16.5 20 11l2 2-5.5 5.5-3 .8z"/></svg></button></div>
   <label class="conversation-search" for="conversationSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="conversationSearch" type="search" autocomplete="off" placeholder="جستجوی گفتگوها" aria-label="جستجوی گفتگوها"></label>
   <div class="conversation-tools"><button class="mini-button" id="showActiveChats" type="button" onclick="setConversationView('active')">گفتگوها</button><button class="mini-button" id="showArchivedChats" type="button" onclick="setConversationView('archived')">آرشیو</button></div>
   <div class="contacts-category-tabs inbox-type-filters" role="group" aria-label="فیلتر نوع گفتگو"><button class="contacts-category-tab is-active" type="button" data-inbox-filter="all" aria-pressed="true">همه</button><button class="contacts-category-tab" type="button" data-inbox-filter="private" aria-pressed="false">خصوصی</button><button class="contacts-category-tab" type="button" data-inbox-filter="group" aria-pressed="false">گروه‌ها</button><button class="contacts-category-tab" type="button" data-inbox-filter="channel" aria-pressed="false">کانال‌ها</button></div>
@@ -511,7 +511,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   });
   function loadLocalScripts(){
     const core=document.createElement("script");
-    core.src="./js/core.js?v=20261106-unified-inbox1";
+    core.src="./js/core.js?v=20261106-compose-menu1";
     watchScript(core,()=>{
       // A script's load event can still fire after a runtime exception.
       // Verify the core boot contract before loading features or attempting
@@ -522,7 +522,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       }
       const featureScripts=[
         "./js/chat-menu-v5.js?v=20261106-logout-guard1",
-        "./js/spaces.js?v=20261106-unified-inbox2",
+        "./js/spaces.js?v=20261106-compose-menu1",
         "./js/calls.js?v=20261106-logout-guard1"
       ];
       if(window.FARNAZ_LIVEKIT_CALLS_ENABLED===true){
