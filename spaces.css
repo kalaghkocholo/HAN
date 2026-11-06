@@ -874,14 +874,12 @@ body[data-theme="light"] #spaceAddContacts .space-contact{background:#f4f6fa!imp
 body[data-theme="light"] #spaceAddDialog,
 body[data-theme="light"] #spaceInfoDialog{color:#172237!important}
 body[data-theme="light"] #spaceAddDialog .space-dialog-card,
-body[data-theme="light"] #spaceInfoDialog .space-dialog-card{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}
-body[data-theme="light"] #spaceAddContacts .space-contact,
+body[data-theme="light"] #spaceInfoDialog .space-dialog-card{background:#fff!important;color:#172237!important;border-color:#dce3ed!important}body[data-theme="light"] #spaceAddContacts .space-contact,
 body[data-theme="light"] #spaceAddContacts .space-contact span,
 body[data-theme="light"] #spaceMemberList,
-body[data-theme="light"] #spaceMemberList .space-member,
-body[data-theme="light"] #spaceMemberList .space-member span,
 body[data-theme="light"] #spaceMemberList strong,
-body[data-theme="light"] #spaceMemberList small{color:#172237!important}
+body[data-theme="light"] #spaceMemberList small
+{color:#172237!important}
 
 
 

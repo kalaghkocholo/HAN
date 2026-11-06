@@ -31,34 +31,15 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{
   display:flex;align-items:center;gap:10px;min-height:48px;
   margin:0 0 15px;padding:0 0 10px;border-bottom:1px solid var(--border)
 }
-.app>header:has(.logo-button[hidden]){display:none!important}
-.logo{
-  width:40px;height:40px;flex-shrink:0;border-radius:13px;
-  display:grid;place-items:center;background:var(--mint);
-  color:var(--bg);font-size:23px;font-weight:800
-}
-.brand-text{flex:1;min-width:0}
 h1{font-size:20px;margin:0}
 .sub{color:var(--muted);font-size:11px;margin-top:3px}
-.icon-button{
-  display:grid;place-items:center;width:40px;height:40px;
-  border:1px solid transparent;border-radius:14px;
-  background:transparent;color:var(--white);font-size:21px
-}
-.brand-stack{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;position:relative}
-.new-chat-button{display:none;flex-shrink:0;width:32px;height:30px;border-radius:10px;font-size:16px}
-.new-chat-button.visible{display:grid}
-.new-chat-button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .page{display:none;animation:appear .15s ease-out}
 .page.active{display:block}
-@keyframes appear{from{opacity:.65}to{opacity:1}}
-.hero,.panel,.feature{
+@keyframes appear{from{opacity:.65}to{opacity:1}}.panel,
+.feature
+{
   background:var(--panel);border:1px solid var(--border);
   border-radius:22px
-}
-.hero{
-  padding:22px 18px;margin-bottom:15px;
-  background:var(--panel)
 }
 .tag{color:var(--mint);font-size:11px;font-weight:700}
 h2{font-size:18px;line-height:1.5;margin:9px 0}
@@ -105,9 +86,6 @@ input::placeholder,textarea::placeholder{color:var(--muted)}
 textarea{resize:vertical;min-height:55px;line-height:1.6}
 input::placeholder,textarea::placeholder{color:#8492a7}
 input[type=file]{font-size:11px;padding:9px}
-.form-row{display:flex;gap:8px;align-items:center}
-.form-row input{flex:1}
-.form-row button{flex-shrink:0;width:auto;margin:0}
 .avatar{
   display:grid;place-items:center;overflow:hidden;flex-shrink:0;
   border-radius:50%;background:var(--mint);color:var(--bg);
@@ -284,8 +262,6 @@ html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16
 #authForm label{font-size:12px;font-weight:650;margin-top:5px}
 #authForm input{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--white);outline:none}
 #authForm input:focus{border-color:var(--accent)}
-.auth-field-hint{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:5px}
-#authPhoneField[hidden]{display:none!important}
 .social-auth{display:grid;gap:9px;margin:14px 0 12px}
 .social-auth-button{width:100%;min-height:42px;border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--white);display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:600;padding:9px 14px}
 .social-auth-button:disabled{opacity:.65}
@@ -302,7 +278,6 @@ html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16
 [hidden]{display:none!important}
 @media(max-width:360px){
   .app{padding-left:9px;padding-right:9px}
-  .hero{padding:15px 12px}
   }
 
 /* One composer layout shared by private chats, groups and channels. */
@@ -377,38 +352,34 @@ html[dir="ltr"] .auth-language-switch{right:max(16px,calc((100vw - 560px)/2 + 16
 .app>header[hidden]{display:none!important}
 
 /* Complete light theme coverage, including fixed bottom navigation and all app surfaces. */
-body[data-theme="light"]{background:var(--bg)!important;color:var(--white)!important}
-body[data-theme="light"] .app,
+body[data-theme="light"]{background:var(--bg)!important;color:var(--white)!important}body[data-theme="light"] .app,
 body[data-theme="light"] .app>header,
 body[data-theme="light"] .bottom-nav,
 body[data-theme="light"] .bottom-nav .nav-inner,
 body[data-theme="light"] .page,
 body[data-theme="light"] .list-item,
-body[data-theme="light"] .conversation-item,
-body[data-theme="light"] .contact-item,
-body[data-theme="light"] .profile-card,
 body[data-theme="light"] .settings-card,
-body[data-theme="light"] 
-body[data-theme="light"] .contact-search-popover,
 body[data-theme="light"] #sendMessageForm,
-body[data-theme="light"] .message-composer,
-body[data-theme="light"] footer{background-color:var(--bg)!important;color:var(--white)!important}
+body[data-theme="light"] footer
+{background-color:var(--bg)!important;color:var(--white)!important}
 body[data-theme="light"] .bottom-nav{border-top:1px solid var(--border)!important;background:var(--panel)!important;box-shadow:0 -4px 18px rgba(20,35,60,.08)!important}
 body[data-theme="light"] .bottom-nav .nav-inner{background:var(--panel)!important}
 body[data-theme="light"] .nav-button{color:var(--muted)!important;background:transparent!important}
 body[data-theme="light"] .nav-button.active{color:var(--accent)!important;background:var(--panel2)!important}
-body[data-theme="light"] .app>header{border-color:var(--border)!important}
-body[data-theme="light"] .page h1,body[data-theme="light"] .page h2,body[data-theme="light"] .page h3,
-body[data-theme="light"] .setting-copy strong,
-body[data-theme="light"] .conversation-title,body[data-theme="light"] .contact-name{color:var(--white)}
+body[data-theme="light"] .app>header{border-color:var(--border)!important}body[data-theme="light"] .page h1,
+body[data-theme="light"] .page h2,
+body[data-theme="light"] .page h3,
+body[data-theme="light"] .setting-copy strong
+{color:var(--white)}
 body[data-theme="light"] .page p,body[data-theme="light"] .setting-copy small{color:var(--muted)}
 body[data-theme="light"] .setting-control{background:var(--bg)!important;border-color:var(--border)!important;color:var(--white)!important}
 body[data-theme="light"] input,body[data-theme="light"] textarea,body[data-theme="light"] select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--white)!important}
 body[data-theme="light"] .bubble{color:var(--white)}
 /* Respect selected bubble colors in light theme too. */
 body[data-theme="light"] .bubble.outgoing{background:var(--my-message-bg,var(--accent))!important;color:var(--my-message-ink,#15372f)!important}
-body[data-theme="light"] .bubble.incoming{background:var(--their-message-bg,color-mix(in srgb,var(--accent) 15%,var(--panel2)))!important;color:var(--their-message-ink,#172237)!important}
-body[data-theme="light"] .icon-button,body[data-theme="light"] .mini-button,body[data-theme="light"] body[data-theme="light"] .bottom-nav *{text-shadow:none}
+body[data-theme="light"] .bubble.incoming{background:var(--their-message-bg,color-mix(in srgb,var(--accent) 15%,var(--panel2)))!important;color:var(--their-message-ink,#172237)!important}body[data-theme="light"] .mini-button,
+body[data-theme="light"] body[data-theme="light"] .bottom-nav *
+{text-shadow:none}
 
 /* Farnaz settings and personal appearance preferences */
 :root{--accent:var(--mint);--font-scale:1}
@@ -435,36 +406,29 @@ button,.primary,.action-button,.nav-button{--button-accent:var(--accent)}
 .settings-reset{width:100%;margin-top:4px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:11px}
 body[data-theme="light"]{--bg:#f5f5f7;--panel:#fff;--panel2:#e9e9eb;--border:#d1d1d6;--muted:#6e6e73;--white:#1c1c1e;--danger:#b42318;--card:var(--panel);--line:var(--border);--text:var(--white)}
 body[data-theme="light"] .settings-card{box-shadow:0 2px 12px rgba(20,35,60,.04)}
-body[data-theme="light"] input,body[data-theme="light"] textarea,body[data-theme="light"] select{color:var(--white)}
-body[data-theme="light"] .icon-button,body[data-theme="light"] .mini-button{color:var(--white)}
+body[data-theme="light"] input,body[data-theme="light"] textarea,body[data-theme="light"] select{color:var(--white)}body[data-theme="light"] .mini-button
+{color:var(--white)}
 .app .page#settingsPage{padding-bottom:26px}
-@media(min-width:560px){.settings-page{padding-left:18px;padding-right:18px}}
-
-/* Theme consistency fix: update the whole app, not only the settings panel. */
+@media(min-width:560px){.settings-page{padding-left:18px;padding-right:18px}}/* Theme consistency fix: update the whole app,
+not only the settings panel. */
 body[data-theme="light"] .app,
 body[data-theme="light"] .app>header,
 body[data-theme="light"] .page,
-body[data-theme="light"] .hero,
 body[data-theme="light"] .panel,
 body[data-theme="light"] .feature,
 body[data-theme="light"] .settings-card,
 body[data-theme="light"] .list-item,
 body[data-theme="light"] .conversation-card,
-body[data-theme="light"] .contact-item,
-body[data-theme="light"] .profile-card,
-body[data-theme="light"] 
-body[data-theme="light"] .contact-search-popover,
 body[data-theme="light"] .attachment-menu,
 body[data-theme="light"] .bottom-nav,
 body[data-theme="light"] .bottom-nav .nav-inner,
-body[data-theme="light"] footer {
+body[data-theme="light"] footer
+{
   background:var(--panel)!important;
   border-color:var(--border)!important;
 }
 body[data-theme="light"] .page {background:transparent!important}
-body[data-theme="light"] .hero {background:var(--panel)!important}
-body[data-theme="light"] .app {background:var(--bg)!important}
-body[data-theme="light"] .page h1,
+body[data-theme="light"] .app {background:var(--bg)!important}body[data-theme="light"] .page h1,
 body[data-theme="light"] .page h2,
 body[data-theme="light"] .page h3,
 body[data-theme="light"] .page .feature h3,
@@ -475,10 +439,9 @@ body[data-theme="light"] .page .empty-state,
 body[data-theme="light"] .page .status:not(.muted-note),
 body[data-theme="light"] .page .profile-info,
 body[data-theme="light"] .page .setting-copy strong,
-body[data-theme="light"] .app>header .brand-text,
-body[data-theme="light"] .icon-button,
 body[data-theme="light"] .mini-button,
-body[data-theme="light"] .attachment-option {
+body[data-theme="light"] .attachment-option
+{
   color:var(--white)!important;
 }
 body[data-theme="light"] .page p,
@@ -503,10 +466,7 @@ body[data-theme="light"] .bottom-nav .nav-button {color:var(--muted)!important}
 body[data-theme="light"] .bottom-nav .nav-button.active {color:var(--accent)!important;background:var(--panel2)!important}
 /* Keep explicit black/white font choices consistent across common text surfaces. */
 body[data-font-color="black"] {--white:#111111!important}
-body[data-font-color="white"]:not([data-theme="light"]) {--white:#ffffff!important}
-
-
-body[data-font-color="black"] .page h1,
+body[data-font-color="white"]:not([data-theme="light"]) {--white:#ffffff!important}body[data-font-color="black"] .page h1,
 body[data-font-color="black"] .page h2,
 body[data-font-color="black"] .page h3,
 body[data-font-color="black"] .page p,
@@ -514,9 +474,8 @@ body[data-font-color="black"] .page label,
 body[data-font-color="black"] .page .list-name,
 body[data-font-color="black"] .page .list-details,
 body[data-font-color="black"] .page .empty-state,
-body[data-font-color="black"] .page .setting-copy strong,
-body[data-font-color="black"] .app>header .brand-text {color:#111!important}
-body[data-font-color="white"]:not([data-theme="light"]) .page h1,
+body[data-font-color="black"] .page .setting-copy strong
+{color:#111!important}body[data-font-color="white"]:not([data-theme="light"]) .page h1,
 body[data-font-color="white"]:not([data-theme="light"]) .page h2,
 body[data-font-color="white"]:not([data-theme="light"]) .page h3,
 body[data-font-color="white"]:not([data-theme="light"]) .page p,
@@ -524,8 +483,8 @@ body[data-font-color="white"]:not([data-theme="light"]) .page label,
 body[data-font-color="white"]:not([data-theme="light"]) .page .list-name,
 body[data-font-color="white"]:not([data-theme="light"]) .page .list-details,
 body[data-font-color="white"]:not([data-theme="light"]) .page .empty-state,
-body[data-font-color="white"]:not([data-theme="light"]) .page .setting-copy strong,
-body[data-font-color="white"]:not([data-theme="light"]) .app>header .brand-text {color:#fff!important}
+body[data-font-color="white"]:not([data-theme="light"]) .page .setting-copy strong
+{color:#fff!important}
 
 
 /* Explicit font-color preference for all readable interface text. */
@@ -589,11 +548,13 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .app .muted-
 body[data-font-color="white"]:not([data-theme="light"])[data-theme] .app .list-preview,
 body[data-font-color="white"]:not([data-theme="light"])[data-theme] .app .list-time,
 body[data-font-color="white"]:not([data-theme="light"])[data-theme] .app .sub,
-body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav .nav-button { color:#ffffff !important; }
-
- 
-/* Accent color picker controls all primary action buttons, including black and white. */
-.primary,.action-button,.auth-submit,.composer-icon.send,.logo {
+body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav .nav-button { color:#ffffff !important; }/* Accent color picker controls all primary action buttons,
+including black and white. */
+.primary,
+.action-button,
+.auth-submit,
+.composer-icon.send
+{
   background:var(--accent)!important;
   color:var(--accent-ink,#101828)!important;
 }
@@ -738,7 +699,8 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 .contact-info-avatar{margin:0 auto 10px;width:82px;height:82px;font-size:26px}
 .contact-info-profile h2{font-size:20px;margin:8px 0}
 .contact-info-profile p{margin:5px 0}
-.contact-info-phone{font-size:14px;margin-top:8px;color:var(--mint,#50e3c2);direction:ltr!important;text-align:right!important;unicode-bidi:isolate;overflow-wrap:anywhere} #userPhone,#profilePage .profile-phone{direction:ltr!important;text-align:center!important;unicode-bidi:isolate;overflow-wrap:anywhere} .phone-contact-details>span,#recipientValue{direction:ltr!important;text-align:left!important;unicode-bidi:isolate;overflow-wrap:anywhere} .profile-phone{display:block;width:100%;margin:0 auto;text-align:center!important}
+.contact-info-phone{font-size:14px;margin-top:8px;color:var(--mint,#50e3c2);direction:ltr!important;text-align:right!important;unicode-bidi:isolate;overflow-wrap:anywhere} #userPhone,#profilePage .profile-phone{direction:ltr!important;text-align:center!important;unicode-bidi:isolate;overflow-wrap:anywhere}.phone-contact-details>span
+{direction:ltr!important;text-align:left!important;unicode-bidi:isolate;overflow-wrap:anywhere} .profile-phone{display:block;width:100%;margin:0 auto;text-align:center!important}
 .contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
 .contact-info-action{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px 2px;border:1px solid var(--border,#334155);border-radius:11px;background:var(--panel2,#27364b);color:inherit;font:inherit;font-size:10px;line-height:1.25;overflow-wrap:anywhere;cursor:pointer}
 .contact-info-action-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--accent,#50e3c2) 18%,transparent);color:var(--accent,#50e3c2);font-size:22px}
@@ -840,12 +802,6 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 .message-search-snippet{font-size:14px;line-height:1.5;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .message-search-meta{font-size:11px;color:var(--muted,#a8b3c7)}
 @media(max-width:560px){.message-search-dialog{padding:0;align-items:stretch}.message-search-card{width:100%;height:100dvh;max-height:100dvh;border-radius:0;border-inline:0;padding:50px 14px max(18px,env(safe-area-inset-bottom))}.message-search-filters{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.message-search-filters>div:first-child{grid-column:1/-1}}
-
-
-/* Private-message emoji reactions and pinned-message banner */
-.message-reaction-picker{display:flex;flex:0 0 100%;justify-content:center;gap:3px;padding:2px 0 4px}
-.message-reaction-choice{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;padding:0;border:1px solid transparent;border-radius:10px;background:var(--panel2);font-size:19px}
-.message-reaction-choice:active{background:#30435b;transform:scale(.96)}
 .message-pin-action{flex:0 0 auto}
 .message-pin-indicator{display:block;margin:0 0 5px;color:var(--mint);font-size:10px;font-weight:700;line-height:1.3}
 .message-reactions{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;direction:ltr;justify-content:flex-start}
@@ -894,12 +850,24 @@ body[data-font-color="white"]:not([data-theme="light"])[data-theme] .bottom-nav 
 body[data-theme="light"]{color-scheme:light}
 body[data-theme="dark"]{color-scheme:dark}
 body, .app, .app.chat-mode>#chatPage #sendMessageForm{background:var(--bg)!important;color:var(--white)!important}
-.hero{background:linear-gradient(145deg,var(--panel2),var(--panel))!important;border-color:var(--border)!important}
 p{color:var(--muted)!important}
-.tag,.nav-button.active,.message-pin-indicator,.message-pinned-copy strong,.message-pinned-arrow{color:var(--accent)!important}
-.logo,.avatar{background:var(--accent)!important;color:var(--accent-ink,#101722)!important}
-.primary,.action-button,.auth-submit,.composer-icon.send{background:var(--accent)!important;color:var(--accent-ink,#101722)!important}
-.icon-button,.list-item,.conversation-card .list-item,.settings-card,.panel,.feature,.contact-search-popover,.contact-info-card,.message-search-card,.space-dialog-card,.message-tools-floating,.attachment-menu,.composer-shell,.mini-button,.message-reaction-chip,.message-pinned-banner{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
+.tag,.nav-button.active,.message-pin-indicator,.message-pinned-copy strong,.message-pinned-arrow{color:var(--accent)!important}.avatar
+{background:var(--accent)!important;color:var(--accent-ink,#101722)!important}
+.primary,.action-button,.auth-submit,.composer-icon.send{background:var(--accent)!important;color:var(--accent-ink,#101722)!important}.list-item,
+.conversation-card .list-item,
+.settings-card,
+.panel,
+.feature,
+.contact-info-card,
+.message-search-card,
+.space-dialog-card,
+.message-tools-floating,
+.attachment-menu,
+.composer-shell,
+.mini-button,
+.message-reaction-chip,
+.message-pinned-banner
+{background:var(--panel)!important;color:var(--white)!important;border-color:var(--border)!important}
 input,textarea,select,#messageSearchQuery,#messageSearchKind,#messageSearchFrom,#messageSearchTo{background:var(--bg)!important;color:var(--white)!important;border-color:var(--border)!important}
 .bottom-nav{background:color-mix(in srgb,var(--panel) 94%,transparent)!important;border-top-color:var(--border)!important}
 .nav-button.active{background:var(--panel2)!important;color:var(--accent)!important}
@@ -925,22 +893,17 @@ input,textarea,select,#messageSearchQuery,#messageSearchKind,#messageSearchFrom,
 #authBox .auth-mode-tabs{background:rgba(218,239,236,.8)!important;border-color:rgba(87,166,158,.16)!important}
 #authBox .auth-mode-tab{color:#58777a!important}
 #authBox .auth-mode-tab.is-active{background:#278f88!important;color:#fff!important;box-shadow:0 3px 10px rgba(39,143,136,.2)!important}
-.social-auth[hidden],.auth-divider[hidden]{display:none!important}
-body[data-theme="light"] .hero,body[data-theme="light"] .panel,body[data-theme="light"] .feature,
-body[data-theme="light"] .settings-card,body[data-theme="light"] .list-item,
-body[data-theme="light"] body[data-theme="light"] .contact-search-popover,
-body[data-theme="light"] .contact-info-card,body[data-theme="light"] .message-search-card,
-body[data-theme="light"] .space-dialog-card,body[data-theme="light"] .auth-card{box-shadow:0 6px 24px rgba(24,39,62,.045)!important}
+.social-auth[hidden],.auth-divider[hidden]{display:none!important}body[data-theme="light"] .panel,
+body[data-theme="light"] .feature,
+body[data-theme="light"] .settings-card,
+body[data-theme="light"] .list-item,
+body[data-theme="light"] .contact-info-card,
+body[data-theme="light"] .message-search-card,
+body[data-theme="light"] .space-dialog-card,
+body[data-theme="light"] .auth-card
+{box-shadow:0 6px 24px rgba(24,39,62,.045)!important}
 body[data-theme="light"] .social-auth-button{background:#fff!important;color:#1f2937!important}
 body[data-theme="light"] .message-tools-floating>.mini-button:active{background:var(--panel2)!important}
-
-
-/* Keep Settings unavailable before login even if other header button styles are applied. */
-#openSettingsButton[hidden]{display:none!important}
-
-
-/* Auth state is explicit: never expose Settings on the guest/login screen. */
-body[data-auth-state="guest"] #openSettingsButton{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
 
 /* Profile phone visibility preference */
@@ -966,8 +929,6 @@ body[data-auth-state="guest"] #openSettingsButton{display:none!important;visibil
 .contact-swipe-actions{position:absolute;inset-block:0;right:0;display:flex;align-items:stretch;width:264px;max-width:82vw;direction:ltr;z-index:0}
 .contact-swipe-action{display:flex;flex:1 1 0;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:5px 2px;border:0;border-inline-start:1px solid #ffffff20;background:#64748b;color:#fff;font:inherit;font-size:11px;line-height:1.15}
 .contact-swipe-action:first-child{background:#287a9d}
-.contact-swipe-pin{background:#7c6b32}
-.contact-swipe-block{background:#9a5b30}
 .contact-swipe-delete{background:#b83d4b}
 .contact-swipe-glyph{font-size:20px;line-height:1}
 .contact-swipe-label{white-space:normal;text-align:center;overflow-wrap:anywhere}
@@ -978,7 +939,6 @@ body[data-auth-state="guest"] #openSettingsButton{display:none!important;visibil
 .contact-swipe-shell .list-name,.contact-swipe-shell .list-preview{overflow:hidden;text-overflow:ellipsis}
 .contact-swipe-shell .saved-contact-row.is-pinned:after{content:"📌";align-self:center;padding:0 10px;font-size:13px}
 @media (prefers-reduced-motion:reduce){.saved-contact-row{transition:none}}
-.contact-remove-button{flex:0 0 40px;width:40px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--danger);font-size:18px}
 .phone-contact-swipe-shell{position:relative;isolation:isolate;overflow:hidden;border-radius:13px;margin-bottom:8px;min-width:0;background:var(--panel2);touch-action:pan-y}
 .phone-contact-swipe-actions{position:absolute;inset-block:0;right:0;width:88px;display:flex;direction:ltr;z-index:0}
 .phone-contact-swipe-actions .contact-swipe-action{width:88px;flex:none}
@@ -1004,8 +964,6 @@ body[data-auth-state="guest"] #openSettingsButton{display:none!important;visibil
 .welcome-shell>p{max-width:280px;margin:0 0 20px;color:var(--muted);font-size:13px}
 .welcome-shell .primary{max-width:300px;min-height:48px;border-radius:15px;background:var(--accent,#7896c5);color:#fff}
 .welcome-secondary{width:100%;max-width:300px;margin-top:9px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--white);font-size:13px;font-weight:650}
-.welcome-footnote{display:flex;align-items:center;gap:8px;margin-top:28px;color:var(--muted);font-size:10px}
-.welcome-footnote span{width:6px;height:6px;border-radius:50%;background:var(--accent,#7896c5);box-shadow:0 0 12px var(--accent,#7896c5)}
 .chats-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 2px 12px;border-bottom:1px solid color-mix(in srgb,var(--border) 82%,transparent)}
 .chats-topline .chats-new-button{margin-inline-start:auto;flex:0 0 42px}
 .chats-topline .page-heading{margin:0;min-width:0;flex:1}
@@ -1029,54 +987,15 @@ body[data-auth-state="guest"] #openSettingsButton{display:none!important;visibil
 #conversationList .list-preview{font-size:11px;max-width:100%}
 #conversationList .list-time{white-space:nowrap}
 body[data-theme="light"] .welcome-shell{background:radial-gradient(ellipse at 50% 5%,color-mix(in srgb,var(--accent,#7896c5) 13%,transparent),transparent 55%),linear-gradient(155deg,#fff,#f3f6fb)}
-@media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:86px;height:86px;border-radius:25px}.welcome-mark img{width:73px;height:73px}}
-
-/* Header F mark is a compact, accessible button. */
-.logo-button{border:0;padding:0;cursor:pointer;font-family:inherit;line-height:1}
-.logo-button:focus-visible{outline:2px solid var(--white);outline-offset:3px}
-
-/* FARNaz-header-cleanup-v1: remove legacy header branding */
-.app>header .brand-text,.app>header #brand,.app>header #subtitle{display:none!important}
-.app>header .brand-stack{display:flex!important;flex-direction:row!important;align-items:center!important;gap:0!important}
-.app>header .logo.logo-button{display:grid!important;place-items:center!important;width:40px!important;height:40px!important;min-width:40px!important;border-radius:13px!important;font-size:23px!important;font-weight:800!important}
-
-/* Keep the global F mark on app pages, but hide it behind the login/signup dialog. */
-.app.auth-open>header,.app.auth-open>header .logo-button{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+@media(max-width:360px){.welcome-shell{min-height:62dvh;padding:24px 15px 20px}.welcome-shell h2{font-size:22px}.welcome-mark{width:86px;height:86px;border-radius:25px}.welcome-mark img{width:73px;height:73px}}/* Header F mark is a compact
+{border:0;padding:0;cursor:pointer;font-family:inherit;line-height:1}.app>header #brand,
+.app>header #subtitle
+{display:none!important}/* Keep the global F mark on app pages,
+but hide it behind the login/signup dialog. */
+.app.auth-open>header
+{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 
 #headerFButton[hidden]{display:none!important}
-
-
-/* Single welcome language toggle: aligned to the app column and blended into the page. */
-#homePage > #welcomeLanguageButton{
-  position:fixed!important;
-  top:calc(env(safe-area-inset-top, 0px) + 14px)!important;
-  right:max(16px,calc((100vw - 560px)/2 + 16px))!important;
-  left:auto!important;
-  inset-inline-start:auto!important;
-  inset-inline-end:max(16px,calc((100vw - 560px)/2 + 16px))!important;
-  transform:none!important;
-  z-index:9999!important;
-  box-sizing:border-box!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:42px!important;
-  min-width:42px!important;
-  height:34px!important;
-  min-height:34px!important;
-  padding:0!important;
-  margin:0!important;
-  border:1px solid var(--border)!important;
-  border-radius:10px!important;
-  background:var(--bg)!important;
-  color:var(--muted)!important;
-  font-size:12px!important;
-  font-weight:700!important;
-  line-height:1!important;
-  box-shadow:none!important;
-}
-#homePage:not(.active) > #welcomeLanguageButton{display:none!important}
-#homePage .welcome-shell .welcome-language-switch{display:none!important}
 
 
 /* Canonical contact-import layout, saved-contact sizing, and header placement. */
@@ -1105,10 +1024,6 @@ body[data-theme="light"] .welcome-shell{background:radial-gradient(ellipse at 50
 }
 #contactsPage .phone-contacts-import:not([hidden]){padding-left:0}
 .app>header{position:relative}
-.app>header #openSettingsButton:not([hidden]){
-  position:absolute!important;left:0!important;right:auto!important;
-  top:4px!important;margin:0!important;z-index:5;
-}
 
 /* iOS home-screen safe-area calibration: keep the app viewport full-height,
    and reserve the safe areas inside the app instead of shrinking its outer box. */
@@ -1266,8 +1181,6 @@ body[data-theme="light"] .welcome-shell{background:radial-gradient(ellipse at 50
 .space-admin-settings .space-setting-toggle{color:var(--white);line-height:1.55}
 .space-admin-settings .space-setting-toggle span{color:inherit}
 .space-admin-settings select,.space-admin-settings input:not([type=checkbox]){color:var(--white)}
-.space-info-exit{width:100%;margin:12px 0 4px;min-height:38px;padding:8px 12px;border:1px solid #d45b62;border-radius:10px;background:transparent;color:#d45b62;font:inherit;font-size:13px;font-weight:650}
-.space-info-exit:disabled{opacity:.55}
 body[data-theme="light"] #spaceShowSettings,body[data-theme="light"] #spaceShowMembers{color:#25354b!important;background:#f5f7fb!important;border-color:#d8e0ea!important}
 body[data-theme="light"] #spaceShowSettings .space-info-section-leading>span:last-child,body[data-theme="light"] #spaceShowMembers .space-info-section-leading>span:last-child{color:#25354b!important}
 body[data-theme="light"] #spaceShowSettings .space-info-section-icon,body[data-theme="light"] #spaceShowMembers .space-info-section-icon{background:#e8eef8!important;color:#526f9d!important}
