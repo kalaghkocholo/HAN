@@ -2466,7 +2466,6 @@ async function refreshSavedContacts(){
     return false;
   }
 }
-async 
 async function addManualPhoneContact(event){
   event.preventDefault();
   if(!currentUser){openAuth();return;}
