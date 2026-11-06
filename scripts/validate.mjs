@@ -283,7 +283,7 @@ const uiChecks = [
     "presence and privacy settings must translate their labels, hints, and select options"],
   [html.includes('class="page-heading"><h2 id="chatsHeading"') && html.includes('class="page-heading"><h2 id="contactsHeading"') && sources["styles.css"].includes("env(safe-area-inset-top, 0px)") && sources["styles.css"].includes("inset-inline-start:10px"),
     "page headers must be separated, safe-area aware, and use logical-direction controls"],
-  [!html.includes('id="contactSearchButton"') && sources["styles.css"].includes(".contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}") && sources["styles.css"].includes(".app.chat-mode>#chatPage .send-row textarea{display:block;direction:rtl;text-align:right;width:100%;min-width:0;min-height:38px;max-height:112px;padding:9px 5px;line-height:1.4;border:0;border-radius:0;background:var(--panel)!important;color:var(--white)}"),
+  [!html.includes('id="contactSearchButton"') && sources["styles.css"].includes(".contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}") && sources["styles.css"].includes(".app.chat-mode>#chatPage .send-row textarea,.app.spaces-chat-mode>#chatPage .send-row textarea{"),
     "new-chat screen must use the saved-contact list/search only, contact actions must stay on one row, and composer surfaces must share one color"],
   [!html.includes('id="contactSearchPopover"') && !html.includes('id="findRecipientBtn"') && !html.includes('id="recipientForm"') && html.includes('id="savedFarnazContactFilter"') && html.includes('id="savedContactsList"'),
     "new-chat flow must keep the saved contacts and their search only, without the extra recipient-search form or button"],
