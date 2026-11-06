@@ -676,6 +676,14 @@ async function subscribeToMessagesNow(){
     ;
   messageSubscription=channel;
   channel.subscribe((status,err)=>{
+    // Removing the channel during logout/account switching is expected, not a network outage.
+    // Ignore late status events from a channel that no longer belongs to the active session.
+    if(messageSubscription!==channel||currentUser?.id!==myId){
+      if(!subscriptionSettled&&status==="CLOSED"){
+        subscriptionSettled=true;clearTimeout(subscriptionTimeout);resolveSubscription();
+      }
+      return;
+    }
     if(status!=="SUBSCRIBED")console.warn("Farnaz inbox realtime status:",status,err?.message||err||"No error details provided");
     if(status==="SUBSCRIBED"){
       if(!subscriptionSettled){subscriptionSettled=true;clearTimeout(subscriptionTimeout);resolveSubscription();}
@@ -692,6 +700,7 @@ async function subscribeToMessagesNow(){
   });
   try{
     await subscriptionReady;
+    if(currentUser?.id!==myId||messageSubscription!==channel)return;
   }catch(error){
     clearTimeout(subscriptionTimeout);
     if(messageSubscription===channel){messageSubscription=null;messageSubscriptionUserId=null;}
