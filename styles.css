@@ -1282,46 +1282,80 @@ body[data-theme="light"] .farnaz-livekit-actions button:not(.is-accept):not(.is-
 .profile-preview-close{position:absolute;top:8px;inset-inline-end:10px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--white);font-size:25px}
 .profile-preview-card [hidden]{display:none!important}
 
-/* Profile header alignment: centered layout, including the LTR account ID. */
+/* Profile identity block: all details share the avatar's center axis. */
 #profilePage .profile-top{
   display:flex!important;
   flex-direction:column!important;
   align-items:center!important;
+  justify-content:center!important;
   text-align:center!important;
 }
-#profilePage .profile-top>.avatar{
+#profilePage .profile-top>#userAvatar{
   align-self:center!important;
   margin-inline:auto!important;
 }
-#profilePage .profile-top>.profile-phone,
-#profilePage .profile-top>.profile-info,
-#profilePage .profile-info h2,
-#profilePage .profile-info .profile-email,
-#profilePage .profile-info .profile-about{
+#profilePage .profile-details{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
+  align-items:center!important;
+  gap:0!important;
   width:100%!important;
+  min-width:0!important;
   margin-inline:auto!important;
   text-align:center!important;
 }
-#profilePage .profile-info .profile-email-line{
-  display:flex!important;
-  justify-content:center!important;
-  align-items:center!important;
-  flex-wrap:wrap!important;
-  width:100%!important;
-}
-#profilePage .profile-info .profile-verification{
-  display:inline-flex!important;
-  width:auto!important;
-}
-#profilePage #userUsername{
-  display:flex!important;
-  justify-content:center!important;
+#profilePage .profile-details>.profile-phone,
+#profilePage .profile-details>.profile-info{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
   align-items:center!important;
   width:100%!important;
-  margin:5px auto 0!important;
-  direction:ltr!important;
-  unicode-bidi:isolate!important;
+  min-width:0!important;
+  margin-inline:auto!important;
+  text-align:center!important;
+}
+#profilePage .profile-details .profile-phone,
+#profilePage .profile-details #userName,
+#profilePage .profile-details .profile-email,
+#profilePage .profile-details .profile-username,
+#profilePage .profile-details .profile-about{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin-inline:auto!important;
   text-align:center!important;
   text-indent:0!important;
+  overflow-wrap:anywhere!important;
 }
-#profilePage #userUsername[hidden]{display:none!important}
+#profilePage .profile-details .profile-phone,
+#profilePage .profile-details .profile-email,
+#profilePage .profile-details .profile-username{
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+}
+#profilePage .profile-details .profile-email-line{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
+  align-items:center!important;
+  gap:4px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-inline:auto!important;
+  text-align:center!important;
+}
+#profilePage .profile-details .profile-verification{
+  display:block!important;
+  width:max-content!important;
+  max-width:100%!important;
+  margin-inline:auto!important;
+  text-align:center!important;
+}
+#profilePage .profile-details #userUsername[hidden],
+#profilePage .profile-details #userAbout[hidden],
+#profilePage .profile-details #userEmailStatus[hidden]{
+  display:none!important;
+}
