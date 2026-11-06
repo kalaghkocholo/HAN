@@ -565,7 +565,9 @@ async function toggleSpaceMessageReaction(message,emoji){
   await loadMessages(spaceId);
  }catch(error){const status=q("spaceMessageStatus");if(status)status.textContent=tr("ذخیره واکنش ناموفق بود: ","Could not save reaction: ")+(error?.message||String(error));}
 }
+let spaceMessageMenuDetach=()=>{};
 function closeSpaceMessageMenu(){
+ const cleanup=spaceMessageMenuDetach;spaceMessageMenuDetach=()=>{};cleanup();
  document.querySelectorAll(".space-message-actions,.space-message-action-backdrop,.space-message-action-clone,.message-tools,.message-action-backdrop,.message-action-clone").forEach(n=>n.remove());
  document.querySelectorAll(".space-message.context-active").forEach(n=>n.classList.remove("context-active"));
 }
@@ -600,7 +602,7 @@ function showSpaceMessageActions(m,item){
  item.classList.add("context-active");
  const restoreItem=()=>{item.classList.remove("context-active");};
  const menu=document.createElement("div");menu.className="message-tools message-tools-floating";
- const closeMenu=()=>{menu.remove();restoreItem();closeSpaceMessageMenu();};
+ const closeMenu=()=>{menu.remove();restoreItem();const cleanup=spaceMessageMenuDetach;spaceMessageMenuDetach=()=>{};cleanup();closeSpaceMessageMenu();};
  const add=(label,fn,cls="mini-button")=>{const b=document.createElement("button");b.type="button";b.className=cls;b.textContent=label;b.onclick=()=>{closeMenu();fn();};menu.appendChild(b);};
  const own=String(m.sender_id)===String(currentUser?.id);
  const quickReactions=document.createElement("div");quickReactions.className="message-quick-reactions";quickReactions.style.cssText="display:flex;align-items:center;justify-content:space-around;gap:7px;padding:7px 5px;margin:0 0 5px;border-radius:14px;background:var(--surface-2,rgba(128,128,128,.12))";
@@ -615,9 +617,7 @@ function showSpaceMessageActions(m,item){
  add("🗑  "+(english?"Delete":"حذف"),async()=>{const scope=await askSpaceDeleteScope(1,own);if(!scope)return;try{if(scope==="me")await hideSpaceMessagesForMe([String(m.id)]);else{const {error}=await getClient().from("space_messages").delete().eq("id",m.id).eq("space_id",active.id).eq("sender_id",currentUser.id);if(error)throw error;}await loadMessages(active.id);q("spaceMessageStatus").textContent=scope==="me"?tr("پیام فقط از صفحه شما پنهان شد.","Message hidden from your view."):tr("پیام برای همه حذف شد.","Message deleted for everyone.");}catch(error){q("spaceMessageStatus").textContent=tr("حذف پیام ناموفق بود: ","Could not delete message: ")+(error?.message||String(error));}},"mini-button danger");
  const close=document.createElement("button");close.type="button";close.className="message-tools-dismiss";close.textContent="×";close.setAttribute("aria-label",english?"Close":"بستن");close.onclick=closeMenu;menu.appendChild(close);
  document.body.appendChild(menu);
- const menuRect=menu.getBoundingClientRect(),margin=12;let left=Math.max(margin,Math.min(rect.left+(rect.width-menuRect.width)/2,window.innerWidth-menuRect.width-margin));let top=rect.top-menuRect.height-8;
- if(top<margin)top=Math.min(window.innerHeight-menuRect.height-margin,rect.bottom+8);
- menu.style.left=left+"px";menu.style.top=Math.max(margin,top)+"px";
+ spaceMessageMenuDetach=window.FarnazMountMessageMenu(menu,item,closeMenu);
 }
 async function downloadSpaceMessage(message){
  let objectUrl=null;
