@@ -1143,6 +1143,7 @@ function toggleLanguage(){
     profilePhoneLabel:["شماره موبایل","Mobile number"],
     profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
     avatarFileLabel:["انتخاب تصویر پروفایل","Choose profile photo"],
+    changeAvatarButton:["ویرایش عکس پروفایل","Edit profile photo"],
     avatarNote:["فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.","JPG, PNG or WebP; maximum 3 MB. You can crop the image before saving."],
     saveProfileButton:["ذخیره تغییرات","Save changes"],
     logoutButton:["خروج از حساب","Sign out"],
@@ -1563,6 +1564,7 @@ function showAvatarCropDialog(image){
  draw();save.focus({preventScroll:true});
 }
 if($("avatarFile"))$("avatarFile").addEventListener("change",event=>{const file=event.target.files?.[0];if(file)openAvatarCropEditor(file);});
+if($("changeAvatarButton"))$("changeAvatarButton").addEventListener("click",()=>$("avatarFile")?.click());
 
 async function saveProfile(event){
   event.preventDefault();if(!currentUser)return;
