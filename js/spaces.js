@@ -799,7 +799,7 @@ function back(){
  if(sub){try{getClient().removeChannel(sub).catch(()=>{});}catch(_){}sub=null;}
  document.querySelector(".app")?.classList.remove("spaces-chat-mode");document.body.classList.remove("spaces-chat-mode");document.querySelector("#chatPage .space-call-actions")?.removeAttribute("hidden");
  q("spaceDetail").hidden=true;q("sendMessageForm").hidden=false;q("messageText").value=privateComposerDraft;window.FarnazUpdateComposerControls?.();q("attachmentMenuButton").hidden=false;q("recordAudioButton").hidden=false;q("sendMessageStatus").textContent="";q("attachmentMenu").hidden=true;
- q("conversationTitle").onclick=null;q("conversationTitle").onkeydown=null;q("chatSubtitle").onclick=null;q("chatSubtitle").onkeydown=null;q("chatAvatar").onclick=null;
+ q("conversationTitle").onclick=()=>openContactInfo();q("conversationTitle").onkeydown=null;q("chatSubtitle").onclick=null;q("chatSubtitle").onkeydown=null;q("chatAvatar").onclick=()=>openContactInfo();
  q("sendMessageForm").onsubmit=null;q("attachmentMenuButton").onclick=()=>toggleAttachmentMenu();q("recordAudioButton").onclick=()=>toggleAudioRecording();q("removeVoicePreview").onclick=()=>discardRecordedVoice();q("attachmentMenu").querySelectorAll("[data-space-attachment]").forEach(b=>b.onclick=()=>chooseAttachment(b.dataset.spaceAttachment));
 }
 window.FarnazConversationController?.registerSpaceCloser(back);
