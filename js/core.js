@@ -2851,13 +2851,87 @@ async function refreshConversationList(){
   }
   requestAnimationFrame(syncViewport);
   
+  // Prevent repeated signup submissions for the same pending email on this device.
+  // Supabase Auth remains the source of truth and enforces unique email identities server-side.
+  const PENDING_SIGNUP_KEY="farnaz.pendingSignup.v1";
+  function readPendingSignup(){
+    try{
+      const value=JSON.parse(localStorage.getItem(PENDING_SIGNUP_KEY)||"null");
+      return value&&typeof value.email==="string"&&Number.isFinite(Number(value.sentAt))
+        ?{email:value.email,sentAt:Number(value.sentAt)}:null;
+    }catch(_){return null;}
+  }
+  function savePendingSignup(email){
+    try{localStorage.setItem(PENDING_SIGNUP_KEY,JSON.stringify({email,sentAt:Date.now()}));}catch(_){}
+  }
+  function clearPendingSignup(email){
+    try{
+      const pending=readPendingSignup();
+      if(!email||pending?.email===email)localStorage.removeItem(PENDING_SIGNUP_KEY);
+    }catch(_){}
+  }
+  function updateAuthResendButton(email){
+    const resend=$("authResendConfirmation");
+    if(!resend)return;
+    const pending=readPendingSignup();
+    if(!pending||pending.email!==email){resend.hidden=true;resend.disabled=false;return;}
+    resend.hidden=false;
+    const remaining=Math.max(0,60000-(Date.now()-pending.sentAt));
+    resend.disabled=remaining>0;
+    resend.textContent=english
+      ?(remaining>0?"Resend available in "+Math.ceil(remaining/1000)+"s":"Resend confirmation email")
+      :(remaining>0?"ارسال مجدد تا "+Math.ceil(remaining/1000)+" ثانیه دیگر":"ارسال دوباره ایمیل تأیید");
+    if(remaining>0)setTimeout(()=>updateAuthResendButton(email),Math.min(remaining,1000));
+  }
+  const authEmailInput=$("authEmail");
+  if(authEmailInput)authEmailInput.addEventListener("input",()=>updateAuthResendButton(authEmailInput.value.trim().toLowerCase()));
+  const authResendButton=$("authResendConfirmation");
+  if(authResendButton)authResendButton.addEventListener("click",async()=>{
+    const email=authEmailInput?.value.trim().toLowerCase()||"";
+    const pending=readPendingSignup();
+    if(!email||!pending||pending.email!==email)return;
+    const remaining=60000-(Date.now()-pending.sentAt);
+    if(remaining>0){updateAuthResendButton(email);return;}
+    authResendButton.disabled=true;
+    try{
+      const {error}=await getClient().auth.resend({
+        type:"signup",email,
+        options:{emailRedirectTo:getAuthRedirectUrl()}
+      });
+      if(error)throw error;
+      savePendingSignup(email);
+      setStatus("authStatus",english
+        ?"A new confirmation email was requested. Check your inbox and spam folder."
+        :"درخواست ارسال دوباره ایمیل تأیید ثبت شد؛ صندوق ورودی و هرزنامه را بررسی کن.");
+    }catch(error){
+      const code=String(error?.code||"").toLowerCase();
+      const message=String(error?.message||"");
+      setStatus("authStatus",code==="over_email_send_rate_limit"||/rate limit|too many/i.test(message)
+        ?(english?"Please wait before requesting another confirmation email.":"برای درخواست ایمیل تأیید بعدی کمی صبر کن.")
+        :(english?"The confirmation email could not be resent. Please try again later.":"ارسال دوباره ایمیل تأیید انجام نشد؛ کمی بعد دوباره تلاش کن."),true);
+    }finally{
+      updateAuthResendButton(email);
+    }
+  });
+
   // Keep email sign-up/sign-in wired to the active core script loaded by index.html.
   const authForm=$("authForm");
   if(authForm){
     authForm.addEventListener("submit",async event=>{
       event.preventDefault();
-      const button=$("authSubmit"),email=$("authEmail").value.trim();
+      const button=$("authSubmit"),email=($("authEmail").value||"").trim().toLowerCase();
       const password=$("authPassword").value;
+      $("authEmail").value=email;
+      if(authMode==="signup"){
+        const pending=readPendingSignup();
+        if(pending?.email===email){
+          updateAuthResendButton(email);
+          setStatus("authStatus",english
+            ?"A confirmation request is already pending for this email. Check your inbox, or use the resend button after the short cooldown."
+            :"برای این ایمیل قبلاً درخواست تأیید ثبت شده است. صندوق ورودی را بررسی کن یا پس از پایان زمان انتظار از دکمه ارسال دوباره استفاده کن.",true);
+          return;
+        }
+      }
       const phone="";
       if(!button||button.disabled)return;
       button.disabled=true;
@@ -2885,9 +2959,19 @@ async function refreshConversationList(){
           });
           if(result.error)throw result.error;
           if(!result.data.session){
+            const identities=result.data?.user?.identities;
+            if(Array.isArray(identities)&&identities.length===0){
+              clearPendingSignup(email);
+              setStatus("authStatus",english
+                ?"This email is already associated with an account. Sign in or use password recovery."
+                :"این ایمیل از قبل به یک حساب متصل است؛ وارد شو یا از بازیابی رمز عبور استفاده کن.",true);
+              return;
+            }
+            savePendingSignup(email);
+            updateAuthResendButton(email);
             setStatus("authStatus",english
-              ?"Sign-up submitted. Confirm your email, then sign in."
-              :"ثبت‌نام انجام شد. ایمیلت را تأیید کن و سپس وارد شو.");
+              ?"Your confirmation request was received. Check your inbox and spam folder. To avoid duplicate requests, use the resend button if needed."
+              :"درخواست تأیید ثبت شد. صندوق ورودی و هرزنامه را بررسی کن؛ برای جلوگیری از درخواست تکراری، در صورت نیاز از دکمه ارسال دوباره استفاده کن.");
             return;
           }
         }else{
@@ -2895,6 +2979,7 @@ async function refreshConversationList(){
           if(result.error)throw result.error;
         }
         console.info("Farnaz auth response time (ms):",Math.round(performance.now()-authStartedAt));
+        if(result.data.session)clearPendingSignup(email);
         if(!result.data.user)throw new Error("اطلاعات حساب دریافت نشد.");
         // Authentication succeeded: enter the app before loading optional profile/chat data.
         // A later conversation or realtime failure must not be reported as a failed login.
@@ -2933,13 +3018,16 @@ async function refreshConversationList(){
         const message=String(error?.message||error||"Unknown error");
         const code=String(error?.code||"").toLowerCase();
         const status=Number(error?.status||error?.statusCode||0);
+        const isExistingEmail=code==="email_exists"||code==="user_already_exists"||/user already registered|email.*already exists/i.test(message);
         const isCredentialsError=code==="invalid_credentials"||/invalid login credentials|invalid email or password/i.test(message);
         const isWeakPassword=code==="weak_password"||/password.*(weak|short)|weak password/i.test(message);
         const isNetwork=error?.name==="TypeError"||error?.name==="TimeoutError"||
           /failed to fetch|fetch failed|network|load failed|timeout|connection|did not respond|request could not reach|aborted/i.test(message);
-        const safeMessage=isCredentialsError
-          ?(english?"Email or password is incorrect. Check both and try again.":"ایمیل یا رمز عبور درست نیست؛ هر دو را بررسی کن و دوباره تلاش کن.")
-          :isWeakPassword
+        const safeMessage=isExistingEmail
+          ?(english?"This email is already registered. Sign in or use password recovery.":"این ایمیل قبلاً ثبت شده است؛ وارد شو یا از بازیابی رمز عبور استفاده کن.")
+          :isCredentialsError
+            ?(english?"Email or password is incorrect. Check both and try again.":"ایمیل یا رمز عبور درست نیست؛ هر دو را بررسی کن و دوباره تلاش کن.")
+            :isWeakPassword
             ?(english?"Choose a stronger password with at least 8 characters.":"رمز عبور قوی‌تری با حداقل ۸ کاراکتر انتخاب کن.")
             :isNetwork
               ?(english?"Could not complete the request to Supabase. Check your connection and retry.":"درخواست به سوپابیس کامل نشد؛ اتصال را بررسی کن و دوباره تلاش کن.")
