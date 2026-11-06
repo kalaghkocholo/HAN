@@ -1353,6 +1353,9 @@ function showGuest(){
   $("unmatchedPhoneContactsList").replaceChildren();setStatus("unmatchedPhoneContactsStatus","");
   $("messageList").replaceChildren();
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="homePage"));
+  // Returning to the guest page must also reveal the authentication panel;
+  // activating homePage alone leaves a hidden authBox after an in-app logout.
+  openSignup();
 }
 
 
