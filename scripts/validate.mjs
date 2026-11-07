@@ -78,6 +78,7 @@ if (html.includes("cdn.jsdelivr.net/npm/@supabase/supabase-js") || html.includes
 
 const clientFiles = [
   "js/local-store.js",
+  "js/private-chat-model.js",
   "js/core.js",
   "js/chat-menu-v5.js",
   "js/spaces.js",
@@ -88,6 +89,24 @@ const clientFiles = [
   "chat-viewport.css",
 ];
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
+const privateChatTests = read("tests/private-chat-model.test.mjs");
+const privateChatWorkflow = read(".github/workflows/validate.yml");
+const privateChatModel = sources["js/private-chat-model.js"];
+const privateChatMenu = sources["js/chat-menu-v5.js"];
+const privateChatModelPosition = html.indexOf("./js/private-chat-model.js?v=20261107-private-chat1");
+const privateChatMenuPosition = html.indexOf("./js/chat-menu-v5.js?v=20261107-private-chat1");
+if (privateChatModelPosition < 0 || privateChatMenuPosition < 0 || privateChatModelPosition > privateChatMenuPosition) {
+  errors.push("index.html must load the private chat model before chat-menu-v5.js");
+}
+if (!sources["service-worker.js"].includes("./js/private-chat-model.js?v=20261107-private-chat1")) {
+  errors.push("service-worker.js shell must cache the private chat model");
+}
+if (!privateChatMenu.includes("PrivateChatModel.olderCursorFilter") || !privateChatMenu.includes("sent=sent.or(cursorFilter)") || !privateChatMenu.includes("received=received.or(cursorFilter)")) {
+  errors.push("Private chat history must use the tested compound keyset cursor in both directions");
+}
+if (!privateChatTests.includes("timestamp collisions") || !privateChatWorkflow.includes("tests/private-chat-model.test.mjs")) {
+  errors.push("Private chat pagination tests must be present and run in CI");
+}
 
 for (const match of html.matchAll(/<(?:script|link)\b[^>]*>/gi)) {
   const tag = match[0];
