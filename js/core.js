@@ -1270,8 +1270,8 @@ function deleteAccount(){
   const byId=id=>modal.querySelector("#"+id);
   byId("accountDeleteTitle").textContent=english?"Delete account permanently":"حذف دائمی حساب کاربری";
   byId("accountDeleteWarning").textContent=english
-    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. Groups with other members will be transferred to an existing member."
-    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. مالکیت گروه‌هایی که عضو دیگری دارند به یکی از اعضا منتقل می‌شود.";
+    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. Groups with other members will be transferred to an existing member. Other sessions are revoked, but an access token already issued may remain valid until it expires."
+    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. مالکیت گروه‌هایی که عضو دیگری دارند به یکی از اعضا منتقل می‌شود. نشست‌های دیگر باطل می‌شوند، اما توکن دسترسی صادرشده ممکن است تا زمان انقضای خودش اعتبار داشته باشد.";
   byId("accountDeleteEmail").textContent=currentUser.email;
   byId("accountDeletePasswordLabel").textContent=english?"Confirm your password":"برای تأیید، رمز عبور حساب را وارد کنید";
   byId("accountDeletePhraseLabel").textContent=english?'Type "DELETE ACCOUNT" to continue':'برای ادامه عبارت «حذف حساب» را وارد کنید';
