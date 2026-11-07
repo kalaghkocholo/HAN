@@ -605,7 +605,7 @@ window.enableFarnazNotifications=async function(){
     if(status)status.textContent=tr("اجازه اعلان فعال شد. برای اعلان حتی پس از بسته‌شدن برنامه، سرویس Push سرور هم باید پیکربندی شود.","Notification permission is enabled. Server push must also be configured for notifications after the app is closed.");
   }catch(e){if(status)status.textContent=tr("فعال‌سازی اعلان ناموفق بود: ","Could not enable notifications: ")+e.message;}
 };
-window.FarnazCalls={setUser,notifyMessage:async function(){await notifyBackground(tr("پیام جدید در فرناز","New message in Farnaz"),tr("برای مشاهده پیام، فرناز را باز کن.","Open Farnaz to view the message."),"farnaz-message");}};
+window.FarnazCalls={setUser,startRingtone,stopRingtone,unlockRingtoneAudio,notifyMessage:async function(){await notifyBackground(tr("پیام جدید در فرناز","New message in Farnaz"),tr("برای مشاهده پیام، فرناز را باز کن.","Open Farnaz to view the message."),"farnaz-message");}};
 window.addEventListener("farnaz-auth-user",event=>{setUser(event.detail?.userId||null).catch(console.error);});
 if(typeof currentUser!=="undefined"&&currentUser?.id)setUser(currentUser.id).catch(console.error);
 })();
