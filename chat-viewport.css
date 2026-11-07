@@ -4,8 +4,10 @@
 html,body{overflow:hidden!important;overscroll-behavior:none!important}
 body.chat-mode .app.chat-mode,body.spaces-chat-mode .app.spaces-chat-mode{
  position:fixed!important;inset-inline:0!important;top:calc(var(--chat-viewport-offset,0px) + max(env(safe-area-inset-top,0px),44px))!important;bottom:auto!important;
+ height:calc(var(--chat-viewport-height,100vh) - max(env(safe-area-inset-top,0px),44px))!important;
  height:calc(var(--chat-viewport-height,100dvh) - max(env(safe-area-inset-top,0px),44px))!important;
- max-height:calc(var(--chat-viewport-height,100dvh) - max(env(safe-area-inset-top,0px),44px))!important;
+ max-height:calc(var(--chat-viewport-height,100vh) - max(env(safe-area-inset-top,0px),44px))!important;
+ height:calc(var(--chat-viewport-height,100dvh) - max(env(safe-area-inset-top,0px),44px))!important;
  min-height:0!important;width:100%!important;max-width:560px!important;margin:0 auto!important;padding:0!important;
  overflow:hidden!important;display:flex!important;flex-direction:column!important;transform:none!important
 }
@@ -30,7 +32,7 @@ body.chat-mode .app.chat-mode>#chatPage #messageList{
 /* Absolute anchoring prevents iOS Home Screen focus auto-scrolling the composer
    into the middle of the chat when the on-screen keyboard appears. */
 body.chat-mode .app.chat-mode>#chatPage #sendMessageForm{
- position:absolute!important;inset-inline:13px!important;left:auto!important;right:auto!important;bottom:0!important;inset-block-start:auto!important;
+ position:absolute!important;left:13px!important;right:13px!important;inset-inline:13px!important;bottom:0!important;inset-block-start:auto!important;
  z-index:10!important;display:block!important;flex:0 0 auto!important;width:auto!important;min-height:0!important;
  margin:0!important;padding:0 0 max(3px,env(safe-area-inset-bottom,0px))!important;
  background:var(--bg)!important;transform:none!important
@@ -66,7 +68,7 @@ body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #messageList{
  overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;margin:0!important
 }
 body.spaces-chat-mode .app.spaces-chat-mode>#chatPage #sendMessageForm{
- position:absolute!important;inset-inline:13px!important;left:auto!important;right:auto!important;bottom:0!important;inset-block-start:auto!important;
+ position:absolute!important;left:13px!important;right:13px!important;inset-inline:13px!important;bottom:0!important;inset-block-start:auto!important;
  z-index:10!important;display:block!important;flex:0 0 auto!important;width:auto!important;min-height:0!important;
  margin:0!important;padding:0 0 max(3px,env(safe-area-inset-bottom,0px))!important;
  background:var(--bg)!important;transform:none!important
