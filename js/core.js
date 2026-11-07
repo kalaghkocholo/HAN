@@ -1265,15 +1265,15 @@ function deleteAccount(){
   const modal=document.createElement("div");
   modal.id="accountDeleteDialog";modal.className="profile-delete-overlay";
   modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-labelledby","accountDeleteTitle");
-  modal.innerHTML='<section class="profile-delete-card"><header class="profile-delete-heading"><h2 id="accountDeleteTitle"></h2><button type="button" id="accountDeleteClose" aria-label="Close">×</button></header><p id="accountDeleteWarning" class="profile-delete-warning"></p><p id="accountDeleteEmail" class="profile-delete-email"></p><form id="accountDeleteForm"><label for="accountDeletePassword" id="accountDeletePasswordLabel"></label><input id="accountDeletePassword" type="password" autocomplete="current-password" required><label for="accountDeletePhrase" id="accountDeletePhraseLabel"></label><input id="accountDeletePhrase" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required><p id="accountDeleteStatus" class="profile-delete-status" role="status" aria-live="polite"></p><div class="profile-delete-actions"><button type="button" class="secondary-button" id="accountDeleteCancel"></button><button type="submit" class="profile-delete-confirm" id="accountDeleteSubmit"></button></div></form></section>';
+  modal.innerHTML='<section class="profile-delete-card"><header class="profile-delete-heading"><h2 id="accountDeleteTitle"></h2><button type="button" id="accountDeleteClose" aria-label="Close">×</button></header><p id="accountDeleteWarning" class="profile-delete-warning"></p><p id="accountDeleteEmail" class="profile-delete-email"></p><form id="accountDeleteForm"><label for="accountDeletePassword" id="accountDeletePasswordLabel"></label><input id="accountDeletePassword" type="password" autocomplete="current-password"><label for="accountDeletePhrase" id="accountDeletePhraseLabel"></label><input id="accountDeletePhrase" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required><p id="accountDeleteStatus" class="profile-delete-status" role="status" aria-live="polite"></p><div class="profile-delete-actions"><button type="button" class="secondary-button" id="accountDeleteCancel"></button><button type="submit" class="profile-delete-confirm" id="accountDeleteSubmit"></button></div></form></section>';
   document.body.appendChild(modal);
   const byId=id=>modal.querySelector("#"+id);
   byId("accountDeleteTitle").textContent=english?"Delete account permanently":"حذف دائمی حساب کاربری";
   byId("accountDeleteWarning").textContent=english
-    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. Groups with other members will be transferred to an existing member. Other sessions are revoked, but an access token already issued may remain valid until it expires."
-    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. مالکیت گروه‌هایی که عضو دیگری دارند به یکی از اعضا منتقل می‌شود. نشست‌های دیگر باطل می‌شوند، اما توکن دسترسی صادرشده ممکن است تا زمان انقضای خودش اعتبار داشته باشد.";
+    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. Groups with other members will be transferred to an existing member. Other sessions are revoked, but an access token already issued may remain valid until it expires. If you use Google, leave the password blank only if you signed in within the last 10 minutes."
+    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. مالکیت گروه‌هایی که عضو دیگری دارند به یکی از اعضا منتقل می‌شود. نشست‌های دیگر باطل می‌شوند، اما توکن دسترسی صادرشده ممکن است تا زمان انقضای خودش اعتبار داشته باشد. اگر با گوگل وارد شده‌اید، فقط در صورتی رمز را خالی بگذارید که در ۱۰ دقیقهٔ اخیر وارد حساب شده باشید.;
   byId("accountDeleteEmail").textContent=currentUser.email;
-  byId("accountDeletePasswordLabel").textContent=english?"Confirm your password":"برای تأیید، رمز عبور حساب را وارد کنید";
+  byId("accountDeletePasswordLabel").textContent=english?"Password (optional if you just signed in with Google)":"رمز عبور (در ورود با گوگل، اگر اخیراً وارد شده‌اید اختیاری است)";
   byId("accountDeletePhraseLabel").textContent=english?'Type "DELETE ACCOUNT" to continue':'برای ادامه عبارت «حذف حساب» را وارد کنید';
   byId("accountDeletePhrase").placeholder=english?"DELETE ACCOUNT":"حذف حساب";
   byId("accountDeleteCancel").textContent=english?"Cancel":"انصراف";
@@ -1300,9 +1300,11 @@ function deleteAccount(){
     byId("accountDeleteStatus").textContent=english?"Verifying your password and deleting account…":"در حال تأیید رمز عبور و حذف حساب…";
     try{
       const client=getClient();
-      const {data:reauth,error:reauthError}=await client.auth.signInWithPassword({email:currentUser.email,password});
-      if(reauthError)throw new Error(english?"The password is incorrect.":"رمز عبور صحیح نیست.");
-      if(String(reauth?.user?.id||"")!==accountId)throw new Error(english?"The account could not be verified.":"هویت حساب تأیید نشد.");
+      if(password.trim()){
+        const {data:reauth,error:reauthError}=await client.auth.signInWithPassword({email:currentUser.email,password});
+        if(reauthError)throw new Error(english?"The password is incorrect.":"رمز عبور صحیح نیست.");
+        if(String(reauth?.user?.id||"")!==accountId)throw new Error(english?"The account could not be verified.":"هویت حساب تأیید نشد.");
+      }
       const {data:result,error:functionError}=await client.functions.invoke("delete-farnaz-account",{body:{confirmation:"DELETE"}});
       if(functionError){
         let detail=functionError.message||"";
