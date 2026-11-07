@@ -5,7 +5,7 @@
   const labels = {photos:["تصاویر","Photos"],videos:["ویدئوها","Videos"],files:["فایل‌ها","Files"],audio:["صوت","Audio"],links:["پیوندها","Links"]};
   const tr = (fa,en) => english ? en : fa;
   const $ = id => document.getElementById(id);
-  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, hiddenIds=new Set(), focusBefore=null, visiblePhone="", profileLoading=false;
+  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, focusBefore=null, visiblePhone="", profileLoading=false;
 
   function ensure(){
     if(dialog && dialog.isConnected) return dialog;
@@ -122,7 +122,7 @@
     if(!currentUser||!currentChatUser)return;
     ensure();focusBefore=document.activeElement;
     const token=++request,user=String(currentUser.id),other=String(currentChatUser.user_id);
-    contactId=other;category="photos";cursor=null;more=false;busy=false;profileLoading=true;hiddenIds=new Set();
+    contactId=other;category="photos";cursor=null;more=false;busy=false;profileLoading=true;
     dialog.hidden=false;document.body.classList.add("private-hub-open");
     $("closeContactInfo").focus({preventScroll:true});
     const name=currentChatUser.display_name||(english?"Farnaz user":"مخاطب فرناز");
