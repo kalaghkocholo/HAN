@@ -563,7 +563,7 @@ const authLayoutChecks = [
 ];
 const viewportControllerSource=sources["js/chat-viewport-controller.js"];
 const viewportTests=read("tests/chat-viewport-controller.test.mjs");
-if (!viewportControllerSource.includes("window.FarnazChatViewportController") ||
+if (!viewportControllerSource.includes("win.FarnazChatViewportController") ||
     !viewportControllerSource.includes("visualViewport") ||
     !viewportControllerSource.includes("ResizeObserver") ||
     !viewportTests.includes("keyboard opening must not force-scroll") ||
