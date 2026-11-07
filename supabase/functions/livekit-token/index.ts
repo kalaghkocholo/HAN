@@ -109,16 +109,29 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid call target identifier." }, 400, origin);
   }
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")
-    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
-  const livekitApiKey = Deno.env.get("LIVEKIT_API_KEY");
-  const livekitApiSecret = Deno.env.get("LIVEKIT_API_SECRET");
-  const livekitUrl = Deno.env.get("LIVEKIT_URL");
+  // Read and trim secrets without ever logging their values. Prefer whichever
+  // Supabase client key is actually populated; an empty legacy anon key must
+  // not mask a valid publishable key.
+  const supabaseUrl = (Deno.env.get("SUPABASE_URL") ?? "").trim();
+  const supabaseAnonKey = (Deno.env.get("SUPABASE_ANON_KEY") ?? "").trim();
+  const supabasePublishableKey = (Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? "").trim();
+  const supabaseKey = supabaseAnonKey || supabasePublishableKey;
+  const livekitApiKey = (Deno.env.get("LIVEKIT_API_KEY") ?? "").trim();
+  const livekitApiSecret = (Deno.env.get("LIVEKIT_API_SECRET") ?? "").trim();
+  const livekitUrl = (Deno.env.get("LIVEKIT_URL") ?? "").trim();
 
-  if (!supabaseUrl || !supabaseKey || !livekitApiKey || !livekitApiSecret || !livekitUrl) {
-    console.error("LiveKit token endpoint is missing required server-side configuration.");
-    return jsonResponse({ error: "Call service is not configured." }, 503, origin);
+  const missingConfiguration = [
+    !supabaseUrl ? "SUPABASE_URL" : null,
+    !supabaseKey ? "SUPABASE_ANON_KEY_or_SUPABASE_PUBLISHABLE_KEY" : null,
+    !livekitApiKey ? "LIVEKIT_API_KEY" : null,
+    !livekitApiSecret ? "LIVEKIT_API_SECRET" : null,
+    !livekitUrl ? "LIVEKIT_URL" : null,
+  ].filter((name): name is string => Boolean(name));
+
+  if (missingConfiguration.length > 0) {
+    // Variable names only; never log secret values or their lengths.
+    console.error("LiveKit token endpoint missing configuration variables:", missingConfiguration);
+    return jsonResponse({ error: "Call service is not configured.", missing: missingConfiguration }, 503, origin);
   }
 
   try {
