@@ -1866,7 +1866,7 @@ function searchCurrentConversation(){
   $("messageSearchToLabel").textContent=contactInfoText("تا تاریخ","To date");
   $("messageSearchSubmit").textContent=contactInfoText("جست‌وجو","Search");
   [["all","همه","All"],["text","متنی","Text"],["images","تصاویر","Images"],["voice","صوتی","Voice"],["files","فایل‌ها","Files"]].forEach(([v,fa,en],i)=>{$("messageSearchKind").options[i].textContent=english?en:fa;});
-  $("messageSearchStatus").textContent=contactInfoText("جست‌وجو در تمام تاریخچهٔ گفتگوی خصوصی","Search the full private conversation history");
+  $("messageSearchStatus").textContent=contactInfoText("جست‌وجو در تاریخچهٔ گفتگو؛ حداکثر ۱۰۰ نتیجهٔ تازه‌تر نمایش داده می‌شود.","Search the conversation history; up to 100 newest matches are shown.");
   $("messageSearchResults").replaceChildren();modal.hidden=false;$("messageSearchQuery").focus();
 }
 function messageSearchQueryBase(client,myId,contactId,senderIsMe,kind,fromIso,toIso){
