@@ -406,7 +406,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 <script src="./js/local-store.js?v=20261107-contact-photo1"></script>
 <script>
 (function(){
-  window.FARNAZ_LIVEKIT_CALLS_ENABLED = new URLSearchParams(window.location.search).get("livekitPilot") === "1";
+  window.FARNAZ_LIVEKIT_CALLS_ENABLED = new URLSearchParams(window.location.search).get("livekitPilot") !== "0";
   const SCRIPT_TIMEOUT_MS=20000;
   function watchScript(script,onload,onerror,timeoutMs=SCRIPT_TIMEOUT_MS){
     let settled=false;
