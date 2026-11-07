@@ -108,42 +108,19 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Transfer each owned group/channel to an existing member. An empty space is removed
-    // only when there is nobody else who could retain it.
+    // Never assign group ownership implicitly during account deletion.
+    // The owner must explicitly resolve every owned space before deletion can proceed.
     const { data: ownedSpaces, error: spacesError } = await admin
       .from("spaces")
       .select("id")
       .eq("created_by", user.id);
     if (spacesError) throw new Error("Could not inspect group ownership: " + spacesError.message);
-
-    for (const space of ownedSpaces ?? []) {
-      const { data: members, error: membersError } = await admin
-        .from("space_members")
-        .select("user_id,role,joined_at")
-        .eq("space_id", space.id)
-        .neq("user_id", user.id)
-        .order("joined_at", { ascending: true });
-      if (membersError) throw new Error("Could not inspect group members: " + membersError.message);
-
-      if (!members?.length) {
-        const { error: deleteSpaceError } = await admin.from("spaces").delete().eq("id", space.id);
-        if (deleteSpaceError) throw new Error("Could not close an empty group: " + deleteSpaceError.message);
-        continue;
-      }
-
-      const successor = members.find((member) => member.role === "admin") ?? members[0];
-      const { error: promoteError } = await admin
-        .from("space_members")
-        .update({ role: "owner" })
-        .eq("space_id", space.id)
-        .eq("user_id", successor.user_id);
-      if (promoteError) throw new Error("Could not transfer group ownership: " + promoteError.message);
-
-      const { error: ownerError } = await admin
-        .from("spaces")
-        .update({ created_by: successor.user_id, updated_at: new Date().toISOString() })
-        .eq("id", space.id);
-      if (ownerError) throw new Error("Could not transfer group ownership: " + ownerError.message);
+    if ((ownedSpaces ?? []).length > 0) {
+      return respond({
+        error: "This account still owns one or more groups or channels. Transfer ownership explicitly from each group's management screen before deleting the account.",
+        code: "OWNED_SPACES_REMAIN",
+        owned_space_count: ownedSpaces.length,
+      }, 409);
     }
 
     // Delete all files owned by the account. Text messages and their sender IDs remain;
