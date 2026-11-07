@@ -194,6 +194,7 @@
     callType = session.call_type === "video" ? "video" : "audio";
     show(callType === "video" ? tr("تماس تصویری ورودی", "Incoming video call") : tr("تماس صوتی ورودی", "Incoming audio call"),
       tr("تماس ورودی…", "Incoming call…"), true);
+    root.FarnazCalls?.startRingtone?.();
     try {
       const result = await getClient().rpc("get_farnaz_user_profile", { search_user_id: session.caller_id });
       const profile = Array.isArray(result.data) ? result.data[0] : result.data;
@@ -251,6 +252,7 @@
       show(title, tr("در انتظار پاسخ…", "Ringing…"), false);
       setStatus(tr("در انتظار پاسخ…", "Ringing…"), "ringing");
     } else if (event.type === "session-accepted") {
+      root.FarnazCalls?.stopRingtone?.();
       activeSession = detail.session || activeSession;
       activeRole = detail.role || activeRole;
       microphoneEnabled = true;
@@ -259,6 +261,7 @@
       showConnectedControls();
       startTimer();
     } else if (event.type === "session-finished") {
+      root.FarnazCalls?.stopRingtone?.();
       activeSession = null;
       activeRole = null;
       stopTimer();
@@ -329,7 +332,8 @@
     activeRole = null;
     stopTimer();
     resetMedia();
-    root.FarnazCalls?.stopRingtone?.();\n    if (previous) await previous.close();
+    root.FarnazCalls?.stopRingtone?.();
+    if (previous) await previous.close();
     const dialog = byId("farnazLiveKitDialog");
     if (!next && dialog) dialog.hidden = true;
     if (!next) return;
@@ -369,6 +373,7 @@
 
   async function answer() {
     if (!controller || !activeSession) return;
+    root.FarnazCalls?.stopRingtone?.();
     const button = byId("farnazLiveKitAccept");
     button.disabled = true;
     try {
@@ -385,11 +390,13 @@
 
   async function reject() {
     if (!controller) return;
+    root.FarnazCalls?.stopRingtone?.();
     try { await controller.reject(); }
     catch (error) { setStatus(tr("رد تماس ناموفق بود: ", "Could not decline: ") + error.message, "error"); }
   }
 
   async function end() {
+    root.FarnazCalls?.stopRingtone?.();
     if (!controller || !activeSession) {
       const dialog = byId("farnazLiveKitDialog");
       if (dialog) dialog.hidden = true;
