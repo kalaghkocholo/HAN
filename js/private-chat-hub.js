@@ -19,7 +19,7 @@
     dialog.innerHTML =
       '<section class="contact-info-card private-hub-sheet">' +
         '<header class="private-hub-header"><button type="button" class="private-hub-back" id="closeContactInfo" aria-label="بستن"><span id="privateHubBackGlyph">→</span></button><h2 id="privateHubHeading">اطلاعات گفتگو</h2><span></span></header>' +
-        '<section class="private-hub-identity"><div class="contact-info-avatar avatar large" id="contactInfoAvatar">F</div><h3 id="contactInfoTitle"></h3><p id="contactInfoAbout" class="muted-note"></p><p id="contactInfoPresence" class="private-hub-presence" role="status"></p><div id="contactInfoPhone" class="contact-info-phone" hidden></div></section>' +
+        '<section class="private-hub-identity"><div class="private-hub-avatar-wrap"><div class="contact-info-avatar avatar large" id="contactInfoAvatar">F</div><button type="button" class="private-hub-avatar-edit" id="privateHubAvatarEdit" aria-label="ویرایش عکس مخاطب" title="ویرایش عکس مخاطب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A2 2 0 0 1 22 9.5v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="14" r="3.5"/></svg></button><input id="privateHubAvatarFile" type="file" accept="image/jpeg,image/png,image/webp" hidden><p class="private-hub-avatar-note" id="privateHubAvatarNote">عکس اختصاصی؛ فقط برای شما</p></div><h3 id="contactInfoTitle"></h3><p id="contactInfoAbout" class="muted-note"></p><p id="contactInfoPresence" class="private-hub-presence" role="status"></p><div id="contactInfoPhone" class="contact-info-phone" hidden></div></section>' +
         '<div class="contact-info-actions private-hub-actions" id="contactInfoActions" aria-label="اقدام‌های گفتگو"></div>' +
         '<section class="private-hub-section"><h3 id="contactInfoMediaTitle">محتوای مشترک</h3>' +
           '<div class="private-hub-category-tabs" id="privateHubCategoryTabs" role="tablist" aria-label="دسته‌بندی محتوای مشترک">' +
@@ -55,6 +55,8 @@
       e.preventDefault();tabs[next].focus();selectCategory(tabs[next].dataset.hubCategory);
     });
     $("privateHubLoadMore").addEventListener("click",()=>loadPage(true));
+    $("privateHubAvatarEdit").addEventListener("click",()=>$("privateHubAvatarFile").click());
+    $("privateHubAvatarFile").addEventListener("change",handleContactPhotoChange);
     $("privateHubRename").addEventListener("click",()=>renameCurrentContact());
     $("privateHubArchive").addEventListener("click",toggleArchive);
     $("contactInfoBlock").addEventListener("click",async()=>{await toggleContactBlock();syncBlockedActions();});
@@ -89,6 +91,9 @@
     $("privateHubBackGlyph").textContent=english?"←":"→";
     $("closeContactInfo").setAttribute("aria-label",tr("بازگشت","Back"));
     $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
+    $("privateHubAvatarEdit").setAttribute("aria-label",tr("ویرایش عکس مخاطب","Edit contact photo"));
+    $("privateHubAvatarEdit").title=tr("ویرایش عکس مخاطب","Edit contact photo");
+    $("privateHubAvatarNote").textContent=tr("عکس اختصاصی؛ فقط برای شما","Custom photo; visible only to you");
     $("contactInfoMediaTitle").textContent=tr("محتوای مشترک","Shared content");
     $("privateHubManagementTitle").textContent=tr("مدیریت گفتگو","Conversation management");
     $("privateHubRename").querySelector("strong").textContent=tr("تغییر نام مخاطب","Rename contact");
@@ -136,6 +141,7 @@
     $("contactInfoMediaStatus").textContent=tr("در حال بارگذاری…","Loading…");$("contactInfoStatus").textContent="";
     $("contactInfoBlock").disabled=true;$("contactInfoDelete").disabled=false;$("privateHubRename").disabled=!!currentChatUser.is_deleted_account;
     renderAvatar($("contactInfoAvatar"),currentChatUser.avatar_url||"",name);
+    await applyContactPhoto(user,other,name,currentChatUser.avatar_url||"",token);
     action(tr("پیام","Message"),"message",close);
     if(!currentChatUser.is_deleted_account){
       action(tr("تغییر نام","Rename"),"edit",()=>renameCurrentContact());
@@ -155,7 +161,7 @@
         const alias=String(prefFor(other).display_name||"").trim();
         $("contactInfoTitle").textContent=alias||profile.display_name;
         $("contactInfoAbout").textContent=[alias?profile.display_name:"",profile.username?"@"+profile.username:"",profile.about||tr("عضو فرناز","Farnaz member")].filter(Boolean).join(" · ");
-        if(profile.avatar_url)renderAvatar($("contactInfoAvatar"),profile.avatar_url,alias||profile.display_name);
+        if(profile.avatar_url)await applyContactPhoto(user,other,alias||profile.display_name,profile.avatar_url,token);
       }
       if(profile?.phone){
         visiblePhone=profile.phone;
@@ -179,6 +185,62 @@
       $("contactInfoMediaStatus").textContent=tr("برای تلاش دوباره دسته را انتخاب کن.","Select a category to retry.");
       $("contactInfoBlock").disabled=false;
     }
+  }
+
+  let contactPhotoUrl=null;
+  function releaseContactPhotoUrl(){if(contactPhotoUrl){URL.revokeObjectURL(contactPhotoUrl);contactPhotoUrl=null;}}
+  async function applyContactPhoto(userId,other,name,fallbackUrl,token){
+    const store=window.FarnazLocalStore;
+    if(!store?.getContactPhoto){renderAvatar($("contactInfoAvatar"),fallbackUrl,name);return;}
+    const blob=await store.getContactPhoto(userId,other);
+    if(token!==request||String(currentUser?.id)!==String(userId)||String(currentChatUser?.user_id)!==String(other))return;
+    releaseContactPhotoUrl();
+    if(blob){contactPhotoUrl=URL.createObjectURL(blob);renderAvatar($("contactInfoAvatar"),contactPhotoUrl,name);}
+    else renderAvatar($("contactInfoAvatar"),fallbackUrl,name);
+  }
+  function normalizeContactPhoto(file){
+    return new Promise((resolve,reject)=>{
+      if(!file||!/^image\\/(jpeg|png|webp)$/i.test(file.type)){reject(new Error(tr("فقط تصویر JPG، PNG یا WebP مجاز است.","Choose a JPG, PNG, or WebP image.")));return;}
+      if(file.size>10*1024*1024){reject(new Error(tr("حجم عکس باید کمتر از ۱۰ مگابایت باشد.","The image must be smaller than 10 MB.")));return;}
+      const reader=new FileReader();
+      reader.onerror=()=>reject(new Error(tr("خواندن عکس ناموفق بود.","Could not read the image.")));
+      reader.onload=()=>{
+        const image=new Image();
+        image.onerror=()=>reject(new Error(tr("فایل تصویر معتبر نیست.","This image file is invalid.")));
+        image.onload=()=>{
+          const max=512,scale=Math.min(1,max/Math.max(image.naturalWidth,image.naturalHeight));
+          const width=Math.max(1,Math.round(image.naturalWidth*scale)),height=Math.max(1,Math.round(image.naturalHeight*scale));
+          const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+          const context=canvas.getContext("2d");
+          if(!context){reject(new Error(tr("پردازش تصویر در این دستگاه پشتیبانی نمی‌شود.","Image processing is unavailable on this device.")));return;}
+          context.fillStyle="#ffffff";context.fillRect(0,0,width,height);
+          const side=Math.min(image.naturalWidth,image.naturalHeight),sx=(image.naturalWidth-side)/2,sy=(image.naturalHeight-side)/2;
+          canvas.width=Math.min(max,Math.round(side*scale));canvas.height=canvas.width;
+          context.drawImage(image,sx,sy,side,side,0,0,canvas.width,canvas.height);
+          canvas.toBlob(blob=>blob?resolve(blob):reject(new Error(tr("ساخت عکس جدید ناموفق بود.","Could not process the image."))),"image/jpeg",0.86);
+        };
+        image.src=String(reader.result||"");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  async function handleContactPhotoChange(event){
+    const input=event.currentTarget,file=input.files?.[0],user=String(currentUser?.id||""),other=String(contactId||""),token=request;
+    if(!file||!user||!other)return;
+    const button=$("privateHubAvatarEdit");button.disabled=true;
+    $("contactInfoStatus").textContent=tr("در حال آماده‌سازی عکس…","Preparing photo…");
+    try{
+      const blob=await normalizeContactPhoto(file);
+      if(token!==request||String(currentUser?.id||"")!==user||String(contactId||"")!==other)return;
+      const saved=await window.FarnazLocalStore?.saveContactPhoto(user,other,blob);
+      if(!saved)throw new Error(tr("ذخیره محلی عکس در دسترس نیست.","Local photo storage is unavailable."));
+      if(token!==request||String(currentUser?.id||"")!==user||String(contactId||"")!==other)return;
+      releaseContactPhotoUrl();contactPhotoUrl=URL.createObjectURL(blob);
+      renderAvatar($("contactInfoAvatar"),contactPhotoUrl,$("contactInfoTitle").textContent);
+      $("contactInfoStatus").textContent=tr("عکس مخاطب ذخیره شد؛ فقط برای شما نمایش داده می‌شود.","Contact photo saved; it is visible only to you.");
+    }catch(error){
+      if(token===request)$("contactInfoStatus").textContent=(english?"Photo error: ":"خطا در عکس: ")+(error?.message||String(error));
+    }finally{button.disabled=false;input.value="";}
   }
 
   function updateArchiveLabel(){
