@@ -256,6 +256,9 @@
       close: close,
       setMicrophoneEnabled: enabled => requireMedia().setMicrophoneEnabled(enabled),
       setCameraEnabled: enabled => requireMedia().setCameraEnabled(enabled),
+      switchCamera: () => requireMedia().switchCamera(),
+      setAudioOutput: deviceId => requireMedia().setAudioOutput(deviceId),
+      getLocalCameraTrack: () => requireMedia().getLocalCameraTrack(),
       startAudioPlayback: () => requireMedia().startAudioPlayback(),
       getState: function () {
         const sessionState = sessions ? sessions.getState() : { status: "idle", role: null, session: null };
