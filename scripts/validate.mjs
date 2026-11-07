@@ -91,6 +91,24 @@ const clientFiles = [
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
 const privateChatTests = read("tests/private-chat-model.test.mjs");
 const privateChatWorkflow = read(".github/workflows/validate.yml");
+const localStore = sources["js/local-store.js"];
+if (!/const DB_VERSION=3;/.test(localStore) || !localStore.includes('const STORE_OUTBOX="privateMessageOutbox"') ||
+    !localStore.includes("enqueueOutbox") || !localStore.includes("getOutbox") || !localStore.includes("removeOutbox") ||
+    !localStore.includes("STORE_OUTBOX];")) {
+  errors.push("Local storage must provide an account-scoped durable private-message outbox and purge it on logout");
+}
+const chatOutbox = sources["js/chat-menu-v5.js"];
+if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") ||
+    !chatOutbox.includes("FarnazLocalStore?.enqueueOutbox") ||
+    !chatOutbox.includes('.eq("id",record.id).maybeSingle()') ||
+    !chatOutbox.includes('flushPrivateOutbox();')) {
+  errors.push("Private messages must be durably queued, retried after reconnect, and reconciled by stable message ID");
+}
+if (!html.includes("./js/local-store.js?v=20261107-outbox1") ||
+    !html.includes("./js/chat-menu-v5.js?v=20261107-outbox1") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v294")) {
+  errors.push("App and service worker must reference the durable outbox release assets");
+}
 const privateChatModel = sources["js/private-chat-model.js"];
 const privateChatMenu = sources["js/chat-menu-v5.js"];
 const privateChatModelPosition = html.indexOf("./js/private-chat-model.js?v=20261107-private-chat1");
