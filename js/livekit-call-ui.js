@@ -23,6 +23,7 @@
     cameraOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8M15 10l6-3v10l-4-2M3 3l18 18"/></svg>',
     flip: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6"/><circle cx="11" cy="13" r="3"/><path d="m16 16 3 3 3-3m-3 3v-7"/></svg>',
     end: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15.5c4.8-4.2 13.2-4.2 18 0l-2.3 4a1.5 1.5 0 0 1-1.8.6l-3.2-1.2a1.5 1.5 0 0 1-1-1.4v-1.2a12 12 0 0 0-3.4 0v1.2a1.5 1.5 0 0 1-1 1.4l-3.2 1.2a1.5 1.5 0 0 1-1.8-.6L3 15.5Z"/></svg>',
+    accept: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.8 10.6a14.2 14.2 0 0 0 7.6 7.6l2.2-2.2a1 1 0 0 1 1.02-.24 11.6 11.6 0 0 0 3.62.58 1 1 0 0 1 1 1V21a1 1 0 0 1-1 1A18.2 18.2 0 0 1 2 4.8a1 1 0 0 1 1-1h3.7a1 1 0 0 1 1 1 11.6 11.6 0 0 0 .58 3.62 1 1 0 0 1-.24 1.02z"/></svg>',
     volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6"/></svg>',
     close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>'
   })[name] || "";
@@ -60,7 +61,7 @@
             '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitFlip" aria-label="تعویض دوربین" title="تعویض دوربین" hidden>' + icon("flip") + '<span>تعویض</span></button>' +
           '</div>' +
           '<div class="farnaz-livekit-actions">' +
-            '<button type="button" id="farnazLiveKitAccept" class="farnaz-livekit-action is-accept" aria-label="پاسخ به تماس" title="پاسخ" hidden>✓</button>' +
+            '<button type="button" id="farnazLiveKitAccept" class="farnaz-livekit-action is-accept" aria-label="پاسخ به تماس" title="پاسخ" hidden>' + icon("accept") + '</button>' +
             '<button type="button" id="farnazLiveKitReject" class="farnaz-livekit-action is-end" aria-label="رد تماس" title="رد تماس" hidden>' + icon("end") + '</button>' +
             '<button type="button" id="farnazLiveKitEnd" class="farnaz-livekit-action is-end" aria-label="پایان تماس" title="پایان تماس" hidden>' + icon("end") + '</button>' +
           '</div>' +
@@ -82,18 +83,27 @@
   function setAvatar(name, avatarUrl) {
     const node = byId("farnazLiveKitAvatar");
     if (!node) return;
+    const initial = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();
     node.replaceChildren();
-    const url = typeof avatarUrl === "string" && avatarUrl.startsWith("https://") ? avatarUrl : "";
-    if (url) {
-      const image = root.document.createElement("img");
-      image.src = url;
-      image.alt = "";
-      image.referrerPolicy = "no-referrer";
-      image.decoding = "async";
-      node.appendChild(image);
-    } else {
-      node.textContent = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();
+    node.dataset.hasImage = "false";
+    const url = typeof avatarUrl === "string" && /^https:\/\//i.test(avatarUrl.trim()) ? avatarUrl.trim() : "";
+    if (!url) {
+      node.textContent = initial;
+      return;
     }
+    const image = root.document.createElement("img");
+    image.alt = "";
+    image.referrerPolicy = "no-referrer";
+    image.decoding = "async";
+    image.onload = function () {
+      node.dataset.hasImage = "true";
+      node.replaceChildren(image);
+    };
+    image.onerror = function () {
+      node.dataset.hasImage = "false";
+      node.textContent = initial;
+    };
+    image.src = url;
   }
 
   function setStatus(message, state) {
@@ -199,10 +209,11 @@
       const result = await getClient().rpc("get_farnaz_user_profile", { search_user_id: session.caller_id });
       const profile = Array.isArray(result.data) ? result.data[0] : result.data;
       if (!activeSession || String(activeSession.id) !== String(session.id)) return;
-      if (profile && profile.display_name) {
-        byId("farnazLiveKitAvatar").textContent = profile.display_name.trim().charAt(0).toLocaleUpperCase();
-        byId("farnazLiveKitTitle").textContent = profile.display_name;
-        setStatus(tr("تماس ورودی از ", "Incoming call from ") + profile.display_name, "ringing");
+      if (profile) {
+        const displayName = String(profile.display_name || tr("مخاطب فرناز", "Farnaz contact")).trim();
+        byId("farnazLiveKitTitle").textContent = displayName;
+        setAvatar(displayName, profile.avatar_url || profile.photo_url || null);
+        setStatus(tr("تماس ورودی از ", "Incoming call from ") + displayName, "ringing");
       }
     } catch (error) {
       console.warn("[Farnaz LiveKit UI] Caller profile lookup failed:", error);
@@ -250,6 +261,7 @@
         ? (currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact"))
         : tr("تماس فرناز", "Farnaz call");
       show(title, tr("در انتظار پاسخ…", "Ringing…"), false);
+      setAvatar(title, typeof currentChatUser !== "undefined" && currentChatUser ? currentChatUser.avatar_url : null);
       setStatus(tr("در انتظار پاسخ…", "Ringing…"), "ringing");
     } else if (event.type === "session-accepted") {
       root.FarnazCalls?.stopRingtone?.();
