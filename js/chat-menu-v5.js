@@ -931,10 +931,7 @@ function queuedPrivateMessage(record){
     attachment_name:record.attachment_name||null,attachment_mime:record.attachment_mime||null,
     attachment_size:record.attachment_size||null,reply_to_id:record.reply_to_id||null,_delivery_state:"queued"};
 }
-function privateOutboxDedupeKey(record){
-  return JSON.stringify([record.receiver_id,record.body||"",record.reply_to_id||"",record.attachment_name||"",
-    record.attachment_size||0,record.attachment_last_modified||0,record.attachment_mime||""]);
-}
+
 async function flushPrivateOutbox(){
   if(privateOutboxFlushPromise)return privateOutboxFlushPromise;
   if(!currentUser||(typeof navigator!=="undefined"&&navigator.onLine===false))return false;
@@ -1049,7 +1046,6 @@ async function sendMessage(event){
     message_type:file?(file.type.startsWith("image/")?"image":"file"):"text",
     attachment_name:safeName,attachment_mime:file?.type||null,attachment_size:file?.size||null,
     attachment_last_modified:file?.lastModified||0,file:file||null,reply_to_id:replyTarget?.id||null,createdAt:Date.now()};
-  record.dedupeKey=privateOutboxDedupeKey(record);
   button.disabled=true;
   try{
     const saved=await window.FarnazLocalStore?.enqueueOutbox(record);
