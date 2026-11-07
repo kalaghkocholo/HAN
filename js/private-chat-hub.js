@@ -49,7 +49,7 @@
     $("privateHubLoadMore").addEventListener("click",()=>loadPage(true));
     $("privateHubRename").addEventListener("click",()=>renameCurrentContact());
     $("privateHubArchive").addEventListener("click",toggleArchive);
-    $("contactInfoBlock").addEventListener("click",()=>toggleContactBlock());
+    $("contactInfoBlock").addEventListener("click",async()=>{await toggleContactBlock();syncBlockedActions();});
     $("contactInfoDelete").addEventListener("click",()=>deleteContactConversation());
     return dialog;
   }
@@ -77,6 +77,7 @@
   }
 
   function applyLanguage(){
+    if(!dialog||!dialog.isConnected)return;
     $("privateHubBackGlyph").textContent=english?"←":"→";
     $("closeContactInfo").setAttribute("aria-label",tr("بازگشت","Back"));
     $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
@@ -97,6 +98,14 @@
   }
 
   window.addEventListener("farnaz-language-changed",applyLanguage);
+
+  function syncBlockedActions(){
+    const buttons=$("contactInfoActions").querySelectorAll("button");
+    const blocked=!!contactInfoBlocked;
+    if(buttons[2]){buttons[2].disabled=blocked;buttons[2].title=blocked?tr("ابتدا مسدودسازی را بردار","Unblock this contact first"):"";}
+    if(buttons[3]){buttons[3].disabled=blocked;buttons[3].title=blocked?tr("ابتدا مسدودسازی را بردار","Unblock this contact first"):"";}
+    $("contactInfoBlock").querySelector("strong").textContent=blocked?tr("رفع مسدودسازی","Unblock contact"):tr("مسدودسازی مخاطب","Block contact");
+  }
 
   function syncTabs(){
     $("privateHubCategoryTabs").querySelectorAll("[data-hub-category]").forEach(b=>{
@@ -147,8 +156,8 @@
       }
       if(blocked.error)throw blocked.error;
       contactInfoBlocked=!!blocked.data;
-      $("contactInfoBlock").querySelector("strong").textContent=contactInfoBlocked?tr("رفع مسدودسازی","Unblock contact"):tr("مسدودسازی مخاطب","Block contact");
       $("contactInfoBlock").disabled=!!currentChatUser.is_deleted_account;
+      syncBlockedActions();
       await refreshPrivatePresence(other);
       if(token!==request||String(currentChatUser?.user_id)!==other)return;
       const presence=currentChatPresenceLabel||"";
@@ -195,7 +204,8 @@
   function newestFirst(a,b){return String(b.created_at).localeCompare(String(a.created_at))||String(b.id).localeCompare(String(a.id));}
 
   async function selectCategory(next){
-    if(!labels[next]||busy)return;
+    if(!labels[next]||next===category)return;
+    request++;busy=false;
     category=next;cursor=null;more=false;$("contactInfoMediaList").replaceChildren();syncTabs();await loadPage(false);
   }
 
