@@ -5,7 +5,7 @@
   const labels = {photos:["تصاویر","Photos"],videos:["ویدئوها","Videos"],files:["فایل‌ها","Files"],audio:["صوت","Audio"],links:["پیوندها","Links"]};
   const tr = (fa,en) => english ? en : fa;
   const $ = id => document.getElementById(id);
-  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, hiddenIds=new Set(), focusBefore=null, visiblePhone="";
+  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, hiddenIds=new Set(), focusBefore=null, visiblePhone="", profileLoading=false;
 
   function ensure(){
     if(dialog && dialog.isConnected) return dialog;
@@ -115,7 +115,7 @@
     if(!currentUser||!currentChatUser)return;
     ensure();focusBefore=document.activeElement;
     const token=++request,user=String(currentUser.id),other=String(currentChatUser.user_id);
-    contactId=other;category="photos";cursor=null;more=false;busy=false;hiddenIds=new Set();
+    contactId=other;category="photos";cursor=null;more=false;busy=false;profileLoading=true;hiddenIds=new Set();
     dialog.hidden=false;document.body.classList.add("private-hub-open");
     const name=currentChatUser.display_name||(english?"Farnaz user":"مخاطب فرناز");
     $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
@@ -161,8 +161,10 @@
       if(token!==request||String(currentChatUser?.user_id)!==other)return;
       const presence=currentChatPresenceLabel||"";
       $("contactInfoPresence").textContent=presence===(english?"Private conversation":"گفتگوی خصوصی")?tr("وضعیت در دسترس نیست","Status unavailable"):presence;
+      profileLoading=false;
       await loadPage(false);
     }catch(error){
+      profileLoading=false;
       if(token!==request)return;
       $("contactInfoStatus").textContent=tr("بارگذاری اطلاعات ناموفق بود: ","Could not load contact information: ")+(error?.message||String(error));
       $("contactInfoMediaStatus").textContent=tr("برای تلاش دوباره دسته را انتخاب کن.","Select a category to retry.");
@@ -204,8 +206,9 @@
 
   async function selectCategory(next){
     if(!labels[next]||next===category)return;
-    request++;busy=false;
-    category=next;cursor=null;more=false;$("contactInfoMediaList").replaceChildren();syncTabs();await loadPage(false);
+    category=next;cursor=null;more=false;$("contactInfoMediaList").replaceChildren();syncTabs();
+    if(profileLoading)return;
+    request++;busy=false;await loadPage(false);
   }
 
   async function loadPage(append){
