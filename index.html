@@ -106,6 +106,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
       <div class="profile-avatar-control">
         <div class="avatar large" id="userAvatar" aria-label="تصویر پروفایل">F</div>
         <button class="profile-avatar-edit" id="changeAvatarButton" type="button" aria-label="ویرایش عکس پروفایل" title="ویرایش عکس پروفایل"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h3l1.5-2h7l1.5 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+        <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>
       </div>
       <div class="profile-details">
         <div class="profile-phone" id="userPhone"></div>
@@ -158,14 +159,6 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         <div class="profile-privacy-control">
           <label class="profile-phone-visibility" for="allowSpaceAdditionsSetting"><input id="allowSpaceAdditionsSetting" type="checkbox" checked onchange="savePrivacySetting('allow_space_additions',this.checked)"> <span id="allowSpaceAdditionsLabel">اجازه اضافه‌شدن من به گروه‌ها و کانال‌ها</span></label>
           <p class="profile-help" id="allowSpaceAdditionsHint">اگر خاموش باشد، دیگران نمی‌توانند شما را مستقیماً اضافه کنند؛ خودتان همچنان می‌توانید عضو شوید.</p>
-        </div>
-      </section>
-      <section class="profile-section" aria-labelledby="profilePhotoTitle">
-        <h3 class="profile-section-title" id="profilePhotoTitle">تصویر پروفایل</h3>
-        <div class="profile-field">
-          <label for="avatarFile" id="avatarFileLabel">انتخاب تصویر پروفایل</label>
-          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="avatarNote" hidden>
-          <p class="profile-help" id="avatarNote">فرمت JPG، PNG یا WebP؛ حداکثر ۳ مگابایت. پیش از ذخیره می‌توانید تصویر را برش دهید.</p>
         </div>
       </section>
       <div class="profile-actions"><button class="action-button" id="saveProfileButton" type="submit">ذخیره تغییرات</button></div>
