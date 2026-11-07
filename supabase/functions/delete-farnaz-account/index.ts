@@ -137,12 +137,19 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // Revoke refresh tokens for every device before deleting the Auth identity.
+    // The database additionally checks session_id against auth.sessions, which blocks
+    // already-issued access JWTs immediately after their session is revoked.
+    const { error: revokeError } = await admin.auth.admin.signOut(jwt, "global");
+    if (revokeError) throw new Error("Could not revoke all active account sessions: " + revokeError.message);
+
     const { error: deleteError } = await admin.auth.admin.deleteUser(user.id, false);
-    if (deleteError) throw new Error("Account data was prepared, but the authentication account could not be deleted: " + deleteError.message);
+    if (deleteError) throw new Error("All sessions were revoked and account files were prepared, but the authentication account could not be deleted: " + deleteError.message);
 
     return respond({
       success: true,
-      message: "Account deleted. Private and group message text was retained for the other participants.",
+      sessions_revoked: true,
+      message: "Account deleted. All sessions were revoked and protected database and Storage requests reject their old access tokens. Private and group message text was retained for the other participants.",
     });
   } catch (error) {
     console.error("Farnaz account deletion failed:", errorMessage(error));
