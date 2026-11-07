@@ -1835,7 +1835,7 @@ async function getContactProfiles(ids){
 let contactInfoBlocked=false;
 /* The private conversation hub is loaded as a single feature module after core. */
 document.addEventListener("keydown",event=>{
-  if((event.key==="Enter"||event.key===" ")&&event.target instanceof Element&&event.target.matches("#conversationTitle, #chatAvatar")&&currentUser&&currentChatUser){
+  if((event.key==="Enter"||event.key===" ")&&event.target instanceof Element&&event.target.matches("#conversationTitle, #chatAvatar")&&currentUser&&currentChatUser&&!document.body.classList.contains("spaces-chat-mode")){
     event.preventDefault();
     openContactInfo();
   }
@@ -2082,7 +2082,8 @@ function openChat(contact,fromPage="chatsPage"){
     if(typeof openContactInfo==="function")openContactInfo();
   };
   chatAvatar.setAttribute("role","button");chatAvatar.tabIndex=0;
-  chatAvatar.setAttribute("aria-label",english?"View profile photo":"بزرگ‌نمایی عکس مخاطب");
+  chatAvatar.setAttribute("aria-label",english?"Contact information":"اطلاعات مخاطب");
+  chatAvatar.setAttribute("aria-haspopup","dialog");
   setStatus("sendMessageStatus",deletedContact?(english?"This account has been deleted. You can read the conversation, but cannot send new messages.":"این حساب حذف شده است؛ می‌توانید تاریخچه را بخوانید اما امکان ارسال پیام جدید وجود ندارد."):"");
   currentChatPresenceLabel=deletedContact?(english?"Deleted account":"حساب حذف‌شده"):(english?"Private conversation":"گفتگوی خصوصی");
   navigate("chatPage");refreshPrivatePresence(contact.user_id);
