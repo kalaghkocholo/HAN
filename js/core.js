@@ -154,6 +154,18 @@ function applySettingsLanguage(){
     resetSettingsButton:["بازگردانی تنظیمات اولیه","Reset to defaults"]
   };
   Object.entries(labels).forEach(([id,pair])=>{if($(id))$(id).textContent=pair[english?1:0];});
+  const inboxFilterLabels={all:["همه","All"],private:["خصوصی","Private"],group:["گروه‌ها","Groups"],channel:["کانال‌ها","Channels"]};
+  document.querySelectorAll("[data-inbox-filter]").forEach(button=>{
+    const pair=inboxFilterLabels[button.dataset.inboxFilter];
+    if(pair)button.textContent=pair[english?1:0];
+  });
+  const inboxFilters=document.querySelector(".inbox-type-filters");
+  if(inboxFilters)inboxFilters.setAttribute("aria-label",english?"Filter conversations by type":"فیلتر نوع گفتگو");
+  const conversationSearch=$("conversationSearch");
+  if(conversationSearch){
+    conversationSearch.placeholder=english?"Search conversations":"جستجوی گفتگوها";
+    conversationSearch.setAttribute("aria-label",conversationSearch.placeholder);
+  }
   const optionSets={
     themeSetting:[["dark","تیره","Dark"],["light","روشن","Light"],["system","مطابق دستگاه","System"]],
     fontSizeSetting:[["small","کوچک","Small"],["medium","معمولی","Medium"],["large","بزرگ","Large"]],
