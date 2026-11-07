@@ -79,7 +79,7 @@
     return dialog;
   }
 
-  function setStatus(message, state) {
+  function setAvatar(name, avatarUrl) {\n    const node = byId("farnazLiveKitAvatar");\n    if (!node) return;\n    node.replaceChildren();\n    const url = typeof avatarUrl === "string" && /^https:\\/\\//i.test(avatarUrl) ? avatarUrl : "";\n    if (url) {\n      const image = root.document.createElement("img");\n      image.src = url;\n      image.alt = "";\n      image.referrerPolicy = "no-referrer";\n      image.decoding = "async";\n      node.appendChild(image);\n    } else {\n      node.textContent = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();\n    }\n  }\n\n  function setStatus(message, state) {
     const node = byId("farnazLiveKitStatus");
     if (node) node.textContent = message;
     const dot = byId("farnazLiveKitDot");
@@ -151,7 +151,7 @@
   function show(title, status, incoming) {
     ensureDialog();
     byId("farnazLiveKitTitle").textContent = title || tr("تماس فرناز", "Farnaz call");
-    byId("farnazLiveKitAvatar").textContent = (title || "F").trim().charAt(0).toLocaleUpperCase();
+    setAvatar(title, null);
     byId("farnazLiveKitDialog").hidden = false;
     byId("farnazLiveKitDialog").classList.toggle("is-video-call", callType === "video");
     byId("farnazLiveKitControls").hidden = true;
@@ -339,7 +339,7 @@
     if (blocked.data) throw new Error(tr("این مخاطب را مسدود کرده‌ای.", "This contact is blocked."));
     callType = type === "video" ? "video" : "audio";
     const title = currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact");
-    show(title, tr("در حال شروع تماس…", "Starting call…"), false);
+    show(title, tr("در حال شروع تماس…", "Starting call…"), false);\n    setAvatar(title, currentChatUser.avatar_url);
     try {
       await controller.start({ peerId: peerId, callType: callType });
     } catch (error) {
