@@ -565,6 +565,10 @@ if (!viewportControllerSource.includes("window.FarnazChatViewportController") ||
     !viewportControllerSource.includes("visualViewport") ||
     !viewportControllerSource.includes("ResizeObserver") ||
     !viewportTests.includes("keyboard opening must not force-scroll") ||
+    !sources["chat-viewport.css"].includes("var(--chat-viewport-height,100vh)") ||
+    !sources["chat-viewport.css"].includes("var(--chat-viewport-height,100dvh)") ||
+    !sources["styles.css"].includes("width:44px;height:44px;min-width:44px;min-height:44px") ||
+    !sources["styles.css"].includes("max-height:120px;overflow-y:auto") ||
     coreSource.includes("installChatKeyboardLayout") ||
     coreSource.includes("syncViewport()") ||
     sources["js/chat-menu-v5.js"].includes("const syncChatViewport=")) {
@@ -597,7 +601,7 @@ const conversationChecks = [
    !sources["spaces.css"].includes("#spacesPage #spaceComposer .space-attachment-menu {"),
     "spaces.css must not retain competing group-only header/composer layout overrides"],
   [sources["chat-viewport.css"].includes("body.chat-mode .app.chat-mode>#chatPage #sendMessageForm") &&
-   sources["chat-viewport.css"].includes("position:absolute!important;inset-inline:13px!important;left:auto!important;right:auto!important;bottom:0!important") &&
+   sources["chat-viewport.css"].includes("position:absolute!important;left:13px!important;right:13px!important;inset-inline:13px!important;bottom:0!important") &&
    sources["chat-viewport.css"].includes("overflow-y:auto!important;") && sources["chat-viewport.css"].includes("padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important"),
     "chat-viewport.css must anchor the group/channel composer and preserve message scroll space"],
 ];
