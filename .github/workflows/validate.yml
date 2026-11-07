@@ -30,6 +30,7 @@ jobs:
           node --check js/supabase-sdk.js
           node --check js/local-store.js
           node --check js/private-chat-model.js
+          node --check js/private-chat-hub.js
           node --check js/core.js
           node --check js/chat-menu-v5.js
           node --check js/spaces.js
