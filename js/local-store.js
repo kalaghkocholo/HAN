@@ -1,13 +1,14 @@
 "use strict";
 (function(){
   const DB_NAME="farnaz-local-v1";
-  const DB_VERSION=3;
+  const DB_VERSION=4;
   const STORE_MESSAGES="chatMessages";
   const STORE_DRAFTS="drafts";
   const STORE_TEMP="tempFiles";
   const STORE_SNAPSHOTS="snapshots";
   const STORE_SPACE_MESSAGES="spaceMessages";
   const STORE_OUTBOX="privateMessageOutbox";
+  const STORE_CONTACT_PHOTOS="contactPhotos";
   let opening=null;
   // Serialize account-cache writes against logout cleanup. A quick re-login must
   // write fresh cache data only after the previous logout purge has completed.
@@ -50,6 +51,7 @@
         if(!db.objectStoreNames.contains(STORE_SNAPSHOTS))db.createObjectStore(STORE_SNAPSHOTS,{keyPath:"key"});
         if(!db.objectStoreNames.contains(STORE_SPACE_MESSAGES))db.createObjectStore(STORE_SPACE_MESSAGES,{keyPath:"key"});
         if(!db.objectStoreNames.contains(STORE_OUTBOX))db.createObjectStore(STORE_OUTBOX,{keyPath:"id"});
+        if(!db.objectStoreNames.contains(STORE_CONTACT_PHOTOS))db.createObjectStore(STORE_CONTACT_PHOTOS,{keyPath:"key"});
       };
       request.onsuccess=()=>finish(null,request.result);
       request.onerror=()=>finish(request.error||new Error("Local storage unavailable"));
@@ -217,6 +219,20 @@
     });
   }
   async function removeOutbox(userId,id){if(!userId||!id)return false;return remove(STORE_OUTBOX,String(id),userId);}
+  async function getContactPhoto(userId,contactId){
+    if(!userId||!contactId)return null;
+    const record=await read(STORE_CONTACT_PHOTOS,keyFor(userId,contactId),userId);
+    return record?.blob instanceof Blob?record.blob:null;
+  }
+  async function saveContactPhoto(userId,contactId,blob){
+    if(!userId||!contactId||!(blob instanceof Blob)||!/^image\\/(jpeg|png|webp)$/i.test(blob.type)||blob.size>2*1024*1024)return false;
+    const key=keyFor(userId,contactId);
+    return write(STORE_CONTACT_PHOTOS,{key,userId:String(userId),contactId:String(contactId),blob,updatedAt:Date.now()});
+  }
+  async function removeContactPhoto(userId,contactId){
+    if(!userId||!contactId)return false;
+    return remove(STORE_CONTACT_PHOTOS,keyFor(userId,contactId),userId);
+  }
   async function getDraft(userId,contactId){
     if(!userId||!contactId)return "";
     const record=await read(STORE_DRAFTS,keyFor(userId,contactId),userId);
@@ -258,7 +274,7 @@
         // Queue repeated cleanup operations for the same account.
         if(previous)await previous;
         const db=await openDB();if(!db)return false;
-        const names=[STORE_MESSAGES,STORE_DRAFTS,STORE_TEMP,STORE_SNAPSHOTS,STORE_SPACE_MESSAGES,STORE_OUTBOX];
+        const names=[STORE_MESSAGES,STORE_DRAFTS,STORE_TEMP,STORE_SNAPSHOTS,STORE_SPACE_MESSAGES,STORE_OUTBOX,STORE_CONTACT_PHOTOS];
         return await new Promise((resolve,reject)=>{
           let settled=false;
           let tx;
@@ -328,7 +344,7 @@
   }
 
   window.FarnazLocalStore=Object.freeze({
-    getMessages,saveMessages,enqueueOutbox,getOutbox,removeOutbox,getDraft,saveDraft,clearDraft,
+    getMessages,saveMessages,enqueueOutbox,getOutbox,removeOutbox,getContactPhoto,saveContactPhoto,removeContactPhoto,getDraft,saveDraft,clearDraft,
     getSnapshot,saveSnapshot,getSpaceMessages,saveSpaceMessages,
     saveTemporaryFile,getTemporaryFile,clearUser,requestPersistentStorage
   });
