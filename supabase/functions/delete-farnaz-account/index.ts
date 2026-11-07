@@ -153,6 +153,6 @@ Deno.serve(async (req: Request) => {
     });
   } catch (error) {
     console.error("Farnaz account deletion failed:", errorMessage(error));
-    return respond({ error: "Account deletion could not be completed. Your account was not intentionally signed out; contact support if the problem persists." }, 500);
+    return respond({ error: "The deletion process did not finish. If your session was revoked, sign in again and retry. Contact support if the problem persists." }, 500);
   }
 });
