@@ -71,7 +71,10 @@ requireCheck(adapter.includes('root.FarnazLiveKitCalls') &&
   adapter.includes('supabase.functions.invoke("livekit-token"') &&
   adapter.includes("adaptiveStream: true") &&
   adapter.includes("dynacast: true") &&
-  adapter.includes("publishMicrophoneOnConnect"),
+  adapter.includes("publishMicrophoneOnConnect") &&
+  adapter.includes("async function switchCamera()") &&
+  adapter.includes("async function setAudioOutput(deviceId)") &&
+  adapter.includes("getLocalCameraTrack"),
   "LiveKit adapter must be isolated, authenticate through Supabase, and enable adaptive media options.");
 requireCheck(adapter.includes('integrationStatus: "isolated-adapter-not-enabled"') &&
   adapterDocs.includes("not loaded during the default app startup"),
@@ -89,11 +92,16 @@ requireCheck(callUi.includes("root.FarnazLiveKitCallUI") &&
   callUi.includes("controller.reject()") &&
   callUi.includes("controller.setMicrophoneEnabled") &&
   callUi.includes("controller.setCameraEnabled") &&
+  callUi.includes("controller.switchCamera()") &&
+  callUi.includes("controller.setAudioOutput(next.deviceId)") &&
+  callUi.includes("farnazLiveKitLocalVideo") &&
+  callUi.includes("media-local-camera-track") &&
   callUi.includes("controller.startAudioPlayback") &&
   callUi.includes("farnazLiveKitAudioRoute") &&
   callUi.includes("setSinkId") &&
   callUi.includes("On iPhone, choose speaker or headphones from the system audio controls.") &&
   appHtml.includes("livekit-call-ui.js") &&
+  appHtml.includes("call-ui.css?v=20261107-call-ui1") &&
   appHtml.includes('new URLSearchParams(window.location.search).get("livekitPilot") === "1"'),
   "The LiveKit call UI must expose incoming/outgoing, mute, audio playback, and video controls behind the disabled pilot flag.");
 requireCheck(!/FARNAZ_LIVEKIT_CALLS_ENABLED\s*=\s*true/.test(appHtml),
