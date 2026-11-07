@@ -10,7 +10,7 @@ const validCallSessionId = "b12f3456-7890-4123-8123-123456789abc";
 function loadAdapter({ sdk = true } = {}) {
   const context = {
     console,
-    navigator: { mediaDevices: { getUserMedia: async () => ({}) } },
+    navigator: { mediaDevices: { getUserMedia: async () => ({}), enumerateDevices: async () => [\n      { kind: "videoinput", deviceId: "camera-front", label: "Front camera" },\n      { kind: "videoinput", deviceId: "camera-back", label: "Back camera" },\n      { kind: "audiooutput", deviceId: "default", label: "Default" },\n      { kind: "audiooutput", deviceId: "speaker", label: "Speaker" }\n    ] }, audioSession: { type: "auto" } },
     setTimeout,
     clearTimeout,
     Promise
@@ -28,7 +28,7 @@ function loadAdapter({ sdk = true } = {}) {
         this.canPlaybackAudio = true;
         this.localParticipant = {
           setMicrophoneEnabled: async enabled => { this.microphoneEnabled = enabled; },
-          setCameraEnabled: async enabled => { this.cameraEnabled = enabled; }
+          setCameraEnabled: async enabled => {\n            this.cameraEnabled = enabled;\n            this.cameraTrack = enabled ? { mediaStreamTrack: { getSettings: () => ({ deviceId: "camera-front" }) } } : null;\n          },\n          getTrackPublication: source => source === "camera" && this.cameraTrack ? { track: this.cameraTrack } : undefined
         };
         this.connected = false;
         this.disconnected = false;
@@ -37,11 +37,11 @@ function loadAdapter({ sdk = true } = {}) {
       on(name, handler) { this.handlers.set(name, handler); return this; }
       async connect(url, token) { this.url = url; this.token = token; this.connected = true; }
       async disconnect(stopTracks) { this.stopTracks = stopTracks; this.disconnected = true; this.connected = false; }
-      async startAudio() { this.canPlaybackAudio = true; }
+      async startAudio() { this.canPlaybackAudio = true; }\n      async switchActiveDevice(kind, deviceId, exact) {\n        this.deviceSwitches = this.deviceSwitches || [];\n        this.deviceSwitches.push({ kind, deviceId, exact });\n      }
     }
     context.LivekitClient = {
       Room: FakeRoom,
-      Track: { Kind: { Audio: "audio", Video: "video" } },
+      Track: { Kind: { Audio: "audio", Video: "video" }, Source: { Camera: "camera" } },
       RoomEvent: {
         TrackSubscribed: "track-subscribed",
         TrackUnsubscribed: "track-unsubscribed",
@@ -50,7 +50,7 @@ function loadAdapter({ sdk = true } = {}) {
         Reconnecting: "reconnecting",
         Reconnected: "reconnected",
         Disconnected: "disconnected",
-        AudioPlaybackStatusChanged: "audio-playback-status",
+        AudioPlaybackStatusChanged: "audio-playback-status",\n        ConnectionQualityChanged: "connection-quality",
         MediaDevicesError: "media-device-error"
       }
     };
@@ -209,4 +209,32 @@ test("does not attempt to load an external SDK when the SDK is missing", async (
   const { context } = loadAdapter({ sdk: false });
   const call = context.FarnazLiveKitCalls.create({ supabase: makeSupabase(), spaceId: validSpaceId });
   await assert.rejects(call.connect(), /SDK is not loaded/);
+});
+
+test("exposes a real local camera track and switches the active camera through LiveKit", async () => {
+  const { context, roomInstances } = loadAdapter();
+  const call = context.FarnazLiveKitCalls.create({
+    supabase: makeSupabase(), callSessionId: validCallSessionId, callType: "video"
+  });
+  await call.connect();
+  assert.ok(call.getLocalCameraTrack());
+  await call.switchCamera();
+  assert.deepEqual(roomInstances[0].deviceSwitches[0], {
+    kind: "videoinput", deviceId: "camera-back", exact: true
+  });
+  await call.disconnect();
+});
+
+test("routes audio output through LiveKit and reports the selected device", async () => {
+  const { context, roomInstances } = loadAdapter();
+  const call = context.FarnazLiveKitCalls.create({
+    supabase: makeSupabase(), callSessionId: validCallSessionId, callType: "audio"
+  });
+  await call.connect();
+  await call.setAudioOutput("speaker");
+  assert.deepEqual(roomInstances[0].deviceSwitches[0], {
+    kind: "audiooutput", deviceId: "speaker", exact: true
+  });
+  assert.equal(call.getState().audioOutputDeviceId, "speaker");
+  await call.disconnect();
 });
