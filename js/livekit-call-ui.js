@@ -11,9 +11,21 @@
   let microphoneEnabled = true;
   let cameraEnabled = true;
   let remoteVideoTrack = null;
-  let remoteAudioTracks = new Set();
+  let localVideoTrack = null;
+  const remoteAudioTracks = new Set();
   const byId = id => root.document.getElementById(id);
   const tr = (fa, en) => typeof english !== "undefined" && english ? en : fa;
+  const icon = (name) => ({
+    mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8"/></svg>',
+    micOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9V5.5a3 3 0 0 0-5.8-1M5.5 11.5a6.5 6.5 0 0 0 11.8 3.8M12 18v3m-4 0h8M3 3l18 18"/></svg>',
+    speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/></svg>',
+    cameraOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8M15 10l6-3v10l-4-2M3 3l18 18"/></svg>',
+    flip: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6"/><circle cx="11" cy="13" r="3"/><path d="m16 16 3 3 3-3m-3 3v-7"/></svg>',
+    end: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15.5c4.8-4.2 13.2-4.2 18 0l-2.3 4a1.5 1.5 0 0 1-1.8.6l-3.2-1.2a1.5 1.5 0 0 1-1-1.4v-1.2a12 12 0 0 0-3.4 0v1.2a1.5 1.5 0 0 1-1 1.4l-3.2 1.2a1.5 1.5 0 0 1-1.8-.6L3 15.5Z"/></svg>',
+    volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6"/></svg>',
+    close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>'
+  })[name] || "";
 
   function ensureDialog() {
     let dialog = byId("farnazLiveKitDialog");
@@ -27,24 +39,32 @@
     dialog.setAttribute("aria-labelledby", "farnazLiveKitTitle");
     dialog.innerHTML =
       '<div class="farnaz-livekit-card">' +
-        '<button type="button" class="farnaz-livekit-close" id="farnazLiveKitClose" aria-label="بستن">×</button>' +
-        '<div class="farnaz-livekit-avatar" id="farnazLiveKitAvatar" aria-hidden="true">F</div>' +
-        '<h2 id="farnazLiveKitTitle">تماس فرناز</h2>' +
-        '<p id="farnazLiveKitStatus" role="status" aria-live="polite">در حال آماده‌سازی…</p>' +
-        '<time id="farnazLiveKitTimer" hidden>00:00</time>' +
-        '<div class="farnaz-livekit-media" id="farnazLiveKitMedia">' +
-          '<video id="farnazLiveKitRemoteVideo" autoplay playsinline hidden></video>' +
-          '<div id="farnazLiveKitRemoteAudio"></div>' +
-        '</div>' +
-        '<div class="farnaz-livekit-actions">' +
-          '<button type="button" id="farnazLiveKitAccept" class="is-accept" hidden>پاسخ</button>' +
-          '<button type="button" id="farnazLiveKitReject" class="is-danger" hidden>رد تماس</button>' +
-          '<button type="button" id="farnazLiveKitMute" hidden>بی‌صدا</button>' +
-          '<button type="button" id="farnazLiveKitSpeaker" hidden>فعال‌سازی صدا</button>' +
-          '<button type="button" id="farnazLiveKitAudioRoute" hidden>بلندگو</button>' +
-          '<button type="button" id="farnazLiveKitCamera" hidden>دوربین خاموش</button>' +
-          '<button type="button" id="farnazLiveKitEnd" class="is-danger" hidden>پایان تماس</button>' +
-        '</div>' +
+        '<header class="farnaz-livekit-header">' +
+          '<div class="farnaz-livekit-status-dot" id="farnazLiveKitDot"></div>' +
+          '<div class="farnaz-livekit-heading"><strong id="farnazLiveKitTitle">تماس فرناز</strong><span id="farnazLiveKitStatus" role="status" aria-live="polite">در حال آماده‌سازی…</span></div>' +
+          '<button type="button" class="farnaz-livekit-close" id="farnazLiveKitClose" aria-label="بستن پنجره تماس" title="بستن">' + icon("close") + '</button>' +
+        '</header>' +
+        '<main class="farnaz-livekit-stage" id="farnazLiveKitStage">' +
+          '<div class="farnaz-livekit-avatar" id="farnazLiveKitAvatar" aria-hidden="true">F</div>' +
+          '<video id="farnazLiveKitRemoteVideo" class="farnaz-livekit-remote-video" autoplay playsinline hidden></video>' +
+          '<video id="farnazLiveKitLocalVideo" class="farnaz-livekit-local-video" autoplay muted playsinline hidden></video>' +
+          '<div class="farnaz-livekit-stage-caption"><time id="farnazLiveKitTimer" hidden>00:00</time><span id="farnazLiveKitQuality" hidden></span></div>' +
+        '</main>' +
+        '<div class="farnaz-livekit-audio" id="farnazLiveKitRemoteAudio"></div>' +
+        '<div class="farnaz-livekit-audio-unlock" id="farnazLiveKitUnlockWrap" hidden><button type="button" id="farnazLiveKitUnlock">فعال‌سازی صدای تماس</button></div>' +
+        '<footer class="farnaz-livekit-footer">' +
+          '<div class="farnaz-livekit-controls" id="farnazLiveKitControls" hidden>' +
+            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitMute" aria-label="خاموش‌کردن میکروفون" aria-pressed="true" title="میکروفون">' + icon("mic") + '<span>میکروفون</span></button>' +
+            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitAudioRoute" aria-label="خروجی صدا" title="خروجی صدا">' + icon("speaker") + '<span>بلندگو</span></button>' +
+            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitCamera" aria-label="خاموش‌کردن دوربین" aria-pressed="true" title="دوربین" hidden>' + icon("camera") + '<span>دوربین</span></button>' +
+            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitFlip" aria-label="تعویض دوربین" title="تعویض دوربین" hidden>' + icon("flip") + '<span>تعویض</span></button>' +
+          '</div>' +
+          '<div class="farnaz-livekit-actions">' +
+            '<button type="button" id="farnazLiveKitAccept" class="farnaz-livekit-action is-accept" aria-label="پاسخ به تماس" title="پاسخ" hidden>✓</button>' +
+            '<button type="button" id="farnazLiveKitReject" class="farnaz-livekit-action is-end" aria-label="رد تماس" title="رد تماس" hidden>' + icon("end") + '</button>' +
+            '<button type="button" id="farnazLiveKitEnd" class="farnaz-livekit-action is-end" aria-label="پایان تماس" title="پایان تماس" hidden>' + icon("end") + '</button>' +
+          '</div>' +
+        '</footer>' +
       '</div>';
     root.document.body.appendChild(dialog);
     byId("farnazLiveKitClose").addEventListener("click", end);
@@ -52,21 +72,23 @@
     byId("farnazLiveKitReject").addEventListener("click", reject);
     byId("farnazLiveKitEnd").addEventListener("click", end);
     byId("farnazLiveKitMute").addEventListener("click", toggleMicrophone);
-    byId("farnazLiveKitSpeaker").addEventListener("click", unlockAudio);
     byId("farnazLiveKitAudioRoute").addEventListener("click", toggleAudioRoute);
     byId("farnazLiveKitCamera").addEventListener("click", toggleCamera);
+    byId("farnazLiveKitFlip").addEventListener("click", switchCamera);
+    byId("farnazLiveKitUnlock").addEventListener("click", unlockAudio);
     return dialog;
   }
 
-  function setStatus(message) {
+  function setStatus(message, state) {
     const node = byId("farnazLiveKitStatus");
     if (node) node.textContent = message;
+    const dot = byId("farnazLiveKitDot");
+    if (dot && state) dot.dataset.state = state;
   }
 
   function formatDuration(seconds) {
     const minutes = Math.floor(seconds / 60);
-    const remainder = seconds % 60;
-    return String(minutes).padStart(2, "0") + ":" + String(remainder).padStart(2, "0");
+    return String(minutes).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
   }
 
   function stopTimer() {
@@ -87,47 +109,61 @@
     }, 1000);
   }
 
-  function resetMedia() {
-    if (remoteVideoTrack) {
-      try { remoteVideoTrack.detach(); } catch (_) {}
-      remoteVideoTrack = null;
+  function detachTrack(track) {
+    if (track && typeof track.detach === "function") {
+      try { track.detach(); } catch (_) {}
     }
-    remoteAudioTracks.forEach(track => { try { track.detach(); } catch (_) {} });
+  }
+
+  function resetMedia() {
+    detachTrack(remoteVideoTrack);
+    detachTrack(localVideoTrack);
+    remoteVideoTrack = null;
+    localVideoTrack = null;
+    remoteAudioTracks.forEach(detachTrack);
     remoteAudioTracks.clear();
-    const video = byId("farnazLiveKitRemoteVideo");
-    if (video) { video.pause(); video.srcObject = null; video.hidden = true; }
+    const remote = byId("farnazLiveKitRemoteVideo");
+    const local = byId("farnazLiveKitLocalVideo");
+    if (remote) { remote.pause(); remote.srcObject = null; remote.hidden = true; }
+    if (local) { local.pause(); local.srcObject = null; local.hidden = true; }
     const audio = byId("farnazLiveKitRemoteAudio");
     if (audio) audio.replaceChildren();
   }
 
-  function show(title, status, incoming) {
-    ensureDialog();
-    byId("farnazLiveKitTitle").textContent = title;
-    byId("farnazLiveKitAvatar").textContent = (title || "F").trim().charAt(0).toUpperCase();
-    setStatus(status);
-    microphoneEnabled = true;
-    cameraEnabled = true;
-    byId("farnazLiveKitMute").textContent = tr("بی‌صدا", "Mute");
-    byId("farnazLiveKitCamera").textContent = tr("دوربین خاموش", "Turn camera off");
-    byId("farnazLiveKitDialog").hidden = false;
-    byId("farnazLiveKitAccept").hidden = !incoming;
-    byId("farnazLiveKitReject").hidden = !incoming;
-    byId("farnazLiveKitMute").hidden = true;
-    byId("farnazLiveKitSpeaker").hidden = true;
-    byId("farnazLiveKitAudioRoute").hidden = true;
-    byId("farnazLiveKitCamera").hidden = true;
-    byId("farnazLiveKitEnd").hidden = incoming;
-    stopTimer();
-    resetMedia();
+  function attachLocalCamera(track, enabled) {
+    const video = byId("farnazLiveKitLocalVideo");
+    if (localVideoTrack && localVideoTrack !== track) detachTrack(localVideoTrack);
+    localVideoTrack = track || null;
+    if (!video) return;
+    if (!enabled || !track || callType !== "video") {
+      video.pause();
+      video.srcObject = null;
+      video.hidden = true;
+      return;
+    }
+    track.attach(video);
+    video.hidden = false;
+    video.play().catch(() => {});
   }
 
-  function titleFor(session) {
-    if (activeRole === "caller") {
-      return typeof currentChatUser !== "undefined" && currentChatUser
-        ? (currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact"))
-        : tr("تماس فرناز", "Farnaz call");
-    }
-    return tr("تماس ورودی", "Incoming call");
+  function show(title, status, incoming) {
+    ensureDialog();
+    byId("farnazLiveKitTitle").textContent = title || tr("تماس فرناز", "Farnaz call");
+    byId("farnazLiveKitAvatar").textContent = (title || "F").trim().charAt(0).toLocaleUpperCase();
+    byId("farnazLiveKitDialog").hidden = false;
+    byId("farnazLiveKitControls").hidden = true;
+    byId("farnazLiveKitAccept").hidden = !incoming;
+    byId("farnazLiveKitReject").hidden = !incoming;
+    byId("farnazLiveKitEnd").hidden = incoming;
+    byId("farnazLiveKitCamera").hidden = true;
+    byId("farnazLiveKitFlip").hidden = true;
+    byId("farnazLiveKitUnlockWrap").hidden = true;
+    byId("farnazLiveKitRemoteVideo").hidden = true;
+    byId("farnazLiveKitLocalVideo").hidden = true;
+    byId("farnazLiveKitQuality").hidden = true;
+    setStatus(status, incoming ? "ringing" : "connecting");
+    stopTimer();
+    resetMedia();
   }
 
   async function showIncoming(event) {
@@ -136,18 +172,47 @@
     activeSession = session;
     activeRole = "receiver";
     callType = session.call_type === "video" ? "video" : "audio";
-    const title = callType === "video" ? tr("تماس تصویری ورودی", "Incoming video call") : tr("تماس صوتی ورودی", "Incoming audio call");
-    show(title, tr("تماس ورودی…", "Incoming call…"), true);
+    show(callType === "video" ? tr("تماس تصویری ورودی", "Incoming video call") : tr("تماس صوتی ورودی", "Incoming audio call"),
+      tr("تماس ورودی…", "Incoming call…"), true);
     try {
       const result = await getClient().rpc("get_farnaz_user_profile", { search_user_id: session.caller_id });
       const profile = Array.isArray(result.data) ? result.data[0] : result.data;
       if (!activeSession || String(activeSession.id) !== String(session.id)) return;
       if (profile && profile.display_name) {
-        byId("farnazLiveKitAvatar").textContent = profile.display_name.trim().charAt(0).toUpperCase();
-        setStatus(tr("تماس از طرف ", "Incoming call from ") + profile.display_name);
+        byId("farnazLiveKitAvatar").textContent = profile.display_name.trim().charAt(0).toLocaleUpperCase();
+        byId("farnazLiveKitTitle").textContent = profile.display_name;
+        setStatus(tr("تماس ورودی از ", "Incoming call from ") + profile.display_name, "ringing");
       }
     } catch (error) {
       console.warn("[Farnaz LiveKit UI] Caller profile lookup failed:", error);
+    }
+  }
+
+  function showConnectedControls() {
+    byId("farnazLiveKitControls").hidden = false;
+    byId("farnazLiveKitEnd").hidden = false;
+    byId("farnazLiveKitAccept").hidden = true;
+    byId("farnazLiveKitReject").hidden = true;
+    byId("farnazLiveKitCamera").hidden = callType !== "video";
+    byId("farnazLiveKitFlip").hidden = callType !== "video";
+    byId("farnazLiveKitUnlockWrap").hidden = true;
+    updateControlState();
+  }
+
+  function updateControlState() {
+    const mic = byId("farnazLiveKitMute");
+    const camera = byId("farnazLiveKitCamera");
+    if (mic) {
+      mic.setAttribute("aria-pressed", String(microphoneEnabled));
+      mic.setAttribute("aria-label", tr(microphoneEnabled ? "خاموش‌کردن میکروفون" : "روشن‌کردن میکروفون", microphoneEnabled ? "Mute microphone" : "Unmute microphone"));
+      mic.innerHTML = icon(microphoneEnabled ? "mic" : "micOff") + "<span>" + tr(microphoneEnabled ? "میکروفون" : "میکروفون خاموش", microphoneEnabled ? "Microphone" : "Mic muted") + "</span>";
+      mic.classList.toggle("is-off", !microphoneEnabled);
+    }
+    if (camera) {
+      camera.setAttribute("aria-pressed", String(cameraEnabled));
+      camera.setAttribute("aria-label", tr(cameraEnabled ? "خاموش‌کردن دوربین" : "روشن‌کردن دوربین", cameraEnabled ? "Turn camera off" : "Turn camera on"));
+      camera.innerHTML = icon(cameraEnabled ? "camera" : "cameraOff") + "<span>" + tr(cameraEnabled ? "دوربین" : "دوربین خاموش", cameraEnabled ? "Camera" : "Camera off") + "</span>";
+      camera.classList.toggle("is-off", !cameraEnabled);
     }
   }
 
@@ -155,30 +220,30 @@
     if (!event) return;
     const detail = event.detail || {};
     if (event.type === "session-incoming") {
-      showIncoming(detail).catch(error => setStatus(error.message));
+      showIncoming(detail).catch(error => setStatus(error.message, "error"));
     } else if (event.type === "session-outgoing") {
       activeSession = detail.session || null;
       activeRole = "caller";
       callType = activeSession && activeSession.call_type === "video" ? "video" : "audio";
-      show(titleFor(activeSession), tr("در انتظار پاسخ…", "Waiting for answer…"), false);
+      const title = typeof currentChatUser !== "undefined" && currentChatUser
+        ? (currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact"))
+        : tr("تماس فرناز", "Farnaz call");
+      show(title, tr("در انتظار پاسخ…", "Ringing…"), false);
+      setStatus(tr("در انتظار پاسخ…", "Ringing…"), "ringing");
     } else if (event.type === "session-accepted") {
       activeSession = detail.session || activeSession;
       activeRole = detail.role || activeRole;
-      setStatus(tr("تماس برقرار است", "Call connected"));
-      byId("farnazLiveKitMute").hidden = false;
-      byId("farnazLiveKitSpeaker").hidden = false;
-      byId("farnazLiveKitAudioRoute").hidden = false;
-      byId("farnazLiveKitCamera").hidden = callType !== "video";
-      byId("farnazLiveKitEnd").hidden = false;
-      byId("farnazLiveKitMute").textContent = tr("بی‌صدا", "Mute");
-      byId("farnazLiveKitCamera").textContent = tr("دوربین خاموش", "Turn camera off");
+      microphoneEnabled = true;
+      cameraEnabled = callType === "video";
+      setStatus(tr("تماس برقرار است", "Call connected"), "connected");
+      showConnectedControls();
       startTimer();
     } else if (event.type === "session-finished") {
       activeSession = null;
       activeRole = null;
       stopTimer();
       resetMedia();
-      setStatus(tr("تماس پایان یافت", "Call ended"));
+      setStatus(tr("تماس پایان یافت", "Call ended"), "ended");
       const dialog = byId("farnazLiveKitDialog");
       if (dialog) root.setTimeout(() => { if (!activeSession) dialog.hidden = true; }, 900);
     } else if (event.type === "media-track-subscribed") {
@@ -186,36 +251,51 @@
       if (!track || typeof track.attach !== "function") return;
       if (track.kind === "video") {
         const video = byId("farnazLiveKitRemoteVideo");
-        if (remoteVideoTrack && remoteVideoTrack !== track) {
-          try { remoteVideoTrack.detach(); } catch (_) {}
-        }
+        if (remoteVideoTrack && remoteVideoTrack !== track) detachTrack(remoteVideoTrack);
         remoteVideoTrack = track;
         track.attach(video);
         video.hidden = false;
         video.play().catch(() => {});
+        byId("farnazLiveKitStage").classList.add("has-video");
       } else if (track.kind === "audio") {
         const audio = root.document.createElement("audio");
         audio.autoplay = true;
         audio.playsInline = true;
+        audio.setAttribute("aria-label", tr("صدای مخاطب", "Contact audio"));
         byId("farnazLiveKitRemoteAudio").appendChild(audio);
         track.attach(audio);
         remoteAudioTracks.add(track);
-        audio.play().catch(() => setStatus(tr("برای شنیدن صدا، «فعال‌سازی صدا» را بزن.", "Tap Enable audio to hear the call.")));
+        audio.play().catch(() => {
+          byId("farnazLiveKitUnlockWrap").hidden = false;
+          setStatus(tr("برای شنیدن صدا، فعال‌سازی صدا را بزن.", "Tap Enable audio to hear the call."), "connected");
+        });
       }
     } else if (event.type === "media-track-unsubscribed") {
       const track = detail.track;
-      if (track && typeof track.detach === "function") {
-        try { track.detach(); } catch (_) {}
-        remoteAudioTracks.delete(track);
-        if (remoteVideoTrack === track) remoteVideoTrack = null;
+      detachTrack(track);
+      remoteAudioTracks.delete(track);
+      if (remoteVideoTrack === track) {
+        remoteVideoTrack = null;
+        const video = byId("farnazLiveKitRemoteVideo");
+        video.pause(); video.srcObject = null; video.hidden = true;
+        byId("farnazLiveKitStage").classList.remove("has-video");
       }
+    } else if (event.type === "media-local-camera-track") {
+      attachLocalCamera(detail.track, detail.enabled);
+    } else if (event.type === "media-audio-playback-status") {
+      if (detail.canPlaybackAudio === false) byId("farnazLiveKitUnlockWrap").hidden = false;
+    } else if (event.type === "media-connection-quality") {
+      const quality = String(detail.quality || "").toLowerCase();
+      const label = ({ excellent: tr("شبکه عالی", "Excellent network"), good: tr("شبکه خوب", "Good network"), poor: tr("شبکه ضعیف", "Weak network"), lost: tr("اتصال ناپایدار", "Unstable connection") })[quality];
+      const node = byId("farnazLiveKitQuality");
+      if (node && label) { node.textContent = label; node.hidden = false; node.dataset.quality = quality; }
+    } else if (event.type === "media-reconnecting") {
+      setStatus(tr("ارتباط ناپایدار است؛ در حال اتصال مجدد…", "Connection interrupted; reconnecting…"), "reconnecting");
+    } else if (event.type === "media-reconnected") {
+      setStatus(tr("ارتباط دوباره برقرار شد", "Connection restored"), "connected");
     } else if (event.type === "error" || event.type === "media-error") {
       const error = detail.error || detail;
-      setStatus(tr("خطا: ", "Call error: ") + String(error && error.message || error));
-    } else if (event.type === "media-reconnecting") {
-      setStatus(tr("ارتباط ناپایدار است؛ در حال اتصال مجدد…", "Connection interrupted; reconnecting…"));
-    } else if (event.type === "media-reconnected") {
-      setStatus(tr("ارتباط دوباره برقرار شد", "Connection restored"));
+      setStatus(tr("خطا: ", "Call error: ") + String(error && error.message || error), "error");
     }
   }
 
@@ -255,44 +335,37 @@
     if (blocked.error) throw blocked.error;
     if (blocked.data) throw new Error(tr("این مخاطب را مسدود کرده‌ای.", "This contact is blocked."));
     callType = type === "video" ? "video" : "audio";
-    show(callType === "video" ? tr("تماس تصویری", "Video call") : tr("تماس صوتی", "Audio call"),
-      tr("در حال شروع تماس…", "Starting call…"), false);
+    const title = currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact");
+    show(title, tr("در حال شروع تماس…", "Starting call…"), false);
     try {
       await controller.start({ peerId: peerId, callType: callType });
     } catch (error) {
       activeSession = null;
-      setStatus(tr("تماس شروع نشد: ", "Call could not start: ") + error.message);
+      setStatus(tr("تماس شروع نشد: ", "Call could not start: ") + error.message, "error");
       throw error;
     }
   }
 
   async function answer() {
     if (!controller || !activeSession) return;
-    byId("farnazLiveKitAccept").disabled = true;
+    const button = byId("farnazLiveKitAccept");
+    button.disabled = true;
     try {
-      byId("farnazLiveKitAccept").hidden = true;
+      button.hidden = true;
       byId("farnazLiveKitReject").hidden = true;
-      byId("farnazLiveKitMute").hidden = false;
-      byId("farnazLiveKitSpeaker").hidden = false;
-      byId("farnazLiveKitCamera").hidden = callType !== "video";
-      byId("farnazLiveKitEnd").hidden = false;
-      microphoneEnabled = true;
-      cameraEnabled = true;
-      byId("farnazLiveKitMute").textContent = tr("بی‌صدا", "Mute");
-      byId("farnazLiveKitCamera").textContent = tr("دوربین خاموش", "Turn camera off");
-      setStatus(tr("در حال اتصال…", "Connecting…"));
+      setStatus(tr("در حال اتصال…", "Connecting…"), "connecting");
       await controller.answer();
     } catch (error) {
-      setStatus(tr("پاسخ به تماس ناموفق بود: ", "Could not answer: ") + error.message);
+      setStatus(tr("پاسخ به تماس ناموفق بود: ", "Could not answer: ") + error.message, "error");
     } finally {
-      byId("farnazLiveKitAccept").disabled = false;
+      button.disabled = false;
     }
   }
 
   async function reject() {
     if (!controller) return;
     try { await controller.reject(); }
-    catch (error) { setStatus(tr("رد تماس ناموفق بود: ", "Could not decline: ") + error.message); }
+    catch (error) { setStatus(tr("رد تماس ناموفق بود: ", "Could not decline: ") + error.message, "error"); }
   }
 
   async function end() {
@@ -301,32 +374,81 @@
       if (dialog) dialog.hidden = true;
       return;
     }
-    setStatus(tr("در حال پایان تماس…", "Ending call…"));
+    setStatus(tr("در حال پایان تماس…", "Ending call…"), "ending");
     try { await controller.end(); }
-    catch (error) { setStatus(tr("پایان تماس ناموفق بود: ", "Could not end call: ") + error.message); }
+    catch (error) { setStatus(tr("پایان تماس ناموفق بود: ", "Could not end call: ") + error.message, "error"); }
   }
 
   async function toggleMicrophone() {
     if (!controller) return;
+    const next = !microphoneEnabled;
     try {
-      microphoneEnabled = !microphoneEnabled;
-      await controller.setMicrophoneEnabled(microphoneEnabled);
-      byId("farnazLiveKitMute").textContent = microphoneEnabled ? tr("بی‌صدا", "Mute") : tr("فعال‌کردن میکروفن", "Unmute");
+      await controller.setMicrophoneEnabled(next);
+      microphoneEnabled = next;
+      updateControlState();
     } catch (error) {
-      microphoneEnabled = !microphoneEnabled;
-      setStatus(error.message);
+      setStatus(error.message, "error");
     }
   }
 
   async function toggleCamera() {
     if (!controller || callType !== "video") return;
+    const next = !cameraEnabled;
     try {
-      cameraEnabled = !cameraEnabled;
-      await controller.setCameraEnabled(cameraEnabled);
-      byId("farnazLiveKitCamera").textContent = cameraEnabled ? tr("دوربین خاموش", "Turn camera off") : tr("روشن‌کردن دوربین", "Turn camera on");
+      await controller.setCameraEnabled(next);
+      cameraEnabled = next;
+      updateControlState();
     } catch (error) {
-      cameraEnabled = !cameraEnabled;
-      setStatus(error.message);
+      setStatus(error.message, "error");
+    }
+  }
+
+  async function switchCamera() {
+    if (!controller || callType !== "video") return;
+    const button = byId("farnazLiveKitFlip");
+    button.disabled = true;
+    try {
+      await controller.switchCamera();
+    } catch (error) {
+      setStatus(tr("تعویض دوربین انجام نشد: ", "Could not switch camera: ") + error.message, "error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function isIOSBrowser() {
+    const ua = root.navigator && root.navigator.userAgent || "";
+    const platform = root.navigator && root.navigator.platform || "";
+    return /iPhone|iPad|iPod/i.test(ua) || (platform === "MacIntel" && root.navigator.maxTouchPoints > 1);
+  }
+
+  async function toggleAudioRoute() {
+    if (isIOSBrowser()) {
+      // WebKit may resolve setSinkId() without changing the real speaker route
+      // for a single remote WebRTC audio track. Never show a false success state.
+      setStatus(tr("در آیفون، خروجی بلندگو یا هدفون را از کنترل پخش صدا در iOS انتخاب کن.", "On iPhone, choose speaker or headphones from the system audio controls."), "connected");
+      return;
+    }
+    const mediaDevices = root.navigator && root.navigator.mediaDevices;
+    if (!mediaDevices || typeof mediaDevices.enumerateDevices !== "function") {
+      setStatus(tr("انتخاب خروجی صدا در این مرورگر پشتیبانی نمی‌شود.", "Audio output selection is not supported by this browser."), "connected");
+      return;
+    }
+    if (typeof root.HTMLMediaElement !== "undefined" && !("setSinkId" in root.HTMLMediaElement.prototype)) {
+      setStatus(tr("این مرورگر امکان انتخاب مستقیم خروجی صدا را ندارد.", "This browser cannot select an audio output directly."), "connected");
+      return;
+    }
+    try {
+      const outputs = (await mediaDevices.enumerateDevices()).filter(device => device.kind === "audiooutput");
+      if (!outputs.length) throw new Error(tr("خروجی صدایی پیدا نشد.", "No audio output devices were found."));
+      const state = controller && controller.getState ? controller.getState() : null;
+      const currentId = state && state.media && state.media.audioOutputDeviceId || "default";
+      const index = outputs.findIndex(device => device.deviceId === currentId);
+      const next = outputs[(index + 1 + outputs.length) % outputs.length];
+      await controller.setAudioOutput(next.deviceId);
+      setStatus(tr("خروجی صدا تغییر کرد: ", "Audio output changed: ") + (next.label || tr("دستگاه صوتی", "Audio device")), "connected");
+    } catch (error) {
+      setStatus(tr("تغییر خروجی صدا انجام نشد: ", "Could not change audio output: ") + error.message, "error");
     }
   }
 
@@ -334,41 +456,20 @@
     if (!controller) return;
     try {
       const ready = await controller.startAudioPlayback();
-      setStatus(ready ? tr("صدای تماس فعال است", "Call audio is enabled") : tr("مرورگر هنوز پخش صدا را مسدود کرده است.", "The browser is still blocking audio playback."));
-    } catch (error) {
-      setStatus(error.message);
-    }
-  }
-
-  async function toggleAudioRoute() {
-    const container = byId("farnazLiveKitRemoteAudio");
-    const audioElements = container ? Array.from(container.querySelectorAll("audio")) : [];
-    if (!audioElements.length) {
-      setStatus(tr("هنوز صدای طرف مقابل دریافت نشده است.", "Remote audio is not available yet."));
-      return;
-    }
-    if (typeof audioElements[0].setSinkId !== "function") {
-      setStatus(tr("در آیفون، انتخاب بلندگو و هدفون از کنترل صدای خود گوشی انجام می‌شود.", "On iPhone, choose speaker or headphones from the system audio controls."));
-      return;
-    }
-    try {
-      const mediaDevices = root.navigator && root.navigator.mediaDevices;
-      if (!mediaDevices || typeof mediaDevices.enumerateDevices !== "function") {
-        throw new Error(tr("انتخاب خروجی صدا در این مرورگر پشتیبانی نمی‌شود.", "Audio output selection is not supported by this browser."));
+      if (ready) {
+        byId("farnazLiveKitUnlockWrap").hidden = true;
+        setStatus(tr("صدای تماس فعال است", "Call audio is enabled"), "connected");
+      } else {
+        setStatus(tr("مرورگر هنوز پخش صدا را مسدود کرده است.", "The browser is still blocking audio playback."), "error");
       }
-      const outputs = (await mediaDevices.enumerateDevices()).filter(device => device.kind === "audiooutput");
-      if (!outputs.length) throw new Error(tr("خروجی صدایی پیدا نشد.", "No audio output devices were found."));
-      const currentId = audioElements[0].sinkId || "default";
-      const currentIndex = outputs.findIndex(device => device.deviceId === currentId);
-      const next = outputs[(currentIndex + 1 + outputs.length) % outputs.length];
-      await Promise.all(audioElements.map(audio => audio.setSinkId(next.deviceId)));
-      const label = next.label || tr("خروجی صدا تغییر کرد", "Audio output changed");
-      byId("farnazLiveKitAudioRoute").textContent = label.length > 22 ? label.slice(0, 22) + "…" : label;
-      setStatus(tr("خروجی صدا: ", "Audio output: ") + label);
     } catch (error) {
-      setStatus(error && error.message ? error.message : String(error));
+      setStatus(error.message, "error");
     }
   }
 
-  root.FarnazLiveKitCallUI = Object.freeze({ setUser: setUser, start: start, toggleAudioRoute: toggleAudioRoute });
+  root.FarnazLiveKitCallUI = Object.freeze({
+    setUser: setUser,
+    start: start,
+    toggleAudioRoute: toggleAudioRoute
+  });
 })(typeof window !== "undefined" ? window : globalThis);
