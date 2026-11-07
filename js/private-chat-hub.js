@@ -164,8 +164,8 @@
       profileLoading=false;
       await loadPage(false);
     }catch(error){
-      profileLoading=false;
       if(token!==request)return;
+      profileLoading=false;
       $("contactInfoStatus").textContent=tr("بارگذاری اطلاعات ناموفق بود: ","Could not load contact information: ")+(error?.message||String(error));
       $("contactInfoMediaStatus").textContent=tr("برای تلاش دوباره دسته را انتخاب کن.","Select a category to retry.");
       $("contactInfoBlock").disabled=false;
