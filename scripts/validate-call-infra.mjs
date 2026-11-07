@@ -95,7 +95,9 @@ requireCheck(callUi.includes("root.FarnazLiveKitCallUI") &&
   callUi.includes("controller.switchCamera()") &&
   callUi.includes("controller.setAudioOutput(next.deviceId)") &&
   callUi.includes("farnazLiveKitLocalVideo") &&
-  callUi.includes("media-local-camera-track") &&\n  callUi.includes("FarnazCalls?.startRingtone?.()") &&\n  callUi.includes("FarnazCalls?.stopRingtone?.()") &&
+  callUi.includes("media-local-camera-track") &&
+  callUi.includes("FarnazCalls?.startRingtone?.()") &&
+  callUi.includes("FarnazCalls?.stopRingtone?.()") &&
   callUi.includes("controller.startAudioPlayback") &&
   callUi.includes("farnazLiveKitAudioRoute") &&
   callUi.includes("setSinkId") &&
