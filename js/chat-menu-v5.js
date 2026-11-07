@@ -1,3 +1,5 @@
+const PrivateChatModel=window.FarnazPrivateChatModel;
+if(!PrivateChatModel)throw new Error("Private chat model failed to load");
 let pendingPrivateSend=null;
 let attachmentPreviewUrl=null;
 let readReceiptMessageIds=new Set();
@@ -125,13 +127,26 @@ async function loadPrivateMessages(older=false,preserveScroll=false){
       let received=client.from("messages")
         .select("id,sender_id,receiver_id,body,created_at,message_type,attachment_path,attachment_name,attachment_mime,reply_to_id,edited_at")
         .eq("sender_id",contactId).eq("receiver_id",myId).order("created_at",{ascending:false}).limit(51);
-      if(oldest){sent=sent.lt("created_at",oldest.dataset.createdAt);received=received.lt("created_at",oldest.dataset.createdAt);}
+      sent=sent.order("id",{ascending:false});
+      received=received.order("id",{ascending:false});
+      if(oldest){
+        const cursorFilter=PrivateChatModel.olderCursorFilter({
+          created_at:oldest.dataset.createdAt,
+          id:oldest.dataset.messageId
+        });
+        sent=sent.or(cursorFilter);
+        received=received.or(cursorFilter);
+      }
       return Promise.all([sent,received]);
     });
     if(request!==chatRequestNumber||currentUser?.id!==myId||currentChatUser?.user_id!==contactId)return;
-    let data=[...(results[0].data||[]),...(results[1].data||[])];
-    data.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    // Fetch up to 50 combined messages; direction queries each return at most 50.
+    for(const result of results){if(result.error)throw result.error;}
+    const data=PrivateChatModel.mergeMessagesNewestFirst(
+      results[0].data||[],
+      results[1].data||[]
+    );
+    // A compound (created_at,id) cursor and deterministic tie-breaker prevent
+    // messages sharing the same timestamp from being skipped between pages.
     const page=data.slice(0,50),rows=page.reverse();
     let hiddenIds=new Set();
     try{
