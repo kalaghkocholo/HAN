@@ -191,7 +191,7 @@ input[type=file]{font-size:11px;padding:9px}
 .send-row textarea:focus-visible{outline:none}
 .composer-actions{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:2px 3px 3px}
 .composer-left,.composer-right{display:flex;align-items:center;gap:5px}
-.composer-icon{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:50%;background:var(--panel2);color:var(--white);font-size:19px;padding:0}
+.composer-icon{width:44px;height:44px;min-width:44px;min-height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:var(--panel2);color:var(--white);font-size:19px;padding:0}
 .composer-icon:active{background:#30435b}
 .composer-icon.recording{background:#7f303a;color:#fff;animation:recordPulse 1.2s infinite}
 .composer-icon.send{background:var(--mint);color:var(--bg);font-size:18px;font-weight:800}
