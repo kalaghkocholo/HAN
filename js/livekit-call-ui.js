@@ -329,7 +329,7 @@
     activeRole = null;
     stopTimer();
     resetMedia();
-    if (previous) await previous.close();
+    root.FarnazCalls?.stopRingtone?.();\n    if (previous) await previous.close();
     const dialog = byId("farnazLiveKitDialog");
     if (!next && dialog) dialog.hidden = true;
     if (!next) return;
