@@ -101,8 +101,8 @@ if (!hubSource.includes("createSignedUrls(paths,3600)") ||
     !hubSource.includes('window.openContactInfo=open') ||
     !hubSource.includes('await refreshPrivatePresence(other)') ||
     !sources["styles.css"].includes(".private-hub-category-tabs") ||
-    !html.includes("./js/private-chat-hub.js?v=20261107-hub1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v296")) {
+    !html.includes("./js/private-chat-hub.js?v=20261107-contact-photo1") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v297")) {
   errors.push("Private conversation hub must load as the single contact-info surface, expose all shared-content categories, batch signed URLs, and use stable (created_at,id) pagination.");
 }
 
@@ -110,9 +110,9 @@ const privateChatTests = read("tests/private-chat-model.test.mjs");
 const privateOutboxTests = read("tests/private-message-outbox.test.mjs");
 const privateChatWorkflow = read(".github/workflows/validate.yml");
 const localStore = sources["js/local-store.js"];
-if (!/const DB_VERSION=3;/.test(localStore) || !localStore.includes('const STORE_OUTBOX="privateMessageOutbox"') ||
+if (!/const DB_VERSION=4;/.test(localStore) || !localStore.includes('const STORE_OUTBOX="privateMessageOutbox"') ||
     !localStore.includes("enqueueOutbox") || !localStore.includes("getOutbox") || !localStore.includes("removeOutbox") ||
-    !localStore.includes("STORE_OUTBOX];") ||
+    !localStore.includes("STORE_CONTACT_PHOTOS];") || !localStore.includes("STORE_OUTBOX") ||
     localStore.includes("item.dedupeKey===record.dedupeKey")) {
   errors.push("Local storage must provide an account-scoped durable private-message outbox, preserve intentional identical messages, and purge it on logout");
 }
@@ -127,9 +127,9 @@ if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") |
     !privateChatWorkflow.includes("tests/private-message-outbox.test.mjs")) {
   errors.push("Private messages must be durably queued and fault-injection tested for upload interruption, ambiguous inserts, and intentional duplicate text");
 }
-if (!html.includes("./js/local-store.js?v=20261107-outbox2") ||
+if (!html.includes("./js/local-store.js?v=20261107-contact-photo1") ||
     !html.includes("./js/chat-menu-v5.js?v=20261107-outbox2") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v296")) {
+    !sources["service-worker.js"].includes("farnaz-shell-v297")) {
   errors.push("App and service worker must reference the durable outbox release assets");
 }
 const privateChatModel = sources["js/private-chat-model.js"];
@@ -286,7 +286,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v296"') || !sources["service-worker.js"].includes('styles.css?v=20261107-private-hub1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-outbox2') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-outbox2') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-outbox2')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v297"') || !sources["service-worker.js"].includes('styles.css?v=20261107-private-hub-photo1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-contact-photo1') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-outbox2') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-outbox2')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
