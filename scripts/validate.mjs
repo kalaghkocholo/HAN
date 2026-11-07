@@ -81,6 +81,7 @@ const clientFiles = [
   "js/private-chat-model.js",
   "js/private-chat-hub.js",
   "js/core.js",
+  "js/chat-viewport-controller.js",
   "js/chat-menu-v5.js",
   "js/spaces.js",
   "js/calls.js",
@@ -102,7 +103,7 @@ if (!hubSource.includes("createSignedUrls(paths,3600)") ||
     !hubSource.includes('await refreshPrivatePresence(other)') ||
     !sources["styles.css"].includes(".private-hub-category-tabs") ||
     !html.includes("./js/private-chat-hub.js?v=20261107-contact-photo1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v297")) {
+    !sources["service-worker.js"].includes("farnaz-shell-v298")) {
   errors.push("Private conversation hub must load as the single contact-info surface, expose all shared-content categories, batch signed URLs, and use stable (created_at,id) pagination.");
 }
 
@@ -128,7 +129,7 @@ if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") |
   errors.push("Private messages must be durably queued and fault-injection tested for upload interruption, ambiguous inserts, and intentional duplicate text");
 }
 if (!html.includes("./js/local-store.js?v=20261107-contact-photo1") ||
-    !html.includes("./js/chat-menu-v5.js?v=20261107-outbox2") ||
+    !html.includes("./js/chat-menu-v5.js?v=20261107-viewport1") ||
     !sources["service-worker.js"].includes("farnaz-shell-v297")) {
   errors.push("App and service worker must reference the durable outbox release assets");
 }
@@ -558,6 +559,25 @@ const authLayoutChecks = [
    coreSource.includes('Too many attempts') && coreSource.includes('window.addEventListener("offline"'),
     "auth requests must guard duplicate submissions, explain rate limits, and show offline state"],
 ];
+const viewportControllerSource=sources["js/chat-viewport-controller.js"];
+const viewportTests=read("tests/chat-viewport-controller.test.mjs");
+if (!viewportControllerSource.includes("window.FarnazChatViewportController") ||
+    !viewportControllerSource.includes("visualViewport") ||
+    !viewportControllerSource.includes("ResizeObserver") ||
+    !viewportTests.includes("keyboard opening must not force-scroll") ||
+    coreSource.includes("installChatKeyboardLayout") ||
+    coreSource.includes("syncViewport()") ||
+    sources["js/chat-menu-v5.js"].includes("const syncChatViewport=")) {
+  errors.push("Conversation viewport and keyboard geometry must have one tested controller, with no competing legacy handlers.");
+}
+if (!html.includes("./js/chat-viewport-controller.js?v=20261107-viewport1") ||
+    !html.includes("styles.css?v=20261107-viewport1") ||
+    !html.includes("chat-viewport.css?v=20261107-viewport1") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v298") ||
+    !sources["service-worker.js"].includes("./js/chat-viewport-controller.js?v=20261107-viewport1") ||
+    !html.includes('class="composer-shell conversation-composer-shell">\\n      <div id="replyPreview"')) {
+  errors.push("Conversation viewport release must load the controller, keep reply preview inside the composer, and refresh the shell cache.");
+}
 const conversationChecks = [
   [!sources["js/spaces.js"].includes("SPACE_"+"SHARED_IDS") && !sources["js/spaces.js"].includes("window.FarnazConversation"+"Back") && !sources["js/spaces.js"].includes("const old=window.navigate") && !sources["js/spaces.js"].includes("spacesPage") && !sources["js/spaces.js"].includes("renderSpacesList") && coreSource.includes("FarnazConversationController.openPrivate") && coreSource.includes("FarnazConversationController.get().type===\"space\""),
     "private, group and channel conversations must use one typed route controller and explicit DOM references"],
@@ -577,7 +597,7 @@ const conversationChecks = [
    !sources["spaces.css"].includes("#spacesPage #spaceComposer .space-attachment-menu {"),
     "spaces.css must not retain competing group-only header/composer layout overrides"],
   [sources["chat-viewport.css"].includes("body.chat-mode .app.chat-mode>#chatPage #sendMessageForm") &&
-   sources["chat-viewport.css"].includes("position:absolute!important;left:13px!important;right:13px!important;bottom:0!important") &&
+   sources["chat-viewport.css"].includes("position:absolute!important;inset-inline:13px!important;left:auto!important;right:auto!important;bottom:0!important") &&
    sources["chat-viewport.css"].includes("overflow-y:auto!important;") && sources["chat-viewport.css"].includes("padding:14px 2px calc(var(--chat-composer-height,112px) + 12px)!important;gap:8px!important"),
     "chat-viewport.css must anchor the group/channel composer and preserve message scroll space"],
   [coreSource.includes('DOMContentLoaded",()=>{if(isChatActive())syncViewport();}') &&
