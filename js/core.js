@@ -2045,7 +2045,7 @@ async function openContactInfo(){
     if(blockedResult.error)throw blockedResult.error;
     contactInfoBlocked=!!blockedResult.data;
     $("contactInfoBlock").textContent=contactInfoBlocked?contactInfoText("رفع مسدودسازی","Unblock contact"):contactInfoText("مسدود کردن مخاطب","Block contact");
-    $("contactInfoBlock").disabled=false;
+    $("contactInfoBlock").disabled=!!currentChatUser.is_deleted_account;
     await loadContactInfoMedia(contactId,request);
   }catch(error){
     if(request===contactInfoRequest)$("contactInfoStatus").textContent=(english?"Could not load contact information: ":"بارگذاری اطلاعات مخاطب ناموفق بود: ")+error.message;
@@ -2079,7 +2079,7 @@ async function loadContactInfoMedia(contactId,request){
   if(!list.children.length)$("contactInfoMediaStatus").textContent=contactInfoText("پیوست‌ها در حال حاضر قابل نمایش نیستند.","Attachments are currently unavailable.");
 }
 async function toggleContactBlock(){
-  if(!currentUser||!currentChatUser)return;
+  if(!currentUser||!currentChatUser||currentChatUser.is_deleted_account)return;
   const userId=String(currentUser.id),contactId=String(currentChatUser.user_id),name=currentChatUser.display_name||(english?"this contact":"این مخاطب");
   if(contactInfoBlocked){
     if(!confirm(contactInfoText("مسدودسازی این مخاطب برداشته شود؟","Unblock this contact?")))return;
@@ -2143,6 +2143,7 @@ function openChat(contact,fromPage="chatsPage"){
   currentChatUser=contact;previousPage=fromPage;
   const deletedContact=!!contact.is_deleted_account;
   $("messageText").disabled=deletedContact;$("sendMessageButton").disabled=deletedContact;$("attachmentMenuButton").disabled=deletedContact;
+  document.querySelectorAll("#chatPage .call-actions button").forEach(button=>button.disabled=deletedContact);
   if(deletedContact)$("attachmentMenu").hidden=true;
   FarnazConversationController.openPrivate(contact.user_id,fromPage);startPrivateTypingChannel(contact.user_id).catch(()=>{});
   if(switchingContacts&&draftInput){
