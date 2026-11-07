@@ -92,7 +92,7 @@ const clientFiles = [
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
 const hubSource = sources["js/private-chat-hub.js"];
 if (!hubSource.includes("createSignedUrls(paths, 3600)") ||
-    !hubSource.includes('order("created_at", { ascending: false }).order("id", { ascending: false })') ||
+    !hubSource.includes('order("created_at",{ascending:false}).order("id",{ascending:false})') ||
     !hubSource.includes('data-hub-category="photos"') ||
     !hubSource.includes('data-hub-category="videos"') ||
     !hubSource.includes('data-hub-category="files"') ||
@@ -129,7 +129,7 @@ if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") |
 }
 if (!html.includes("./js/local-store.js?v=20261107-outbox2") ||
     !html.includes("./js/chat-menu-v5.js?v=20261107-outbox2") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v295")) {
+    !sources["service-worker.js"].includes("farnaz-shell-v296")) {
   errors.push("App and service worker must reference the durable outbox release assets");
 }
 const privateChatModel = sources["js/private-chat-model.js"];
@@ -286,7 +286,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v295"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-outbox2') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-outbox2') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-outbox2')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v296"') || !sources["service-worker.js"].includes('styles.css?v=20261107-private-hub1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-outbox2') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-outbox2') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-outbox2')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -343,7 +343,7 @@ const uiChecks = [
     "presence and privacy settings must translate their labels, hints, and select options"],
   [html.includes('class="page-heading"><h2 id="chatsHeading"') && html.includes('class="page-heading"><h2 id="contactsHeading"') && sources["styles.css"].includes("env(safe-area-inset-top, 0px)") && sources["styles.css"].includes("inset-inline-start:10px"),
     "page headers must be separated, safe-area aware, and use logical-direction controls"],
-  [!html.includes('id="contactSearchButton"') && sources["styles.css"].includes(".contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}") && sources["styles.css"].includes(".app.chat-mode>#chatPage .send-row textarea,.app.spaces-chat-mode>#chatPage .send-row textarea{"),
+  [!html.includes('id="contactSearchButton"') && sources["styles.css"].includes(".contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}") && sources["styles.css"].includes(".app.chat-mode>#chatPage .send-row textarea,.app.spaces-chat-mode>#chatPage .send-row textarea{"),
     "new-chat screen must use the saved-contact list/search only, contact actions must stay on one row, and composer surfaces must share one color"],
   [!html.includes('id="contactSearchPopover"') && !html.includes('id="findRecipientBtn"') && !html.includes('id="recipientForm"') && html.includes('id="savedFarnazContactFilter"') && html.includes('id="savedContactsList"'),
     "new-chat flow must keep the saved contacts and their search only, without the extra recipient-search form or button"],
