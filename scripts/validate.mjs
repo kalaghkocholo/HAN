@@ -226,7 +226,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v289"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete4') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-account-delete1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-account-delete1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v290"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete5') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-account-delete1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-account-delete1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -257,7 +257,7 @@ for (const [passed, message] of safeUpdateChecks) { if (!passed) errors.push(mes
 const loaderChecks = [
   [html.includes('script.src="./js/supabase-sdk.js"') && html.includes("watchScript(script,()=>{") && html.includes("loadLocalScripts();"),
     "index.html must wait for the local Supabase SDK before loading the app core"],
-  [html.includes('core.src="./js/core.js?v=20261107-account-delete4"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
+  [html.includes('core.src="./js/core.js?v=20261107-account-delete5"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
     "index.html must handle successful, failed, and stalled core-script loading"],
   [html.includes("watchScript(script,loadNextFeature,()=>{") && html.includes("featureScripts[featureIndex++]") && html.includes('if(typeof window.FarnazBoot==="function")window.FarnazBoot();'),
     "index.html must load feature scripts sequentially and boot only after the loader sequence"],
@@ -570,7 +570,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v289"')) {
+    !sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v290"')) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 
@@ -586,6 +586,9 @@ if (!html.includes('id="deleteAccountButton"') ||
     !accountDeletionEdge.includes('auth.getUser(jwt)') ||
     !accountDeletionEdge.includes('farnaz_account_deletion_storage_objects') ||
     !accountDeletionEdge.includes('last_sign_in_at') ||
+    !accountDeletionEdge.includes('OWNED_SPACES_REMAIN') ||
+    !accountDeletionEdge.includes('owned_space_count: ownedSpaces.length') ||
+    !accountDeletionEdge.includes('if ((ownedSpaces ?? []).length > 0)') ||
     !accountDeletionMigration.includes("drop constraint if exists messages_sender_id_fkey") ||
     !accountDeletionMigration.includes("drop constraint if exists space_messages_sender_id_fkey") ||
     !accountDeletionMigration.includes("grant execute on function public.farnaz_account_deletion_storage_objects(uuid) to service_role")) {
