@@ -195,7 +195,7 @@ Implemented directly on `main`:
 
 - IndexedDB schema version 3 adds a dedicated `privateMessageOutbox` object store, separate from the recoverable message cache and drafts.
 - Outbox records are scoped to the authenticated account and include a client-generated stable message UUID, destination, text/reply metadata, and the selected attachment Blob when present.
-- Enqueue deduplicates an already-pending message using its destination, body, reply target, and attachment metadata. A deliberate repeat after successful delivery is allowed because the earlier queue record has been removed.
+- The IndexedDB primary key is the stable message UUID. Retrying the same UUID cannot create a second queue record, while two intentional messages with identical text but different UUIDs remain separate.
 - The composer clears only after the record has been committed to IndexedDB. If local persistence fails, the composer remains intact.
 - Pending records render in the private conversation with a waiting indicator and remain visible after reopening the conversation.
 - Reconnection and successful realtime subscription trigger sequential retry. Attachment object paths are deterministic from the sender and message UUID; storage conflicts are reconciled, and a failed/ambiguous database insert is checked by the same message UUID before retrying.
@@ -207,5 +207,6 @@ Verification scope and limitations:
 - The implementation uses IndexedDB for the durable queue and Supabase as the authoritative message store; the outbox is not a cross-device source of truth.
 - This increment does not yet provide a dedicated failed-message management screen, manual per-message retry/cancel controls, or background delivery while Safari is fully closed. Retry resumes when the app is open and its authenticated realtime connection is established, or when the browser reports the network online.
 - Attachment payloads are retained locally until successful delivery; browser storage quotas and user-cleared site data can still remove local pending data.
-- CI/static validation and real Safari offline/online testing are separate. Do not consider two-device delivery verified until tested with two real accounts and a network interruption during both upload and message insert.
+- Added fault-injection tests that execute the production retry function against controlled Supabase/Storage adapters: offline hold, interrupted attachment upload, retry after an object already exists, ambiguous insert committed before response loss, failed insert with no commit, blocked-recipient isolation, identical intentional messages, and account switching during upload. GitHub Actions is configured to run these alongside the pagination tests.
+- These automated tests exercise the production retry orchestration but do not emulate Safari's actual IndexedDB implementation or prove real two-account delivery. Real Safari offline/online and two-account E2E tests remain required.
 
