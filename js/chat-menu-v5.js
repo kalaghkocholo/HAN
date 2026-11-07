@@ -101,8 +101,11 @@ async function loadPrivateMessages(older=false,preserveScroll=false){
     messageReactionMap=new Map();pinnedMessageIds=new Set();currentPinnedMessage=null;updatePinnedMessageBanner();
     try{
       const cached=await window.FarnazLocalStore?.getMessages(myId,contactId);
+      const queued=await window.FarnazLocalStore?.getOutbox?.(myId)||[];
+      const queuedRows=queued.filter(item=>String(item.receiver_id)===String(contactId)).map(queuedPrivateMessage);
+      const cachedAndQueued=[...(Array.isArray(cached)?cached:[]),...queuedRows].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
       const hiddenBoundary=prefFor(contactId).hidden_at?new Date(prefFor(contactId).hidden_at).getTime():null;
-      const visibleCached=Array.isArray(cached)?cached.filter(m=>!hiddenBoundary||new Date(m.created_at).getTime()>hiddenBoundary):[];
+      const visibleCached=cachedAndQueued.filter(m=>!hiddenBoundary||new Date(m.created_at).getTime()>hiddenBoundary);
       if(request===chatRequestNumber&&currentUser?.id===myId&&String(currentChatUser?.user_id)===String(contactId)&&visibleCached.length){
         displayedCachedMessages=true;
         await renderMessages(visibleCached,myId,true);
@@ -164,6 +167,9 @@ async function loadPrivateMessages(older=false,preserveScroll=false){
     const visibleRows=rows.filter(m=>
       !hiddenIds.has(m.id)&&(!hiddenBoundary||new Date(m.created_at).getTime()>hiddenBoundary)
     );
+    const queuedRecords=!older?(await window.FarnazLocalStore?.getOutbox?.(myId)||[]).filter(item=>String(item.receiver_id)===String(contactId)):[];
+    const queuedRows=queuedRecords.map(queuedPrivateMessage);
+    const displayRows=[...visibleRows,...queuedRows].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
     window.FarnazLocalStore?.saveMessages(myId,contactId,visibleRows,older).catch(cacheError=>console.warn("Could not cache messages:",cacheError));
     await loadMessageDecorations(visibleRows,myId,contactId);
     if(request!==chatRequestNumber||currentUser?.id!==myId||currentChatUser?.user_id!==contactId)return;
@@ -176,7 +182,7 @@ async function loadPrivateMessages(older=false,preserveScroll=false){
     (receiptResult?.data||[]).forEach(r=>{if(String(r.reader_id)!==String(myId))readReceiptMessageIds.add(String(r.message_id));});
     if(older){await prependMessages(visibleRows,myId);messageLoadedCount+=50;}
     else{
-      await renderMessages(visibleRows,myId);
+      await renderMessages(displayRows,myId);
       if(preserveScroll&&!wasNearBottom)scrollList.scrollTop=oldScrollTop;
     }
     messageHasMore=data.length>50;
@@ -197,7 +203,7 @@ async function loadPrivateMessages(older=false,preserveScroll=false){
 async function makeMessageElement(m,myId,fromCache=false){
   const item=document.createElement("article");
   const isOwnMessage=String(m.sender_id)===String(myId);
-  item.className="message "+(isOwnMessage?"my-message":"their-message");
+  item.className="message "+(isOwnMessage?"my-message":"their-message")+(m._delivery_state==="queued"?" message-pending":"");
   item.dataset.messageSide=isOwnMessage?"own":"contact";
   // Use a one-column grid and explicitly place each bubble in its grid cell.
   // This avoids flex-direction/RTL interactions and the historical duplicate CSS rules.
@@ -273,8 +279,8 @@ async function makeMessageElement(m,myId,fromCache=false){
   time.textContent=date.toLocaleTimeString(english?"en":"fa-IR",{hour:"2-digit",minute:"2-digit"})+(m.edited_at?(english?" · edited":" · ویرایش‌شده"):"");
   if(isOwnMessage){
     const read=readReceiptMessageIds.has(String(m.id)),receipt=document.createElement("small");
-    receipt.className="message-read-status";receipt.textContent=read?"✓✓":"✓";
-    receipt.title=read?(english?"Read":"خوانده‌شده"):(english?"Sent; not read yet":"ارسال‌شده؛ هنوز خوانده نشده");
+    receipt.className="message-read-status";receipt.textContent=m._delivery_state==="queued"?"◷":read?"✓✓":"✓";
+    receipt.title=m._delivery_state==="queued"?(english?"Waiting to send":"در انتظار ارسال"):read?(english?"Read":"خوانده‌شده"):(english?"Sent; not read yet":"ارسال‌شده؛ هنوز خوانده نشده");
     receipt.setAttribute("aria-label",receipt.title);
     receipt.style.cssText="display:inline-block;margin:0;font-size:12px;letter-spacing:-2px;font-weight:700;color:"+(read?"#20a66a":"var(--muted,#8a94a6)");
     meta.appendChild(receipt);
@@ -916,11 +922,95 @@ async function toggleAudioRecording(){
     setStatus("sendMessageStatus",english?"Microphone permission is needed to record audio.":"برای ضبط پیام صوتی باید اجازه دسترسی به میکروفون بدهی.",true);
   }
 }
+let privateOutboxFlushPromise=null;
+function queuedPrivateMessage(record){
+  return {id:record.id,sender_id:record.userId,receiver_id:record.receiver_id,body:record.body||null,
+    created_at:new Date(record.createdAt||Date.now()).toISOString(),message_type:record.message_type||"text",
+    attachment_name:record.attachment_name||null,attachment_mime:record.attachment_mime||null,
+    attachment_size:record.attachment_size||null,reply_to_id:record.reply_to_id||null,_delivery_state:"queued"};
+}
+function privateOutboxDedupeKey(record){
+  return JSON.stringify([record.receiver_id,record.body||"",record.reply_to_id||"",record.attachment_name||"",
+    record.attachment_size||0,record.attachment_last_modified||0,record.attachment_mime||""]);
+}
+async function flushPrivateOutbox(){
+  if(privateOutboxFlushPromise)return privateOutboxFlushPromise;
+  if(!currentUser||(typeof navigator!=="undefined"&&navigator.onLine===false))return false;
+  const userId=String(currentUser.id);
+  const task=(async()=>{
+    const store=window.FarnazLocalStore;
+    if(!store?.getOutbox||!store?.removeOutbox)return false;
+    const records=await store.getOutbox(userId);
+    for(const record of records){
+      if(String(currentUser?.id||"")!==userId)break;
+      if(typeof navigator!=="undefined"&&navigator.onLine===false)break;
+      const client=getClient(),receiverId=String(record.receiver_id);
+      try{
+        const {data:sessionResult,error:sessionError}=await client.auth.getSession();
+        if(sessionError)throw sessionError;
+        if(!sessionResult?.session||String(sessionResult.session.user.id)!==userId)break;
+        const {data:blocked,error:blockError}=await client.from("blocked_contacts").select("blocked_user_id")
+          .eq("blocker_id",userId).eq("blocked_user_id",receiverId).maybeSingle();
+        if(blockError)throw blockError;
+        if(blocked)throw new Error(english?"This contact is blocked. Unblock them to send the queued message.":"این مخاطب مسدود است؛ برای ارسال پیام در صف، ابتدا مسدودسازی را بردار.");
+        let attachmentPath=null;
+        if(record.file){
+          const safeName=(record.attachment_name||"attachment").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-120)||"attachment";
+          const ext=(safeName.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,"")||"bin";
+          attachmentPath=userId+"/"+record.id+"."+ext;
+          const {error:uploadError}=await client.storage.from("chat-attachments").upload(attachmentPath,record.file,{
+            contentType:record.attachment_mime||record.file.type||"application/octet-stream",upsert:false
+          });
+          if(uploadError){
+            const conflict=String(uploadError.statusCode||uploadError.status||"")==="409"||/already exists|duplicate/i.test(String(uploadError.message||""));
+            if(!conflict)throw uploadError;
+          }
+        }
+        const row={id:record.id,sender_id:userId,receiver_id:receiverId,body:record.body||null,
+          message_type:record.message_type||"text",attachment_path:attachmentPath,
+          attachment_name:record.attachment_name||null,attachment_mime:record.attachment_mime||null,
+          attachment_size:record.attachment_size||null,reply_to_id:record.reply_to_id||null};
+        let {data:sentMessage,error:sendError}=await client.from("messages").insert(row)
+          .select("id,sender_id,receiver_id,body,created_at,message_type,attachment_path,attachment_name,attachment_mime,reply_to_id,edited_at").single();
+        if(sendError){
+          const {data:existing,error:lookupError}=await client.from("messages")
+            .select("id,sender_id,receiver_id,body,created_at,message_type,attachment_path,attachment_name,attachment_mime,reply_to_id,edited_at")
+            .eq("id",record.id).maybeSingle();
+          if(existing&&!lookupError)sentMessage=existing;else throw sendError;
+        }
+        if(String(currentUser?.id||"")!==userId)break;
+        await store.removeOutbox(userId,record.id);
+        const cached=await store.getMessages(userId,receiverId);
+        await store.saveMessages(userId,receiverId,[...cached,sentMessage]);
+        if(String(currentChatUser?.user_id||"")===receiverId){
+          const list=$("messageList"),old=list.querySelector('[data-message-id="'+record.id+'"]');
+          if(old){
+            const element=await makeMessageElement(sentMessage,userId);
+            if(old.isConnected)old.replaceWith(element);
+          }else if(sentMessage){
+            list.querySelector(".empty-state")?.remove();
+            list.appendChild(await makeMessageElement(sentMessage,userId));
+          }
+          list.scrollTop=list.scrollHeight;
+          setStatus("sendMessageStatus",english?"Message sent.":"پیام ارسال شد.");
+        }
+        refreshConversationList();
+      }catch(error){
+        console.warn("Private message remains in durable outbox:",error);
+        if(String(currentChatUser?.user_id||"")===receiverId)
+          setStatus("sendMessageStatus",(english?"Message saved; waiting to send: ":"پیام ذخیره شد و در انتظار ارسال است: ")+error.message);
+        break;
+      }
+    }
+    return true;
+  })();
+  privateOutboxFlushPromise=task;
+  try{return await task;}finally{if(privateOutboxFlushPromise===task)privateOutboxFlushPromise=null;}
+}
+window.FarnazFlushPrivateOutbox=flushPrivateOutbox;
 async function sendMessage(event){
-  // Prevent native form navigation even when invoked directly by the send button.
   event?.preventDefault();
   const button=$("sendMessageButton");
-  // The button click and form submit must never start two sends for one tap.
   if(button?.disabled)return;
   if(!currentUser||!currentChatUser){setStatus("sendMessageStatus",english?"Choose a contact first.":"ابتدا مخاطب را انتخاب کن.",true);return;}
   if(mediaRecorder&&mediaRecorder.state==="recording"){setStatus("sendMessageStatus",english?"Stop recording before sending.":"پیش از ارسال، ضبط صدا را متوقف کن.",true);return;}
@@ -929,90 +1019,60 @@ async function sendMessage(event){
   const restoreComposerFocus=document.activeElement===input;
   const file=recordedVoiceFile||selectedFile||photoFile||cameraFile;
   if(!body&&!file&&!editingMessageId)return;
-  const sendFingerprint=JSON.stringify([senderId,receiverId,body,file?.name||"",file?.size||0,file?.lastModified||0,file?.type||"",replyTarget?.id||""]);
-  const pendingSend=editingMessageId?null:(pendingPrivateSend?.fingerprint===sendFingerprint&&pendingPrivateSend.fileRef===(file||null)?pendingPrivateSend:{fingerprint:sendFingerprint,fileRef:file||null,id:crypto.randomUUID(),attachmentPath:null});
-  if(pendingSend)pendingPrivateSend=pendingSend;
   if(file&&file.size>20*1024*1024){setStatus("sendMessageStatus",english?"Choose a file up to 20 MB.":"حجم فایل باید حداکثر ۲۰ مگابایت باشد.",true);return;}
   if(editingMessageId&&file){setStatus("sendMessageStatus",english?"Remove the attachment before editing a message.":"برای ویرایش پیام، ابتدا پیوست را بردار.",true);return;}
-  button.disabled=true;setStatus("sendMessageStatus",english?"Sending…":"در حال ارسال…");
-  const sameChat=()=>String(currentUser?.id||"")===senderId&&String(currentChatUser?.user_id||"")===receiverId;
-  let pendingUploadPath=null;
-  try{
-    const {data:s,error:se}=await getClient().auth.getSession();if(se)throw se;
-    if(String(currentUser?.id||"")!==senderId||!s.session||String(s.session.user.id)!==senderId)throw new Error(english?"Session changed or expired. Sign in again.":"نشست حساب تغییر کرده یا منقضی شده؛ دوباره وارد شو.");
-    const client=getClient();
-    if(!editingMessageId){
-      // Do not rewrite conversation preferences before sending. That write also
-      // refreshes/rebuilds the inbox and can interrupt the active chat on mobile.
-      // Keep the deletion boundary stable; a successful new message is handled
-      // below without navigating away from this conversation.
-      const {data:blocked,error:blockError}=await client.from("blocked_contacts").select("blocked_user_id").eq("blocker_id",senderId).eq("blocked_user_id",receiverId).maybeSingle();
-      if(String(currentUser?.id||"")!==senderId)throw new Error("Account changed while sending.");
-      if(blockError)throw blockError;
-      if(blocked)throw new Error(english?"This contact is blocked. Unblock them before sending a message.":"این مخاطب را مسدود کرده‌ای؛ برای ارسال پیام ابتدا مسدودسازی را بردار.");
-    }
-    if(editingMessageId){
-      if(!sameChat())throw new Error("Account or conversation changed while editing.");
+  if(editingMessageId){
+    button.disabled=true;
+    try{
+      const client=getClient(),{data:s,error:se}=await client.auth.getSession();if(se)throw se;
+      if(String(currentUser?.id||"")!==senderId||!s.session||String(s.session.user.id)!==senderId)throw new Error("Session changed or expired.");
+      if(String(currentChatUser?.user_id||"")!==receiverId)throw new Error("Conversation changed while editing.");
       const {error}=await client.from("messages").update({body,edited_at:new Date().toISOString()}).eq("id",editingMessageId).eq("sender_id",senderId);
       if(error)throw error;
-      if(!sameChat())return;
-      cancelMessageEdit();
-    }else{
-      let attachmentPath=null,attachmentName=null,attachmentMime=null,attachmentSize=null;
-      const isImage=!!file&&file.type.startsWith("image/");
-      if(file){
-        const safeName=(file.name||"attachment").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-120)||"attachment";
-        const ext=(safeName.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,"")||"bin";
-        pendingSend.attachmentPath=pendingSend.attachmentPath||senderId+"/"+pendingSend.id+"."+ext;
-        attachmentPath=pendingSend.attachmentPath;pendingUploadPath=attachmentPath;
-        const {error:uploadError}=await client.storage.from("chat-attachments").upload(attachmentPath,file,{contentType:file.type||"application/octet-stream",upsert:false});
-        if(uploadError){const conflict=String(uploadError.statusCode||uploadError.status||"")==="409"||/already exists|duplicate/i.test(String(uploadError.message||""));if(!conflict)throw uploadError;}
-        if(String(currentUser?.id||"")!==senderId)throw new Error("Account changed while uploading; sign in again before sending.");
-        attachmentName=safeName;attachmentMime=file.type||"application/octet-stream";attachmentSize=file.size;
-      }
-      if(String(currentUser?.id||"")!==senderId)throw new Error("Account changed while sending.");
-      const row={id:pendingSend.id,sender_id:senderId,receiver_id:receiverId,body:body||null,message_type:file?(isImage?"image":"file"):"text",
-        attachment_path:attachmentPath,attachment_name:attachmentName,attachment_mime:attachmentMime,attachment_size:attachmentSize,reply_to_id:replyTarget?.id||null};
-      let {data:sentMessage,error:sendError}=await client.from("messages").insert(row).select("id,sender_id,receiver_id,body,created_at,message_type,attachment_path,attachment_name,attachment_mime,reply_to_id,edited_at").single();
-      if(sendError){
-        // A mobile connection can drop after PostgreSQL has committed the row.
-        // Reconcile by the client-generated UUID before allowing a retry.
-        const {data:existing,error:lookupError}=await client.from("messages").select("id,sender_id,receiver_id,body,created_at,message_type,attachment_path,attachment_name,attachment_mime,reply_to_id,edited_at").eq("id",pendingSend.id).maybeSingle();
-        if(existing&&!lookupError){sentMessage=existing;sendError=null;}else throw sendError;
-      }
-      pendingUploadPath=null;pendingPrivateSend=null;
-      if(String(currentUser?.id||"")!==senderId)return;
-      // Only touch the composer and visible history if the user is still in the
-      // same account and conversation; switching chats must preserve its draft.
-      if(sameChat()&&sentMessage){
-        const list=$("messageList");
-        list.querySelector(".empty-state")?.remove();
-        const element=await makeMessageElement(sentMessage,senderId);
-        if(sameChat()){
-          list.appendChild(element);
-          list.scrollTop=list.scrollHeight;
-          window.FarnazLocalStore?.getMessages(senderId,receiverId)
-            .then(cached=>window.FarnazLocalStore.saveMessages(senderId,receiverId,[...cached,sentMessage]))
-            .catch(cacheError=>console.warn("Could not update message cache:",cacheError));
-          cancelReply();if(file&&(file.type||"").startsWith("audio/"))discardRecordedVoice();
-        }
-      }
+      if(String(currentUser?.id||"")!==senderId||String(currentChatUser?.user_id||"")!==receiverId)return;
+      cancelMessageEdit();input.value="";input.style.height="auto";updateComposerControls();
+      setStatus("sendMessageStatus",english?"Message updated.":"پیام ویرایش شد.");
+      await loadPrivateMessages(false,true);
+    }catch(error){setStatus("sendMessageStatus",(english?"Could not update message: ":"ویرایش پیام ناموفق بود: ")+error.message,true);}
+    finally{button.disabled=false;if(restoreComposerFocus&&String(currentChatUser?.user_id||"")===receiverId)input.focus({preventScroll:true});}
+    return;
+  }
+  const safeName=file?(file.name||"voice-message").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-120)||"attachment":null;
+  const record={id:crypto.randomUUID(),userId:senderId,receiver_id:receiverId,body:body||null,
+    message_type:file?(file.type.startsWith("image/")?"image":"file"):"text",
+    attachment_name:safeName,attachment_mime:file?.type||null,attachment_size:file?.size||null,
+    attachment_last_modified:file?.lastModified||0,file:file||null,reply_to_id:replyTarget?.id||null,createdAt:Date.now()};
+  record.dedupeKey=privateOutboxDedupeKey(record);
+  button.disabled=true;
+  try{
+    const saved=await window.FarnazLocalStore?.enqueueOutbox(record);
+    if(!saved)throw new Error(english?"Could not save this message safely on this device. Keep it in the composer and try again.":"ذخیرهٔ مطمئن پیام روی این دستگاه انجام نشد؛ متن را در کادر نگه دار و دوباره تلاش کن.");
+    if(String(currentUser?.id||"")!==senderId||String(currentChatUser?.user_id||"")!==receiverId)return;
+    const queued=queuedPrivateMessage(saved),list=$("messageList");
+    list.querySelector(".empty-state")?.remove();
+    if(!list.querySelector('[data-message-id="'+saved.id+'"]'))list.appendChild(await makeMessageElement(queued,senderId));
+    list.scrollTop=list.scrollHeight;
+    input.value="";input.style.height="auto";
+    $("attachmentFile").value="";$("cameraFile").value="";$("photoFile").value="";
+    clearAttachmentPreview();cancelReply();if(file&&(file.type||"").startsWith("audio/"))discardRecordedVoice();
+    if(window.farnazDraftSaveTimer)clearTimeout(window.farnazDraftSaveTimer);
+    await window.FarnazLocalStore.clearDraft(senderId,receiverId);
+    updateComposerControls();
+    setStatus("sendMessageStatus",english?"Saved on this device; sending…":"پیام روی دستگاه ذخیره شد؛ در حال ارسال…");
+    await flushPrivateOutbox();
+    if(String(currentUser?.id||"")===senderId&&String(currentChatUser?.user_id||"")===receiverId){
+      const remaining=await window.FarnazLocalStore.getOutbox(senderId);
+      if(remaining.some(item=>item.id===saved.id))
+        setStatus("sendMessageStatus",english?"Message is safely queued and will retry when the connection returns.":"پیام با اطمینان در صف ذخیره شد و با بازگشت اینترنت دوباره ارسال می‌شود.");
     }
-    if(String(currentUser?.id||"")!==senderId)return;
-    if(String(currentChatUser?.user_id||"")===receiverId){
-      input.value="";input.style.height="auto";$("attachmentFile").value="";$("cameraFile").value="";$("photoFile").value="";
-      clearAttachmentPreview();updateComposerControls();
-      if(window.farnazDraftSaveTimer)clearTimeout(window.farnazDraftSaveTimer);
-      window.FarnazLocalStore?.clearDraft(senderId,receiverId).catch(cacheError=>console.warn("Could not clear sent draft:",cacheError));
-      setStatus("sendMessageStatus",english?"Message sent.":"پیام ارسال شد.");
-    }
-    await refreshConversationList();
-  }catch(e){
-    // The insert may have committed even if its response was lost. Never delete a stable retry path here.
-    if(String(currentUser?.id||"")!==senderId)return;
-    console.error("Send message:",e);
-    if(String(currentChatUser?.user_id||"")===receiverId)setStatus("sendMessageStatus",(english?"Could not send; your text and attachment are preserved. Tap Send to retry: ":"ارسال ناموفق بود؛ متن و پیوستت حفظ شده است. برای تلاش دوباره دکمه ارسال را بزن: ")+e.message,true);
-  }finally{button.disabled=false;if(restoreComposerFocus&&sameChat()&&document.activeElement!==input){try{input.focus({preventScroll:true});}catch(_){input.focus();}}}
+  }catch(error){
+    console.error("Queue private message:",error);
+    if(String(currentUser?.id||"")===senderId&&String(currentChatUser?.user_id||"")===receiverId)
+      setStatus("sendMessageStatus",(english?"Message was not queued; your composer is preserved: ":"پیام وارد صف نشد؛ متن و پیوست در کادر باقی مانده‌اند: ")+error.message,true);
+  }finally{
+    button.disabled=false;
+    if(restoreComposerFocus&&String(currentChatUser?.user_id||"")===receiverId&&document.activeElement!==input){try{input.focus({preventScroll:true});}catch(_){input.focus();}}
+  }
 }
 $("profileForm")?.addEventListener("submit",saveProfile);
 // Legacy recipient lookup form is not present in the current HTML.
@@ -1070,6 +1130,7 @@ window.addEventListener("offline",()=>{
   setConnectionBanner(english?"You are offline. Messages will reload when you reconnect.":"اینترنت قطع است؛ پس از اتصال، پیام‌ها دوباره بارگذاری می‌شوند.");
 });
 window.addEventListener("online",()=>{
+  flushPrivateOutbox();
   setConnectionBanner(english?"Internet restored. Reconnecting…":"اینترنت وصل شد؛ در حال بازیابی ارتباط…");
   recoverConnection();
 });
