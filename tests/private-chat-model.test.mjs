@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
+import privateChatModel from "../js/private-chat-model.js";
+const {
   compareMessagesNewestFirst,
   compareMessagesOldestFirst,
   mergeMessagesNewestFirst,
   olderCursorFilter,
   selectConversationPage
-} from "../js/private-chat-model.js";
+}=privateChatModel;
 
 const base="2026-11-07T10:00:00.000Z";
 const older="2026-11-07T09:59:59.999Z";
