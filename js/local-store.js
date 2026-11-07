@@ -192,9 +192,8 @@
       const request=store.getAll();let saved=null;
       request.onsuccess=()=>{
         if(!generationIsCurrent(userId,generation)){try{tx.abort();}catch(_){};return;}
-        const duplicate=(request.result||[]).find(item=>String(item.userId)===userId&&String(item.receiver_id)===String(record.receiver_id)&&item.dedupeKey&&item.dedupeKey===record.dedupeKey);
-        if(duplicate){saved=duplicate;return;}
-        saved={...record,id:String(record.id),userId,createdAt:Number(record.createdAt)||Date.now()};store.put(saved);
+        saved={...record,id:String(record.id),userId,createdAt:Number(record.createdAt)||Date.now()};
+        store.put(saved);
       };
       request.onerror=()=>{try{tx.abort();}catch(_){};reject(request.error||new Error("Outbox read failed"));};
       tx.oncomplete=()=>resolve(saved);
