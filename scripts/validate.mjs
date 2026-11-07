@@ -570,7 +570,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
     !html.includes('id="clearAppCacheButton"') ||
     !coreSource.includes('allow_space_additions:profilePrivacy.allow_space_additions!==false') ||
     !coreSource.includes('function clearAppCache()') ||
-    !/const CACHE_NAME="farnaz-shell-v\\d+";/.test(sources["service-worker.js"])) {
+    !/const CACHE_NAME="farnaz-shell-v\d+";/.test(sources["service-worker.js"])) {
   errors.push("Profile group/channel privacy, combined phone field, and safe cache-clearing controls must be present.");
 }
 
@@ -601,7 +601,7 @@ if (!html.includes('id="deleteAccountButton"') ||
     !accountDeletionMigration.includes("grant execute on function public.farnaz_account_deletion_storage_objects(uuid) to service_role") ||
     !accountDeletionSessionMigration.includes("private.farnaz_has_active_auth_session") ||
     !accountDeletionSessionMigration.includes("auth.sessions") ||
-    (accountDeletionSessionMigration.match(/\\bas restrictive\\b/gi)||[]).length < 2 ||
+    (accountDeletionSessionMigration.match(/\bas restrictive\b/gi)||[]).length < 2 ||
     !accountDeletionSessionMigration.includes("on storage.objects") ||
     (accountDeletionRpcMigration.match(/private.farnaz_has_active_auth_session\(\)/g)||[]).length < 17) {
   errors.push("Account deletion must require recent reauthentication, revoke all sessions, reject old access tokens through restrictive RLS policies, clean owned Storage objects, await local cleanup, and preserve private/group message history.");
