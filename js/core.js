@@ -2744,6 +2744,7 @@ async function refreshConversationList(){
   }
 }
 
+(function installAuthResendControls(){
   // Viewport and keyboard geometry are owned by js/chat-viewport-controller.js.
     // Prevent repeated signup submissions for the same pending email on this device.
   // Supabase Auth remains the source of truth and enforces unique email identities server-side.
