@@ -778,28 +778,7 @@ async function subscribeToMessagesNow(){
 function stopAudioRecordingTracks(){
   if(recordingStream){recordingStream.getTracks().forEach(track=>track.stop());recordingStream=null;}
 }
-if(window.visualViewport){
-  const syncChatViewport=()=>{
-    const inChat=document.body.classList.contains("chat-mode")||document.body.classList.contains("spaces-chat-mode");
-    const viewport=window.visualViewport;
-    if(inChat){
-      document.documentElement.style.setProperty("--chat-viewport-height",Math.round(viewport.height)+"px");
-      document.documentElement.style.setProperty("--chat-viewport-offset",Math.max(0,Math.round(viewport.offsetTop))+"px");
-      const focusedComposer=document.activeElement&&["messageText","spaceText"].includes(document.activeElement.id);
-      const keyboardLikelyOpen=!!focusedComposer && (window.innerHeight-viewport.height)>120;
-      document.body.classList.toggle("keyboard-open",keyboardLikelyOpen);
-    }else{
-      document.documentElement.style.removeProperty("--chat-viewport-height");
-      document.documentElement.style.removeProperty("--chat-viewport-offset");
-      document.body.classList.remove("keyboard-open");
-    }
-  };
-  window.visualViewport.addEventListener("resize",syncChatViewport);
-  window.visualViewport.addEventListener("scroll",syncChatViewport);
-  window.addEventListener("orientationchange",()=>setTimeout(syncChatViewport,180));
-  document.addEventListener("focusin",event=>{if(["messageText","spaceText"].includes(event.target?.id))setTimeout(syncChatViewport,100);});
-  document.addEventListener("focusout",()=>setTimeout(syncChatViewport,150));
-}
+// Viewport and keyboard geometry are owned by js/chat-viewport-controller.js.
 const COMPOSER_MIC_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg>';
 const COMPOSER_STOP_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 function setComposerRecordingState(button,recording){
@@ -1114,7 +1093,7 @@ $("cameraFile").addEventListener("change",()=>handleAttachmentChange($("cameraFi
 $("authBox").addEventListener("click",e=>{if(e.target.id==="authBox")closeAuth();});
 $("authBox").addEventListener("keydown",e=>{if(e.key==="Escape")closeAuth();});
 $("messageText").addEventListener("input",()=>{
-  const el=$("messageText");el.style.height="auto";el.style.height=Math.min(el.scrollHeight,112)+"px";
+  const el=$("messageText");el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";el.style.overflowY=el.scrollHeight>120?"auto":"hidden";
   updateComposerControls();
   if(window.farnazDraftSaveTimer)clearTimeout(window.farnazDraftSaveTimer);
   const userId=currentUser?.id,contactId=currentChatUser?.user_id,value=el.value;
