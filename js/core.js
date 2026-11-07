@@ -1145,6 +1145,7 @@ function toggleLanguage(){
     saveProfileButton:["ذخیره تغییرات","Save changes"],
     logoutButton:["خروج از حساب","Sign out"],
     deleteAccountButton:["حذف حساب کاربری","Delete account"],
+    deleteAccountHint:["با حذف حساب، اطلاعات هویتی و فایل‌های شما پاک می‌شود؛ متن پیام‌های قبلی برای سایر اعضا باقی می‌ماند.","Deleting your account removes your identity and files; the text of your previous messages remains visible to other participants."],
     navChats:["گفتگوها","Chats"],
     navContacts:["مخاطبان","Contacts"],
     navProfile:["پروفایل","Profile"],
@@ -1255,6 +1256,70 @@ async function signOutOtherSessions(){
   try{const {error}=await getClient().auth.signOut({scope:"others"});if(error)throw error;setStatus("profileStatus",english?"Other sessions signed out.":"نشست‌های دیگر از حساب خارج شدند.");}
   catch(error){setStatus("profileStatus",(english?"Could not sign out other sessions: ":"خروج از نشست‌های دیگر ناموفق بود: ")+(error?.message||String(error)),true);}
   finally{if(button)button.disabled=false;}
+}
+
+
+function deleteAccount(){
+  if(!currentUser||!currentUser.email)return;
+  document.getElementById("accountDeleteDialog")?.remove();
+  const modal=document.createElement("div");
+  modal.id="accountDeleteDialog";modal.className="profile-delete-overlay";
+  modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-labelledby","accountDeleteTitle");
+  modal.innerHTML='<section class="profile-delete-card"><header class="profile-delete-heading"><h2 id="accountDeleteTitle"></h2><button type="button" id="accountDeleteClose" aria-label="Close">×</button></header><p id="accountDeleteWarning" class="profile-delete-warning"></p><p id="accountDeleteEmail" class="profile-delete-email"></p><form id="accountDeleteForm"><label for="accountDeletePassword" id="accountDeletePasswordLabel"></label><input id="accountDeletePassword" type="password" autocomplete="current-password" required><label for="accountDeletePhrase" id="accountDeletePhraseLabel"></label><input id="accountDeletePhrase" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required><p id="accountDeleteStatus" class="profile-delete-status" role="status" aria-live="polite"></p><div class="profile-delete-actions"><button type="button" class="secondary-button" id="accountDeleteCancel"></button><button type="submit" class="profile-delete-confirm" id="accountDeleteSubmit"></button></div></form></section>';
+  document.body.appendChild(modal);
+  const byId=id=>modal.querySelector("#"+id);
+  byId("accountDeleteTitle").textContent=english?"Delete account permanently":"حذف دائمی حساب کاربری";
+  byId("accountDeleteWarning").textContent=english
+    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. Groups with other members will be transferred to an existing member."
+    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. مالکیت گروه‌هایی که عضو دیگری دارند به یکی از اعضا منتقل می‌شود.";
+  byId("accountDeleteEmail").textContent=currentUser.email;
+  byId("accountDeletePasswordLabel").textContent=english?"Confirm your password":"برای تأیید، رمز عبور حساب را وارد کنید";
+  byId("accountDeletePhraseLabel").textContent=english?'Type "DELETE ACCOUNT" to continue':'برای ادامه عبارت «حذف حساب» را وارد کنید';
+  byId("accountDeletePhrase").placeholder=english?"DELETE ACCOUNT":"حذف حساب";
+  byId("accountDeleteCancel").textContent=english?"Cancel":"انصراف";
+  byId("accountDeleteSubmit").textContent=english?"Permanently delete account":"حذف دائمی حساب";
+  byId("accountDeleteClose").setAttribute("aria-label",english?"Close":"بستن");
+  const close=()=>modal.remove();
+  byId("accountDeleteClose").addEventListener("click",close);
+  byId("accountDeleteCancel").addEventListener("click",close);
+  modal.addEventListener("click",event=>{if(event.target===modal)close();});
+  modal.addEventListener("keydown",event=>{if(event.key==="Escape")close();});
+  byId("accountDeletePassword").focus();
+  byId("accountDeleteForm").addEventListener("submit",async event=>{
+    event.preventDefault();
+    const password=byId("accountDeletePassword").value;
+    const phrase=byId("accountDeletePhrase").value.trim();
+    const expected=english?"DELETE ACCOUNT":"حذف حساب";
+    if(phrase!==expected){
+      byId("accountDeleteStatus").textContent=english?'The confirmation text does not match.':'عبارت تأیید درست نیست.';
+      return;
+    }
+    const accountId=String(currentUser?.id||"");
+    const submit=byId("accountDeleteSubmit"),cancel=byId("accountDeleteCancel"),closeButton=byId("accountDeleteClose");
+    submit.disabled=true;cancel.disabled=true;closeButton.disabled=true;
+    byId("accountDeleteStatus").textContent=english?"Verifying your password and deleting account…":"در حال تأیید رمز عبور و حذف حساب…";
+    try{
+      const client=getClient();
+      const {data:reauth,error:reauthError}=await client.auth.signInWithPassword({email:currentUser.email,password});
+      if(reauthError)throw new Error(english?"The password is incorrect.":"رمز عبور صحیح نیست.");
+      if(String(reauth?.user?.id||"")!==accountId)throw new Error(english?"The account could not be verified.":"هویت حساب تأیید نشد.");
+      const {data:result,error:functionError}=await client.functions.invoke("delete-farnaz-account",{body:{confirmation:"DELETE"}});
+      if(functionError){
+        let detail=functionError.message||"";
+        try{const payload=await functionError.context?.clone?.().json?.();if(payload?.error)detail=payload.error;}catch(_){}
+        throw new Error(detail||(english?"The deletion service could not complete the request.":"سرویس حذف حساب نتوانست درخواست را کامل کند."));
+      }
+      if(!result?.success)throw new Error(result?.error||(english?"Account deletion was not confirmed.":"حذف حساب تأیید نشد."));
+      modal.remove();
+      try{await client.auth.signOut({scope:"local"});}catch(_){}
+      try{localStorage.removeItem("sb-iemykhluluoymsbqpjsn-auth-token");}catch(_){}
+      showGuest();
+      window.alert(english?"Your Farnaz account has been permanently deleted.":"حساب فرناز شما به‌طور دائمی حذف شد.");
+    }catch(error){
+      byId("accountDeleteStatus").textContent=(english?"Could not delete account: ":"حذف حساب ناموفق بود: ")+(error?.message||String(error));
+      submit.disabled=false;cancel.disabled=false;closeButton.disabled=false;
+    }
+  });
 }
 
 async function showUser(user){
