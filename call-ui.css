@@ -60,10 +60,10 @@
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-stage-caption time,.farnaz-livekit-dialog.is-video-call .farnaz-livekit-stage-caption span{background:#11151dbd;border-color:#ffffff22}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-local-video{top:calc(86px + env(safe-area-inset-top,0px));inset-inline-end:16px;width:clamp(92px,26vw,116px);max-height:26%;border-radius:17px}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-footer{position:absolute;left:0;right:0;bottom:0;z-index:6;gap:20px;padding:30px 20px calc(22px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent 0%,#05060835 18%,#050608df 100%)}
-.farnaz-livekit-dialog.is-video-call .farnaz-livekit-controls{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,360px);min-height:76px}
+.farnaz-livekit-dialog.is-video-call .farnaz-livekit-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:min(100%,390px);min-height:64px}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-control{width:58px;height:58px;min-width:58px;min-height:58px;border:1px solid #ffffff20;background:#30343dcc;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-control svg{width:23px;height:23px}
-.farnaz-livekit-dialog.is-video-call .farnaz-livekit-control span{top:64px;font-size:11px}
+.farnaz-livekit-dialog.is-video-call .farnaz-livekit-control span{display:none}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-control.is-off{background:#f2f2f7;color:#20232a}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-actions{min-height:64px}
 .farnaz-livekit-dialog.is-video-call .farnaz-livekit-action{width:64px;height:64px;min-width:64px;min-height:64px}
