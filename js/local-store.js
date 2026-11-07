@@ -1,12 +1,13 @@
 "use strict";
 (function(){
   const DB_NAME="farnaz-local-v1";
-  const DB_VERSION=2;
+  const DB_VERSION=3;
   const STORE_MESSAGES="chatMessages";
   const STORE_DRAFTS="drafts";
   const STORE_TEMP="tempFiles";
   const STORE_SNAPSHOTS="snapshots";
   const STORE_SPACE_MESSAGES="spaceMessages";
+  const STORE_OUTBOX="privateMessageOutbox";
   let opening=null;
   // Serialize account-cache writes against logout cleanup. A quick re-login must
   // write fresh cache data only after the previous logout purge has completed.
@@ -48,6 +49,7 @@
         if(!db.objectStoreNames.contains(STORE_TEMP))db.createObjectStore(STORE_TEMP,{keyPath:"key"});
         if(!db.objectStoreNames.contains(STORE_SNAPSHOTS))db.createObjectStore(STORE_SNAPSHOTS,{keyPath:"key"});
         if(!db.objectStoreNames.contains(STORE_SPACE_MESSAGES))db.createObjectStore(STORE_SPACE_MESSAGES,{keyPath:"key"});
+        if(!db.objectStoreNames.contains(STORE_OUTBOX))db.createObjectStore(STORE_OUTBOX,{keyPath:"id"});
       };
       request.onsuccess=()=>finish(null,request.result);
       request.onerror=()=>finish(request.error||new Error("Local storage unavailable"));
@@ -177,6 +179,45 @@
       };
     });
   }
+  async function enqueueOutbox(record){
+    if(!record?.userId||!record?.receiver_id||!record?.id)return null;
+    const userId=String(record.userId),generation=generationFor(userId);
+    await waitForUserClear(userId);
+    if(!generationIsCurrent(userId,generation))return null;
+    const db=await openDB();if(!db)return null;
+    await waitForUserClear(userId);
+    if(!generationIsCurrent(userId,generation))return null;
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORE_OUTBOX,"readwrite"),store=tx.objectStore(STORE_OUTBOX);
+      const request=store.getAll();let saved=null;
+      request.onsuccess=()=>{
+        if(!generationIsCurrent(userId,generation)){try{tx.abort();}catch(_){};return;}
+        const duplicate=(request.result||[]).find(item=>String(item.userId)===userId&&String(item.receiver_id)===String(record.receiver_id)&&item.dedupeKey&&item.dedupeKey===record.dedupeKey);
+        if(duplicate){saved=duplicate;return;}
+        saved={...record,id:String(record.id),userId,createdAt:Number(record.createdAt)||Date.now()};store.put(saved);
+      };
+      request.onerror=()=>{try{tx.abort();}catch(_){};reject(request.error||new Error("Outbox read failed"));};
+      tx.oncomplete=()=>resolve(saved);
+      tx.onerror=()=>reject(tx.error||new Error("Outbox write failed"));
+      tx.onabort=()=>generationIsCurrent(userId,generation)?reject(tx.error||new Error("Outbox write aborted")):resolve(null);
+    });
+  }
+  async function getOutbox(userId){
+    if(!userId)return [];
+    const generation=generationFor(userId);
+    await waitForUserClear(userId);
+    if(!generationIsCurrent(userId,generation))return [];
+    const db=await openDB();if(!db)return [];
+    await waitForUserClear(userId);
+    if(!generationIsCurrent(userId,generation))return [];
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORE_OUTBOX,"readonly"),request=tx.objectStore(STORE_OUTBOX).getAll();
+      request.onsuccess=()=>resolve(generationIsCurrent(userId,generation)?(request.result||[]).filter(item=>String(item.userId)===String(userId)).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)):[]);
+      request.onerror=()=>reject(request.error||new Error("Outbox read failed"));
+      tx.onerror=()=>reject(tx.error||new Error("Outbox transaction failed"));
+    });
+  }
+  async function removeOutbox(userId,id){if(!userId||!id)return false;return remove(STORE_OUTBOX,String(id),userId);}
   async function getDraft(userId,contactId){
     if(!userId||!contactId)return "";
     const record=await read(STORE_DRAFTS,keyFor(userId,contactId),userId);
@@ -218,7 +259,7 @@
         // Queue repeated cleanup operations for the same account.
         if(previous)await previous;
         const db=await openDB();if(!db)return false;
-        const names=[STORE_MESSAGES,STORE_DRAFTS,STORE_TEMP,STORE_SNAPSHOTS,STORE_SPACE_MESSAGES];
+        const names=[STORE_MESSAGES,STORE_DRAFTS,STORE_TEMP,STORE_SNAPSHOTS,STORE_SPACE_MESSAGES,STORE_OUTBOX];
         return await new Promise((resolve,reject)=>{
           let settled=false;
           let tx;
@@ -288,7 +329,7 @@
   }
 
   window.FarnazLocalStore=Object.freeze({
-    getMessages,saveMessages,getDraft,saveDraft,clearDraft,
+    getMessages,saveMessages,enqueueOutbox,getOutbox,removeOutbox,getDraft,saveDraft,clearDraft,
     getSnapshot,saveSnapshot,getSpaceMessages,saveSpaceMessages,
     saveTemporaryFile,getTemporaryFile,clearUser,requestPersistentStorage
   });
