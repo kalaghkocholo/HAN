@@ -1144,6 +1144,7 @@ function toggleLanguage(){
     profilePhoneHint:["کد کشور را از فهرست داخل کادر انتخاب کن و شماره را وارد کن. این مرحله به معنی تأیید پیامکی شماره نیست.","Choose the country code inside the field, then enter your number. This does not verify it by SMS."],
     saveProfileButton:["ذخیره تغییرات","Save changes"],
     logoutButton:["خروج از حساب","Sign out"],
+    deleteAccountButton:["حذف حساب کاربری","Delete account"],
     navChats:["گفتگوها","Chats"],
     navContacts:["مخاطبان","Contacts"],
     navProfile:["پروفایل","Profile"],
@@ -1340,6 +1341,7 @@ async function showUser(user){
     setStatus("profileStatus",(english?"Could not load profile: ":"بارگذاری پروفایل ناموفق بود: ")+e.message,true);
   }
 }
+function farnazMessageBodyText(value){const body=String(value??"");return body==="[FARNAZ_DELETED_ATTACHMENT]"?(english?"Attachment removed":"پیوست حذف‌شده"):body;}
 function showGuest(){
   swipePageHistory=[];swipePageHistoryIndex=-1;clearSwipeTransition();
   profileCompletionRequired=false;
@@ -2656,9 +2658,10 @@ function renderConversationSnapshot(snapshot,myId){
       card.appendChild(btn);list.appendChild(card);continue;
     }
     const p=c.profile||{};
-    const name=pref.display_name||c.local_contact_name||p.display_name||(english?"Farnaz user":"مخاطب فرناز");
+    const deletedAccount=!!p.deleted_account;
+    const name=deletedAccount?(english?"Deleted account":"حساب حذف‌شده"):(pref.display_name||c.local_contact_name||p.display_name||(english?"Farnaz user":"مخاطب فرناز"));
     const preview=(c.lastSender===myId?(english?"You: ":"شما: "):"")+(pref.pinned?"📌 ":"")+(pref.archived?"🗄 ":"")+c.lastMessage;
-    const contact={user_id:c.user_id,display_name:name,profile_display_name:p.display_name||"",avatar_url:p.avatar_url||""};
+    const contact={user_id:c.user_id,display_name:name,profile_display_name:p.display_name||"",avatar_url:p.avatar_url||"",is_deleted_account:deletedAccount};
     const card=document.createElement("div");card.className="conversation-card"+(pref.pinned?" pinned":"")+(pref.archived?" archived":"");
     card.dataset.searchName=String(pref.display_name||c.local_contact_name||name);card.dataset.searchPreview=String(c.lastMessage||"");
     const btn=makeContactButton(contact,preview,new Date(c.created_at).toLocaleString(english?"en":"fa-IR"));
@@ -2711,7 +2714,7 @@ async function refreshConversationList(){
       if(!id||id===myId||conversations.has(id))continue;
       const pref=prefFor(id);
       if(pref.hidden_at&&new Date(m.created_at)<=new Date(pref.hidden_at))continue;
-      conversations.set(id,{user_id:id,lastMessage:m.body||((m.message_type||"text")==="image"?(english?"📷 Photo":"📷 عکس"):""),created_at:m.created_at,lastSender:m.sender_id,pref});
+      conversations.set(id,{user_id:id,lastMessage:m.body?farnazMessageBodyText(m.body):((m.message_type||"text")==="image"?(english?"📷 Photo":"📷 عکس"):""),created_at:m.created_at,lastSender:m.sender_id,pref});
     }
     const entries=[...conversations.values()];
     let profilesById=new Map(),profilesLoaded=true;
@@ -2725,7 +2728,7 @@ async function refreshConversationList(){
         if(id&&!importedPhoneNames.has(id)&&String(item.display_name||"").trim())importedPhoneNames.set(id,String(item.display_name).trim());
       }
     }catch(phoneNameError){console.warn("Conversation local contact names:",phoneNameError);}
-    const privateSnapshot=entries.map(c=>({...c,kind:"private",pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:profilesById.get(String(c.user_id))||{}}));
+    const privateSnapshot=entries.map(c=>{const profile=profilesById.get(String(c.user_id));return {...c,kind:"private",pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:profile||(profilesLoaded?{deleted_account:true}:{})};});
     let spaceSnapshot=[];
     try{spaceSnapshot=await window.FarnazGetUnifiedSpaceInboxSnapshot?.()||[];}catch(spaceInboxError){console.warn("Unified group and channel inbox:",spaceInboxError);setConnectionBanner(english?"Groups and channels could not be refreshed.":"به‌روزرسانی گروه‌ها و کانال‌ها انجام نشد؛ دوباره تلاش می‌کنیم.");}
     if(currentUser?.id!==myId||request!==conversationListRequestNumber)return;
