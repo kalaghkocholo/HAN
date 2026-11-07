@@ -21,6 +21,7 @@
     let localMediaEnabled = false;
     let microphoneEnabled = false;
     let cameraEnabled = false;
+    let audioOutputDeviceId = "default";
 
     function emit(type, detail) {
       try { onEvent({ type: type, detail: detail || null }); }
@@ -224,7 +225,8 @@
       if (!room || !connected) throw new Error("Not connected to a call.");
       if (typeof room.switchActiveDevice !== "function") throw new Error("Audio output selection is not supported by this browser.");
       await room.switchActiveDevice("audiooutput", String(deviceId), true);
-      emit("audio-output-changed", { deviceId: String(deviceId) });
+      audioOutputDeviceId = String(deviceId);
+      emit("audio-output-changed", { deviceId: audioOutputDeviceId });
       return true;
     }
 
@@ -275,6 +277,7 @@
           localMediaEnabled: localMediaEnabled,
           microphoneEnabled: microphoneEnabled,
           cameraEnabled: cameraEnabled,
+          audioOutputDeviceId: audioOutputDeviceId,
           callType: callType,
           spaceId: isDirectCall ? null : spaceId,
           callSessionId: isDirectCall ? callSessionId : null
