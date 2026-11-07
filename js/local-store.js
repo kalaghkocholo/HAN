@@ -225,7 +225,7 @@
     return record?.blob instanceof Blob?record.blob:null;
   }
   async function saveContactPhoto(userId,contactId,blob){
-    if(!userId||!contactId||!(blob instanceof Blob)||!/^image\\/(jpeg|png|webp)$/i.test(blob.type)||blob.size>2*1024*1024)return false;
+    if(!userId||!contactId||!(blob instanceof Blob)||!/^image\/(jpeg|png|webp)$/i.test(blob.type)||blob.size>2*1024*1024)return false;
     const key=keyFor(userId,contactId);
     return write(STORE_CONTACT_PHOTOS,{key,userId:String(userId),contactId:String(contactId),blob,updatedAt:Date.now()});
   }
