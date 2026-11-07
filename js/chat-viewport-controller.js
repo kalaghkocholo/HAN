@@ -95,7 +95,7 @@
     observer=new win.ResizeObserver(measureAnchors);
   }
   baselineHeight=viewportMetrics().layoutHeight;
-  win.FarnazChatViewportController={
+  const api={
     sync:scheduleSync,
     destroy(){
       listeners.splice(0).forEach(remove=>remove());
@@ -103,8 +103,9 @@
       root.style.removeProperty("--chat-viewport-height");
       root.style.removeProperty("--chat-viewport-offset");
       body.classList.remove("keyboard-open");
-      if(win.FarnazChatViewportController)this.destroyed=true;
+      if(win.FarnazChatViewportController===api)delete win.FarnazChatViewportController;
     }
   };
+  win.FarnazChatViewportController=api;
   scheduleSync();
 })();
