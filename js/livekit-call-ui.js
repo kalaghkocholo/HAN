@@ -128,6 +128,8 @@
     if (local) { local.pause(); local.srcObject = null; local.hidden = true; }
     const audio = byId("farnazLiveKitRemoteAudio");
     if (audio) audio.replaceChildren();
+    const stage = byId("farnazLiveKitStage");
+    if (stage) stage.classList.remove("has-video");
   }
 
   function attachLocalCamera(track, enabled) {
@@ -151,6 +153,7 @@
     byId("farnazLiveKitTitle").textContent = title || tr("تماس فرناز", "Farnaz call");
     byId("farnazLiveKitAvatar").textContent = (title || "F").trim().charAt(0).toLocaleUpperCase();
     byId("farnazLiveKitDialog").hidden = false;
+    byId("farnazLiveKitDialog").classList.toggle("is-video-call", callType === "video");
     byId("farnazLiveKitControls").hidden = true;
     byId("farnazLiveKitAccept").hidden = !incoming;
     byId("farnazLiveKitReject").hidden = !incoming;
