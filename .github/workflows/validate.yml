@@ -32,6 +32,7 @@ jobs:
           node --check js/private-chat-model.js
           node --check js/private-chat-hub.js
           node --check js/core.js
+          node --check js/chat-viewport-controller.js
           node --check js/chat-menu-v5.js
           node --check js/spaces.js
           node --check js/calls.js
@@ -48,6 +49,8 @@ jobs:
         run: node scripts/validate-call-infra.mjs
       - name: Test isolated LiveKit adapter
         run: node --test tests/livekit-adapter.test.mjs tests/livekit-call-sessions.test.mjs tests/livekit-call-controller.test.mjs tests/livekit-call-ui.test.mjs tests/livekit-sdk-loader.test.mjs
+      - name: Test mobile chat viewport and keyboard controller
+        run: node --test tests/chat-viewport-controller.test.mjs
       - name: Test private chat ordering and durable outbox retries
         run: node --test tests/private-chat-model.test.mjs tests/private-message-outbox.test.mjs
       - name: Type-check LiveKit token endpoint
