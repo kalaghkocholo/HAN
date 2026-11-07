@@ -64,6 +64,15 @@ p{color:#b6c1d1;line-height:1.7;font-size:12px}
 #profilePage>.page-heading{margin-bottom:14px}
 #settingsPage>.page-heading{margin-bottom:16px}
 .chats-topline .page-heading,.spaces-head .page-heading{border:0;padding:0;margin:0}
+.chats-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;margin:0 0 12px;padding:0 2px}
+.chats-new-button,.chats-search-button{width:44px;height:44px;min-width:44px;display:grid;place-items:center;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--panel2);color:var(--white);-webkit-tap-highlight-color:transparent}
+.chats-new-button:active,.chats-search-button:active{transform:scale(.96);background:var(--panel)}
+.chats-new-button svg,.chats-search-button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chats-search-button[aria-expanded="true"]{color:var(--mint);border-color:var(--mint)}
+.conversation-search-panel{margin:0 0 12px}
+.conversation-search-panel[hidden]{display:none!important}
+.conversation-search{display:block;margin:0}
+.conversation-search input{min-height:44px;margin:0;padding:10px 13px;border-radius:13px}
 .panel{padding:14px 12px;margin-bottom:12px}
 .features{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
 .emoji{font-size:20px}
