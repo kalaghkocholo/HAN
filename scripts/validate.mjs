@@ -90,19 +90,25 @@ const clientFiles = [
 ];
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
 const privateChatTests = read("tests/private-chat-model.test.mjs");
+const privateOutboxTests = read("tests/private-message-outbox.test.mjs");
 const privateChatWorkflow = read(".github/workflows/validate.yml");
 const localStore = sources["js/local-store.js"];
 if (!/const DB_VERSION=3;/.test(localStore) || !localStore.includes('const STORE_OUTBOX="privateMessageOutbox"') ||
     !localStore.includes("enqueueOutbox") || !localStore.includes("getOutbox") || !localStore.includes("removeOutbox") ||
-    !localStore.includes("STORE_OUTBOX];")) {
-  errors.push("Local storage must provide an account-scoped durable private-message outbox and purge it on logout");
+    !localStore.includes("STORE_OUTBOX];") ||
+    localStore.includes("item.dedupeKey===record.dedupeKey")) {
+  errors.push("Local storage must provide an account-scoped durable private-message outbox, preserve intentional identical messages, and purge it on logout");
 }
 const chatOutbox = sources["js/chat-menu-v5.js"];
 if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") ||
     !chatOutbox.includes("FarnazLocalStore?.enqueueOutbox") ||
     !chatOutbox.includes('.eq("id",record.id).maybeSingle()') ||
-    !chatOutbox.includes('flushPrivateOutbox();')) {
-  errors.push("Private messages must be durably queued, retried after reconnect, and reconciled by stable message ID");
+    !chatOutbox.includes('flushPrivateOutbox();') ||
+    !privateOutboxTests.includes("ambiguous committed insert") ||
+    !privateOutboxTests.includes("interrupted attachment upload") ||
+    !privateOutboxTests.includes("intentional identical messages") ||
+    !privateChatWorkflow.includes("tests/private-message-outbox.test.mjs")) {
+  errors.push("Private messages must be durably queued and fault-injection tested for upload interruption, ambiguous inserts, and intentional duplicate text");
 }
 if (!html.includes("./js/local-store.js?v=20261107-outbox1") ||
     !html.includes("./js/chat-menu-v5.js?v=20261107-outbox1") ||
