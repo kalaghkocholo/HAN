@@ -188,3 +188,24 @@ Verification on commit `1736325939c753f049448b60b73dc8772d4c1448`:
 - Vercel status: failed due to the team's deployment build-rate limit, not a reported source build error. The current production deployment was not replaced by this change.
 
 This increment addresses deterministic history pagination only. It does not yet add offline outbox/idempotency, media library redesign, mute controls, notification delivery, E2EE, or two-account end-to-end security coverage.
+
+## 10. Implementation increment: durable private-message outbox
+
+Implemented directly on `main`:
+
+- IndexedDB schema version 3 adds a dedicated `privateMessageOutbox` object store, separate from the recoverable message cache and drafts.
+- Outbox records are scoped to the authenticated account and include a client-generated stable message UUID, destination, text/reply metadata, and the selected attachment Blob when present.
+- Enqueue deduplicates an already-pending message using its destination, body, reply target, and attachment metadata. A deliberate repeat after successful delivery is allowed because the earlier queue record has been removed.
+- The composer clears only after the record has been committed to IndexedDB. If local persistence fails, the composer remains intact.
+- Pending records render in the private conversation with a waiting indicator and remain visible after reopening the conversation.
+- Reconnection and successful realtime subscription trigger sequential retry. Attachment object paths are deterministic from the sender and message UUID; storage conflicts are reconciled, and a failed/ambiguous database insert is checked by the same message UUID before retrying.
+- A queue item is removed only after the server confirms the insert or the message is found by its stable UUID.
+- Account logout cleanup also purges that account's outbox so queued private content cannot leak into another signed-in session.
+
+Verification scope and limitations:
+
+- The implementation uses IndexedDB for the durable queue and Supabase as the authoritative message store; the outbox is not a cross-device source of truth.
+- This increment does not yet provide a dedicated failed-message management screen, manual per-message retry/cancel controls, or background delivery while Safari is fully closed. Retry resumes when the app is open and its authenticated realtime connection is established, or when the browser reports the network online.
+- Attachment payloads are retained locally until successful delivery; browser storage quotas and user-cleared site data can still remove local pending data.
+- CI/static validation and real Safari offline/online testing are separate. Do not consider two-device delivery verified until tested with two real accounts and a network interruption during both upload and message insert.
+
