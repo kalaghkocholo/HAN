@@ -1832,44 +1832,15 @@ async function getContactProfiles(ids){
   return new Map((data||[]).filter(p=>p?.user_id).map(p=>[String(p.user_id),p]));
 }
 
-let contactInfoDialog=null,contactInfoBlocked=false,contactInfoRequest=0;
-/* Click is wired directly in index.html; avoid a second delegated click path. */
+let contactInfoBlocked=false;
+/* The private conversation hub is loaded as a single feature module after core. */
 document.addEventListener("keydown",event=>{
   if((event.key==="Enter"||event.key===" ")&&event.target instanceof Element&&event.target.matches("#conversationTitle, #chatAvatar")&&currentUser&&currentChatUser){
     event.preventDefault();
     openContactInfo();
   }
 });
-function ensureContactInfoDialog(){
-  if(contactInfoDialog)return contactInfoDialog;
-  const modal=document.createElement("div");
-  modal.id="contactInfoDialog";modal.className="contact-info-dialog";modal.hidden=true;
-  modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-labelledby","contactInfoTitle");
-  modal.innerHTML='<section class="contact-info-card"><button type="button" class="contact-info-close" id="closeContactInfo" aria-label="بستن">×</button><div class="contact-info-profile"><div class="contact-info-avatar avatar large" id="contactInfoAvatar">F</div><h2 id="contactInfoTitle"></h2><p id="contactInfoAbout" class="muted-note"></p><div id="contactInfoPhone" class="contact-info-phone" hidden></div></div><div class="contact-info-actions" id="contactInfoActions"></div><section class="contact-info-media"><h3 id="contactInfoMediaTitle">رسانه‌ها و فایل‌ها</h3><p id="contactInfoMediaStatus" class="muted-note" role="status"></p><div id="contactInfoMediaList" class="contact-info-media-list"></div></section><p id="contactInfoStatus" class="status" role="status"></p><div class="contact-info-danger-actions"><button type="button" id="contactInfoBlock" class="contact-info-danger-button"></button><button type="button" id="contactInfoDelete" class="contact-info-danger-button">حذف گفتگو</button></div></section>';
-  document.body.appendChild(modal);contactInfoDialog=modal;
-  $("closeContactInfo").addEventListener("click",closeContactInfo);
-  modal.addEventListener("click",event=>{if(event.target===modal)closeContactInfo();});
-  $("contactInfoBlock").addEventListener("click",toggleContactBlock);
-  $("contactInfoDelete").addEventListener("click",deleteContactConversation);
-  const title=$("conversationTitle"),avatar=$("chatAvatar");
-  [title,avatar].forEach(el=>{
-    if(!el)return;
-    el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("tabindex","0");
-    el.setAttribute("aria-haspopup","dialog");el.setAttribute("aria-label",english?"Contact information":"اطلاعات مخاطب");
-  });
-  return modal;
-}
-function closeContactInfo(){if(contactInfoDialog)contactInfoDialog.hidden=true;}
 function contactInfoText(fa,en){return english?en:fa;}
-function addContactInfoAction(label,icon,handler){
-  const button=document.createElement("button");button.type="button";button.className="contact-info-action";
-  const glyph=document.createElement("span");glyph.className="contact-info-action-icon";
-  if(icon.startsWith("#chatPage")){
-    const source=document.querySelector(icon);
-    if(source)glyph.appendChild(source.cloneNode(true));
-  }else glyph.textContent=icon;
-  const text=document.createElement("span");text.textContent=label;button.append(glyph,text);button.addEventListener("click",handler);$("contactInfoActions").appendChild(button);
-}
 let messageSearchDialog=null,messageSearchRequest=0;
 function ensureMessageSearchDialog(){
   if(messageSearchDialog)return messageSearchDialog;
@@ -2024,89 +1995,6 @@ async function renameCurrentContact(){
     if(String(currentUser?.id)!==userId)return;
     $("contactInfoStatus").textContent=(english?"Could not save contact name: ":"ذخیرهٔ نام مخاطب ناموفق بود: ")+(error?.message||String(error));
   }
-}
-async function openContactInfo(){
-  if(!currentUser||!currentChatUser)return;
-  ensureContactInfoDialog();
-  const request=++contactInfoRequest,contactId=currentChatUser.user_id;
-  $("contactInfoMediaTitle").textContent=contactInfoText("رسانه‌ها و فایل‌ها","Media and files");
-  $("contactInfoDelete").textContent=contactInfoText("حذف گفتگو","Delete conversation");
-  $("closeContactInfo").setAttribute("aria-label",contactInfoText("بستن","Close"));
-  const name=currentChatUser.display_name||(english?"Farnaz user":"مخاطب فرناز");
-  $("contactInfoTitle").textContent=currentChatUser.is_deleted_account?(english?"Deleted account":"حساب حذف‌شده"):name;
-  $("contactInfoAbout").textContent=currentChatUser.is_deleted_account?contactInfoText("این حساب حذف شده است.","This account has been deleted."):contactInfoText("گفتگوی خصوصی در فرناز","Private conversation on Farnaz");
-  $("contactInfoPhone").hidden=true;$("contactInfoPhone").textContent="";
-  renderAvatar($("contactInfoAvatar"),currentChatUser.avatar_url||"",name);
-  $("contactInfoActions").replaceChildren();$("contactInfoMediaList").replaceChildren();
-  $("contactInfoMediaStatus").textContent=contactInfoText("در حال بارگذاری رسانه‌ها…","Loading media and files…");
-  $("contactInfoStatus").textContent="";
-  $("contactInfoBlock").disabled=true;$("contactInfoDelete").disabled=false;
-  $("contactInfoBlock").textContent=contactInfoText("در حال بررسی…","Checking…");
-  contactInfoBlocked=false;contactInfoDialog.hidden=false;
-  addContactInfoAction(contactInfoText("پیام","Message"),"✉",closeContactInfo);
-  if(!currentChatUser.is_deleted_account){
-    addContactInfoAction(contactInfoText("ویرایش نام مخاطب","Edit contact name"),"✎",renameCurrentContact);
-    addContactInfoAction(contactInfoText("تماس صوتی","Audio call"),"#chatPage .call-actions button[onclick=\"startCall('audio')\"] svg",()=>{closeContactInfo();startCall("audio");});
-    addContactInfoAction(contactInfoText("تماس تصویری","Video call"),"#chatPage .call-actions button[onclick=\"startCall('video')\"] svg",()=>{closeContactInfo();startCall("video");});
-  }
-  addContactInfoAction(contactInfoText("جست‌وجو در گفتگو","Search chat"),"⌕",searchCurrentConversation);
-  try{
-    const client=getClient();
-    const [profileResult,blockedResult]=await Promise.all([
-      getContactProfile(contactId),
-      client.from("blocked_contacts").select("blocked_user_id").eq("blocker_id",currentUser.id).eq("blocked_user_id",contactId).maybeSingle()
-    ]);
-    if(request!==contactInfoRequest||String(currentChatUser?.user_id)!==String(contactId))return;
-    if(!profileResult&&currentChatUser.is_deleted_account){
-      $("contactInfoTitle").textContent=english?"Deleted account":"حساب حذف‌شده";
-      $("contactInfoAbout").textContent=english?"This account has been deleted.":"این حساب حذف شده است.";
-    }
-    if(profileResult?.display_name){
-      $("contactInfoTitle").textContent=profileResult.display_name;
-      const profileDetails=[profileResult.username?"@"+profileResult.username:"",profileResult.about||contactInfoText("عضو فرناز","Farnaz member")].filter(Boolean);
-      $("contactInfoAbout").textContent=profileDetails.join(" · ");
-      if(profileResult.avatar_url)renderAvatar($("contactInfoAvatar"),profileResult.avatar_url,profileResult.display_name);
-    }
-    /* The profile RPC is the authority for phone visibility; never fall back to raw profile reads. */
-    if(profileResult?.phone){
-      $("contactInfoPhone").textContent=(english?"Phone: ":"شماره تلفن: ")+formatContactPhone(profileResult.phone);$("contactInfoPhone").setAttribute("dir","ltr");$("contactInfoPhone").style.direction="ltr";$("contactInfoPhone").style.unicodeBidi="isolate";
-      $("contactInfoPhone").hidden=false;
-    }
-    if(blockedResult.error)throw blockedResult.error;
-    contactInfoBlocked=!!blockedResult.data;
-    $("contactInfoBlock").textContent=contactInfoBlocked?contactInfoText("رفع مسدودسازی","Unblock contact"):contactInfoText("مسدود کردن مخاطب","Block contact");
-    $("contactInfoBlock").disabled=!!currentChatUser.is_deleted_account;
-    await loadContactInfoMedia(contactId,request);
-  }catch(error){
-    if(request===contactInfoRequest)$("contactInfoStatus").textContent=(english?"Could not load contact information: ":"بارگذاری اطلاعات مخاطب ناموفق بود: ")+error.message;
-    $("contactInfoBlock").disabled=false;
-    $("contactInfoBlock").textContent=contactInfoBlocked?contactInfoText("رفع مسدودسازی","Unblock contact"):contactInfoText("مسدود کردن مخاطب","Block contact");
-  }
-}
-async function loadContactInfoMedia(contactId,request){
-  const client=getClient(),myId=currentUser.id;
-  const results=await Promise.all([
-    client.from("messages").select("id,sender_id,receiver_id,created_at,message_type,attachment_path,attachment_name,attachment_mime,attachment_size").eq("sender_id",myId).eq("receiver_id",contactId).not("attachment_path","is",null).order("created_at",{ascending:false}).limit(60),
-    client.from("messages").select("id,sender_id,receiver_id,created_at,message_type,attachment_path,attachment_name,attachment_mime,attachment_size").eq("sender_id",contactId).eq("receiver_id",myId).not("attachment_path","is",null).order("created_at",{ascending:false}).limit(60)
-  ]);
-  const failure=results.find(result=>result.error);if(failure)throw failure.error;
-  if(request!==contactInfoRequest)return;
-  const items=[...(results[0].data||[]),...(results[1].data||[])].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,80);
-  const list=$("contactInfoMediaList");list.replaceChildren();
-  if(!items.length){$("contactInfoMediaStatus").textContent=contactInfoText("هنوز رسانه یا فایلی در این گفتگو نیست.","No media or files in this conversation yet.");return;}
-  $("contactInfoMediaStatus").textContent=contactInfoText("آخرین پیوست‌های گفتگو","Recent chat attachments");
-  for(const item of items){
-    const {data,error}=await client.storage.from("chat-attachments").createSignedUrl(item.attachment_path,3600);
-    if(request!==contactInfoRequest)return;
-    if(error||!data?.signedUrl)continue;
-    const link=document.createElement("a");link.className="contact-info-media-item";link.href=data.signedUrl;link.target="_blank";link.rel="noopener noreferrer";
-    const isImage=(item.attachment_mime||"").startsWith("image/")||item.message_type==="image";
-    if(isImage){const image=document.createElement("img");image.src=data.signedUrl;image.alt=item.attachment_name||contactInfoText("تصویر گفتگو","Chat image");image.loading="lazy";link.appendChild(image);}
-    else{const glyph=document.createElement("span");glyph.className="contact-info-file-icon";glyph.textContent=(item.attachment_mime||"").startsWith("audio/")?"♫":"↧";link.appendChild(glyph);}
-    const name=document.createElement("span");name.className="contact-info-media-name";name.textContent=item.attachment_name||contactInfoText("فایل پیوست","Attachment");
-    link.appendChild(name);list.appendChild(link);
-  }
-  if(!list.children.length)$("contactInfoMediaStatus").textContent=contactInfoText("پیوست‌ها در حال حاضر قابل نمایش نیستند.","Attachments are currently unavailable.");
 }
 async function toggleContactBlock(){
   if(!currentUser||!currentChatUser||currentChatUser.is_deleted_account)return;
