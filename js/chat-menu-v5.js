@@ -261,6 +261,7 @@ async function makeMessageElement(m,myId,fromCache=false){
     item.appendChild(quote);
   }
   if(m.body){const body=document.createElement("p");body.textContent=farnazMessageBodyText(m.body);item.appendChild(body);}
+  if(m._delivery_state==="queued"&&m.attachment_name){const pendingFile=document.createElement("small");pendingFile.textContent=(english?"Attachment waiting to send: ":"پیوست در انتظار ارسال: ")+m.attachment_name;item.appendChild(pendingFile);}
   if(m.attachment_path&&fromCache){
     const n=document.createElement("small");
     n.textContent=english?"Attachment saved on server; connect to view it.":"پیوست روی سرور است؛ برای مشاهده به اینترنت وصل شو.";
