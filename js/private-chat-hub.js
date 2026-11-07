@@ -46,6 +46,13 @@
       }
     });
     $("privateHubCategoryTabs").addEventListener("click",e=>{const b=e.target.closest("[data-hub-category]");if(b)selectCategory(b.dataset.hubCategory);});
+    $("privateHubCategoryTabs").addEventListener("keydown",e=>{
+      if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;
+      const tabs=[...$("privateHubCategoryTabs").querySelectorAll("[data-hub-category]")];
+      const current=tabs.indexOf(document.activeElement);let next=current;
+      if(e.key==="Home")next=0;else if(e.key==="End")next=tabs.length-1;else next=(current+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+      e.preventDefault();tabs[next].focus();selectCategory(tabs[next].dataset.hubCategory);
+    });
     $("privateHubLoadMore").addEventListener("click",()=>loadPage(true));
     $("privateHubRename").addEventListener("click",()=>renameCurrentContact());
     $("privateHubArchive").addEventListener("click",toggleArchive);
@@ -117,6 +124,7 @@
     const token=++request,user=String(currentUser.id),other=String(currentChatUser.user_id);
     contactId=other;category="photos";cursor=null;more=false;busy=false;profileLoading=true;hiddenIds=new Set();
     dialog.hidden=false;document.body.classList.add("private-hub-open");
+    $("closeContactInfo").focus({preventScroll:true});
     const name=currentChatUser.display_name||(english?"Farnaz user":"مخاطب فرناز");
     $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
     $("contactInfoTitle").textContent=currentChatUser.is_deleted_account?tr("حساب حذف‌شده","Deleted account"):name;
@@ -170,7 +178,6 @@
       $("contactInfoMediaStatus").textContent=tr("برای تلاش دوباره دسته را انتخاب کن.","Select a category to retry.");
       $("contactInfoBlock").disabled=false;
     }
-    if(token===request)$("closeContactInfo").focus({preventScroll:true});
   }
 
   function updateArchiveLabel(){
@@ -195,7 +202,7 @@
     if(category==="photos")q=q.eq("message_type","image").not("attachment_path","is",null);
     else if(category==="videos")q=q.ilike("attachment_mime","video/%").not("attachment_path","is",null);
     else if(category==="audio")q=q.ilike("attachment_mime","audio/%").not("attachment_path","is",null);
-    else if(category==="files")q=q.not("attachment_path","is",null).not("attachment_mime","ilike","image/%").not("attachment_mime","ilike","video/%").not("attachment_mime","ilike","audio/%");
+    else if(category==="files")q=q.eq("message_type","file").not("attachment_path","is",null);
     else q=q.is("attachment_path",null).ilike("body","%http%");
     q=q.order("created_at",{ascending:false}).order("id",{ascending:false}).limit(PAGE);
     if(after)q=q.or("created_at.lt."+after.created_at+",and(created_at.eq."+after.created_at+",id.lt."+after.id+")");
@@ -227,7 +234,7 @@
       const hiddenResult=page.length?await client.from("message_hidden").select("message_id").eq("user_id",user).in("message_id",page.map(m=>m.id)):{data:[],error:null};
       if(hiddenResult.error)throw hiddenResult.error;
       const pageHidden=new Set((hiddenResult.data||[]).map(row=>String(row.message_id)));
-      const visible=page.filter(m=>!pageHidden.has(String(m.id)));
+      const visible=page.filter(m=>!pageHidden.has(String(m.id))&&(kind!=="files"||! /^(image|video|audio)\\//i.test(m.attachment_mime||"")));
       if(kind==="links")renderLinks(visible,append,other);
       else await renderAttachments(visible,append,token,other);
       if(token!==request||kind!==category)return;
