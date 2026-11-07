@@ -429,8 +429,8 @@ const authChecks = [
    sources["js/local-store.js"].includes("resolve(false);return;}") &&
    sources["js/local-store.js"].includes("if(!generationIsCurrent(userId,generation))return false;"),
     "js/local-store.js must invalidate stale reads and writes as soon as logout begins, including the direct message-cache path"],
-  [coreSource.includes("chatRequestNumber++;contactInfoRequest++;messageSearchRequest++;") &&
-   coreSource.includes("if(contactInfoDialog)contactInfoDialog.hidden=true;") &&
+  [coreSource.includes("chatRequestNumber++;messageSearchRequest++;") &&
+   coreSource.includes("window.closeContactInfo?.();") &&
    coreSource.includes("if(messageSearchDialog)messageSearchDialog.hidden=true;") &&
    coreSource.includes('document.querySelector(".app")?.classList.remove("chat-mode","spaces-chat-mode")') &&
    coreSource.includes('document.body.classList.remove("chat-mode","spaces-chat-mode")') &&
