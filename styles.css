@@ -1253,6 +1253,28 @@ body[data-theme="light"] .farnaz-livekit-actions button:not(.is-accept):not(.is-
 
 .profile-account-tools{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--border)}
 .profile-account-tools .secondary-button{width:100%;min-height:42px;margin:0}
+
+.profile-danger-zone{display:grid;gap:8px;padding:14px 0 2px;border-top:1px solid var(--border)}
+.profile-delete-button{width:100%;min-height:44px;padding:10px 14px;border:1px solid rgba(190,45,55,.34);border-radius:12px;background:rgba(190,45,55,.08);color:var(--danger,#c73540);font:inherit;font-weight:750}
+.profile-delete-button:active{transform:scale(.99)}
+.profile-danger-hint{margin:0;color:var(--muted,#8993a2);font-size:12px;line-height:1.7}
+.profile-delete-overlay{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:18px;background:rgba(8,12,20,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.profile-delete-card{width:min(100%,440px);max-height:min(90dvh,720px);overflow:auto;padding:20px;border:1px solid var(--border);border-radius:20px;background:var(--panel,#fff);color:var(--text,inherit);box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.profile-delete-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.profile-delete-heading h2{margin:0;font-size:17px;font-weight:800}
+.profile-delete-heading button{width:36px;height:36px;border:0;border-radius:50%;background:var(--surface-2,rgba(130,140,155,.14));color:inherit;font-size:24px}
+.profile-delete-warning{margin:0 0 12px;padding:12px;border-radius:12px;background:rgba(190,45,55,.08);color:var(--text,inherit);font-size:13px;line-height:1.8}
+.profile-delete-email{margin:0 0 16px;color:var(--muted,#8993a2);font-size:13px;direction:ltr;text-align:left;overflow-wrap:anywhere}
+.profile-delete-card form{display:grid;gap:9px}
+.profile-delete-card label{font-size:13px;font-weight:700}
+.profile-delete-card input{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:11px;background:var(--surface,transparent);color:inherit;font:inherit}
+.profile-delete-card input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.profile-delete-status{min-height:18px;margin:2px 0;color:var(--danger,#c73540);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.profile-delete-actions{display:flex;gap:9px;margin-top:4px}
+.profile-delete-actions button{flex:1;min-height:44px}
+.profile-delete-confirm{border:0;border-radius:11px;background:#c73540;color:#fff;font:inherit;font-weight:800;padding:10px}
+.profile-delete-confirm:disabled,.profile-delete-actions button:disabled,.profile-delete-heading button:disabled{opacity:.55}
+
 .profile-account-actions #logoutButton{width:100%;min-height:44px;margin:0;border:1px solid #b42318!important;border-radius:11px;background:#b42318!important;color:#fff!important;font-weight:750;box-shadow:0 2px 8px rgba(180,35,24,.18)}
 .profile-account-actions #logoutButton:active{background:#912018!important;border-color:#912018!important}
 .profile-account-actions #logoutButton:focus-visible{outline:3px solid rgba(220,70,60,.35);outline-offset:2px}
