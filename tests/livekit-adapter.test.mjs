@@ -10,7 +10,12 @@ const validCallSessionId = "b12f3456-7890-4123-8123-123456789abc";
 function loadAdapter({ sdk = true } = {}) {
   const context = {
     console,
-    navigator: { mediaDevices: { getUserMedia: async () => ({}), enumerateDevices: async () => [\n      { kind: "videoinput", deviceId: "camera-front", label: "Front camera" },\n      { kind: "videoinput", deviceId: "camera-back", label: "Back camera" },\n      { kind: "audiooutput", deviceId: "default", label: "Default" },\n      { kind: "audiooutput", deviceId: "speaker", label: "Speaker" }\n    ] }, audioSession: { type: "auto" } },
+    navigator: { mediaDevices: { getUserMedia: async () => ({}), enumerateDevices: async () => [
+      { kind: "videoinput", deviceId: "camera-front", label: "Front camera" },
+      { kind: "videoinput", deviceId: "camera-back", label: "Back camera" },
+      { kind: "audiooutput", deviceId: "default", label: "Default" },
+      { kind: "audiooutput", deviceId: "speaker", label: "Speaker" }
+    ] }, audioSession: { type: "auto" } },
     setTimeout,
     clearTimeout,
     Promise
@@ -28,7 +33,11 @@ function loadAdapter({ sdk = true } = {}) {
         this.canPlaybackAudio = true;
         this.localParticipant = {
           setMicrophoneEnabled: async enabled => { this.microphoneEnabled = enabled; },
-          setCameraEnabled: async enabled => {\n            this.cameraEnabled = enabled;\n            this.cameraTrack = enabled ? { mediaStreamTrack: { getSettings: () => ({ deviceId: "camera-front" }) } } : null;\n          },\n          getTrackPublication: source => source === "camera" && this.cameraTrack ? { track: this.cameraTrack } : undefined
+          setCameraEnabled: async enabled => {
+            this.cameraEnabled = enabled;
+            this.cameraTrack = enabled ? { mediaStreamTrack: { getSettings: () => ({ deviceId: "camera-front" }) } } : null;
+          },
+          getTrackPublication: source => source === "camera" && this.cameraTrack ? { track: this.cameraTrack } : undefined
         };
         this.connected = false;
         this.disconnected = false;
@@ -37,7 +46,11 @@ function loadAdapter({ sdk = true } = {}) {
       on(name, handler) { this.handlers.set(name, handler); return this; }
       async connect(url, token) { this.url = url; this.token = token; this.connected = true; }
       async disconnect(stopTracks) { this.stopTracks = stopTracks; this.disconnected = true; this.connected = false; }
-      async startAudio() { this.canPlaybackAudio = true; }\n      async switchActiveDevice(kind, deviceId, exact) {\n        this.deviceSwitches = this.deviceSwitches || [];\n        this.deviceSwitches.push({ kind, deviceId, exact });\n      }
+      async startAudio() { this.canPlaybackAudio = true; }
+      async switchActiveDevice(kind, deviceId, exact) {
+        this.deviceSwitches = this.deviceSwitches || [];
+        this.deviceSwitches.push({ kind, deviceId, exact });
+      }
     }
     context.LivekitClient = {
       Room: FakeRoom,
@@ -50,7 +63,8 @@ function loadAdapter({ sdk = true } = {}) {
         Reconnecting: "reconnecting",
         Reconnected: "reconnected",
         Disconnected: "disconnected",
-        AudioPlaybackStatusChanged: "audio-playback-status",\n        ConnectionQualityChanged: "connection-quality",
+        AudioPlaybackStatusChanged: "audio-playback-status",
+        ConnectionQualityChanged: "connection-quality",
         MediaDevicesError: "media-device-error"
       }
     };
