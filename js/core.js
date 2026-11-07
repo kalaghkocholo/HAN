@@ -918,7 +918,18 @@ function setInboxFilter(filter){
   if(currentUser)refreshConversationList();
 }
 document.querySelectorAll("[data-inbox-filter]").forEach(button=>button.addEventListener("click",()=>setInboxFilter(button.dataset.inboxFilter)));
+function toggleConversationSearch(force){
+  const panel=$("conversationSearchPanel"),button=$("toggleConversationSearch"),input=$("conversationSearch");
+  if(!panel||!button)return;
+  const open=typeof force==="boolean"?force:panel.hidden;
+  panel.hidden=!open;button.setAttribute("aria-expanded",String(open));
+  if(open){input?.focus({preventScroll:true});}
+  else if(input&&!input.value.trim()){input.value="";applyConversationSearch();}
+}
+$("toggleConversationSearch")?.addEventListener("click",()=>toggleConversationSearch());
 $("conversationSearch")?.addEventListener("input",applyConversationSearch);
+$("conversationSearch")?.addEventListener("keydown",event=>{if(event.key==="Escape"){event.preventDefault();toggleConversationSearch(false);$("toggleConversationSearch")?.focus({preventScroll:true});}});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("conversationSearchPanel")?.hidden)toggleConversationSearch(false);});
 $("savedFarnazContactFilter")?.addEventListener("input",filterSavedFarnazContacts);
 function prefFor(id){return conversationPrefs.get(id)||{pinned:false,archived:false,hidden_at:null};}
 async function saveConversationPref(contactId,patch){
@@ -1181,8 +1192,10 @@ function toggleLanguage(){
   $("attachmentPhotoOption").lastElementChild.textContent=english?"Photos & videos":"عکس و ویدئو";
   $("attachmentCameraOption").lastElementChild.textContent=english?"Take a photo":"گرفتن عکس با دوربین";
   $("attachmentFileOption").lastElementChild.textContent=english?"Choose file":"انتخاب فایل";
-  const newChatButton=$("topNewChatButton")||document.querySelector(".chats-new-button");
-  if(newChatButton){newChatButton.title=english?"New chat":"گفتگوی جدید";newChatButton.setAttribute("aria-label",english?"New chat":"گفتگوی جدید");}
+  const newChatButton=$("topNewChatButton");
+  if(newChatButton){newChatButton.title=english?"New message":"پیام جدید";newChatButton.setAttribute("aria-label",newChatButton.title);}
+  const searchToggle=$("toggleConversationSearch");
+  if(searchToggle){searchToggle.title=english?"Search conversations":"جستجوی گفتگوها";searchToggle.setAttribute("aria-label",searchToggle.title);}
   const importToggle=$("contactsImportToggle");
   if(importToggle){importToggle.setAttribute("aria-label",english?"Add or sync contacts":"افزودن یا همگام‌سازی مخاطب");importToggle.title=importToggle.getAttribute("aria-label");}
   if($("savedFarnazContactFilter")){
