@@ -109,6 +109,8 @@
   function setStatus(message, state) {
     const node = byId("farnazLiveKitStatus");
     if (node) node.textContent = message;
+    const dialog = byId("farnazLiveKitDialog");
+    if (dialog && state) dialog.dataset.callState = state;
     const dot = byId("farnazLiveKitDot");
     if (dot && state) dot.dataset.state = state;
   }
@@ -181,6 +183,9 @@
     setAvatar(title, null);
     byId("farnazLiveKitDialog").hidden = false;
     byId("farnazLiveKitDialog").classList.toggle("is-video-call", callType === "video");
+    byId("farnazLiveKitDialog").classList.toggle("is-audio-call", callType !== "video");
+    byId("farnazLiveKitDialog").dataset.callType = callType;
+    byId("farnazLiveKitDialog").dataset.callState = incoming ? "incoming" : "outgoing";
     byId("farnazLiveKitControls").hidden = true;
     byId("farnazLiveKitAccept").hidden = !incoming;
     byId("farnazLiveKitReject").hidden = !incoming;
