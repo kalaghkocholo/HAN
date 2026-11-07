@@ -79,6 +79,7 @@ if (html.includes("cdn.jsdelivr.net/npm/@supabase/supabase-js") || html.includes
 const clientFiles = [
   "js/local-store.js",
   "js/private-chat-model.js",
+  "js/private-chat-hub.js",
   "js/core.js",
   "js/chat-menu-v5.js",
   "js/spaces.js",
@@ -89,6 +90,22 @@ const clientFiles = [
   "chat-viewport.css",
 ];
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
+const hubSource = sources["js/private-chat-hub.js"];
+if (!hubSource.includes("createSignedUrls(paths, 3600)") ||
+    !hubSource.includes('order("created_at", { ascending: false }).order("id", { ascending: false })') ||
+    !hubSource.includes('data-hub-category="photos"') ||
+    !hubSource.includes('data-hub-category="videos"') ||
+    !hubSource.includes('data-hub-category="files"') ||
+    !hubSource.includes('data-hub-category="audio"') ||
+    !hubSource.includes('data-hub-category="links"') ||
+    !hubSource.includes('window.openContactInfo=open') ||
+    !hubSource.includes('await refreshPrivatePresence(other)') ||
+    !sources["styles.css"].includes(".private-hub-category-tabs") ||
+    !html.includes("./js/private-chat-hub.js?v=20261107-hub1") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v296")) {
+  errors.push("Private conversation hub must load as the single contact-info surface, expose all shared-content categories, batch signed URLs, and use stable (created_at,id) pagination.");
+}
+
 const privateChatTests = read("tests/private-chat-model.test.mjs");
 const privateOutboxTests = read("tests/private-message-outbox.test.mjs");
 const privateChatWorkflow = read(".github/workflows/validate.yml");
