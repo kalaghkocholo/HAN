@@ -200,7 +200,7 @@
   }
   function normalizeContactPhoto(file){
     return new Promise((resolve,reject)=>{
-      if(!file||!/^image\\/(jpeg|png|webp)$/i.test(file.type)){reject(new Error(tr("فقط تصویر JPG، PNG یا WebP مجاز است.","Choose a JPG, PNG, or WebP image.")));return;}
+      if(!file||!/^image\/(jpeg|png|webp)$/i.test(file.type)){reject(new Error(tr("فقط تصویر JPG، PNG یا WebP مجاز است.","Choose a JPG, PNG, or WebP image.")));return;}
       if(file.size>10*1024*1024){reject(new Error(tr("حجم عکس باید کمتر از ۱۰ مگابایت باشد.","The image must be smaller than 10 MB.")));return;}
       const reader=new FileReader();
       reader.onerror=()=>reject(new Error(tr("خواندن عکس ناموفق بود.","Could not read the image.")));
@@ -209,13 +209,13 @@
         image.onerror=()=>reject(new Error(tr("فایل تصویر معتبر نیست.","This image file is invalid.")));
         image.onload=()=>{
           const max=512,scale=Math.min(1,max/Math.max(image.naturalWidth,image.naturalHeight));
-          const width=Math.max(1,Math.round(image.naturalWidth*scale)),height=Math.max(1,Math.round(image.naturalHeight*scale));
-          const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+          const canvas=document.createElement("canvas");canvas.width=max;canvas.height=max;
           const context=canvas.getContext("2d");
           if(!context){reject(new Error(tr("پردازش تصویر در این دستگاه پشتیبانی نمی‌شود.","Image processing is unavailable on this device.")));return;}
           context.fillStyle="#ffffff";context.fillRect(0,0,width,height);
           const side=Math.min(image.naturalWidth,image.naturalHeight),sx=(image.naturalWidth-side)/2,sy=(image.naturalHeight-side)/2;
           canvas.width=Math.min(max,Math.round(side*scale));canvas.height=canvas.width;
+          context.fillStyle="#ffffff";context.fillRect(0,0,canvas.width,canvas.height);
           context.drawImage(image,sx,sy,side,side,0,0,canvas.width,canvas.height);
           canvas.toBlob(blob=>blob?resolve(blob):reject(new Error(tr("ساخت عکس جدید ناموفق بود.","Could not process the image."))),"image/jpeg",0.86);
         };
