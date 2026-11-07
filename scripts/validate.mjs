@@ -91,7 +91,7 @@ const clientFiles = [
 ];
 const sources = Object.fromEntries(clientFiles.map((path) => [path, read(path)]));
 const hubSource = sources["js/private-chat-hub.js"];
-if (!hubSource.includes("createSignedUrls(paths, 3600)") ||
+if (!hubSource.includes("createSignedUrls(paths,3600)") ||
     !hubSource.includes('order("created_at",{ascending:false}).order("id",{ascending:false})') ||
     !hubSource.includes('data-hub-category="photos"') ||
     !hubSource.includes('data-hub-category="videos"') ||
