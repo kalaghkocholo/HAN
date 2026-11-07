@@ -226,7 +226,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v290"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete5') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-account-delete1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-account-delete1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v291"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete5') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-account-delete1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-account-delete1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -577,12 +577,17 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
 
 const accountDeletionEdge = read("supabase/functions/delete-farnaz-account/index.ts");
 const accountDeletionMigration = read("supabase/migrations/20261107180000_account_deletion_preserve_messages.sql");
+const accountDeletionSessionMigration = read("supabase/migrations/20261107203000_account_deletion_enforce_active_sessions.sql");
 if (!html.includes('id="deleteAccountButton"') ||
     !coreSource.includes("function deleteAccount()") ||
     !coreSource.includes('client.functions.invoke("delete-farnaz-account"') ||
     !coreSource.includes('client.auth.signInWithPassword({email:deletionEmail,password})') ||
+    !coreSource.includes("await window.FarnazLocalStore?.clearUser(deletionUserId)") ||
+    !coreSource.includes("old access token cannot keep using protected app data after revocation") ||
     !sources["styles.css"].includes(".profile-delete-overlay") ||
     !accountDeletionEdge.includes("auth.admin.deleteUser(user.id, false)") ||
+    !accountDeletionEdge.includes('admin.auth.admin.signOut(jwt, "global")') ||
+    !accountDeletionEdge.includes('sessions_revoked: true') ||
     !accountDeletionEdge.includes('auth.getUser(jwt)') ||
     !accountDeletionEdge.includes('farnaz_account_deletion_storage_objects') ||
     !accountDeletionEdge.includes('last_sign_in_at') ||
@@ -591,8 +596,12 @@ if (!html.includes('id="deleteAccountButton"') ||
     !accountDeletionEdge.includes('if ((ownedSpaces ?? []).length > 0)') ||
     !accountDeletionMigration.includes("drop constraint if exists messages_sender_id_fkey") ||
     !accountDeletionMigration.includes("drop constraint if exists space_messages_sender_id_fkey") ||
-    !accountDeletionMigration.includes("grant execute on function public.farnaz_account_deletion_storage_objects(uuid) to service_role")) {
-  errors.push("Account deletion must require recent reauthentication, use the authenticated Edge Function, clean owned Storage objects, and preserve private/group message history.");
+    !accountDeletionMigration.includes("grant execute on function public.farnaz_account_deletion_storage_objects(uuid) to service_role") ||
+    !accountDeletionSessionMigration.includes("private.farnaz_has_active_auth_session") ||
+    !accountDeletionSessionMigration.includes("auth.sessions") ||
+    !accountDeletionSessionMigration.includes("AS RESTRICTIVE") ||
+    !accountDeletionSessionMigration.includes("on storage.objects")) {
+  errors.push("Account deletion must require recent reauthentication, revoke all sessions, reject old access tokens through restrictive RLS policies, clean owned Storage objects, await local cleanup, and preserve private/group message history.");
 }
 
 if (errors.length) {
