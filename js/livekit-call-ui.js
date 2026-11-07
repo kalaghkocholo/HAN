@@ -79,7 +79,24 @@
     return dialog;
   }
 
-  function setAvatar(name, avatarUrl) {\n    const node = byId("farnazLiveKitAvatar");\n    if (!node) return;\n    node.replaceChildren();\n    const url = typeof avatarUrl === "string" && /^https:\\/\\//i.test(avatarUrl) ? avatarUrl : "";\n    if (url) {\n      const image = root.document.createElement("img");\n      image.src = url;\n      image.alt = "";\n      image.referrerPolicy = "no-referrer";\n      image.decoding = "async";\n      node.appendChild(image);\n    } else {\n      node.textContent = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();\n    }\n  }\n\n  function setStatus(message, state) {
+  function setAvatar(name, avatarUrl) {
+    const node = byId("farnazLiveKitAvatar");
+    if (!node) return;
+    node.replaceChildren();
+    const url = typeof avatarUrl === "string" && /^https:\\/\\//i.test(avatarUrl) ? avatarUrl : "";
+    if (url) {
+      const image = root.document.createElement("img");
+      image.src = url;
+      image.alt = "";
+      image.referrerPolicy = "no-referrer";
+      image.decoding = "async";
+      node.appendChild(image);
+    } else {
+      node.textContent = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();
+    }
+  }
+
+  function setStatus(message, state) {
     const node = byId("farnazLiveKitStatus");
     if (node) node.textContent = message;
     const dot = byId("farnazLiveKitDot");
@@ -339,7 +356,8 @@
     if (blocked.data) throw new Error(tr("این مخاطب را مسدود کرده‌ای.", "This contact is blocked."));
     callType = type === "video" ? "video" : "audio";
     const title = currentChatUser.display_name || currentChatUser.name || tr("مخاطب فرناز", "Farnaz contact");
-    show(title, tr("در حال شروع تماس…", "Starting call…"), false);\n    setAvatar(title, currentChatUser.avatar_url);
+    show(title, tr("در حال شروع تماس…", "Starting call…"), false);
+    setAvatar(title, currentChatUser.avatar_url);
     try {
       await controller.start({ peerId: peerId, callType: callType });
     } catch (error) {
