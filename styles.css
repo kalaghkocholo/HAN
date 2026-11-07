@@ -719,6 +719,7 @@ html[dir="ltr"] .app.chat-mode #chatPage .conversation-back-button svg{
 .private-hub-header{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;min-height:58px;margin:0 -4px;padding:8px 0;background:var(--panel);border-bottom:1px solid var(--border)}
 .private-hub-header h2{margin:0;text-align:center;font-size:16px;font-weight:700}
 .private-hub-header-spacer{width:44px}
+.message-search-card .contact-info-close{position:absolute;top:10px;inset-inline-end:12px;width:40px;height:40px;border:0;border-radius:12px;background:var(--panel2);color:inherit;font-size:24px;cursor:pointer}
 .private-hub-back{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:inherit;font-size:22px}
 .private-hub-back:focus-visible,.private-hub-row:focus-visible,.private-hub-category-tabs button:focus-visible,.contact-info-action:focus-visible,.private-hub-load-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .private-hub-identity{text-align:center;padding:8px 0 0}
