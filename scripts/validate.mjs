@@ -112,7 +112,7 @@ if (!html.includes("./js/local-store.js?v=20261107-outbox1") ||
 const privateChatModel = sources["js/private-chat-model.js"];
 const privateChatMenu = sources["js/chat-menu-v5.js"];
 const privateChatModelPosition = html.indexOf("./js/private-chat-model.js?v=20261107-private-chat1");
-const privateChatMenuPosition = html.indexOf("./js/chat-menu-v5.js?v=20261107-private-chat1");
+const privateChatMenuPosition = html.indexOf("./js/chat-menu-v5.js?v=20261107-outbox1");
 if (privateChatModelPosition < 0 || privateChatMenuPosition < 0 || privateChatModelPosition > privateChatMenuPosition) {
   errors.push("index.html must load the private chat model before chat-menu-v5.js");
 }
