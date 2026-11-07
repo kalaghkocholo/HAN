@@ -70,6 +70,21 @@ Deno.serve(async (req: Request) => {
       return respond({ error: "For your security, sign in again before deleting your account." }, 403);
     }
 
+    // Never assign group ownership implicitly during account deletion.
+    // The owner must explicitly resolve every owned space before deletion can proceed.
+    const { data: ownedSpaces, error: spacesError } = await admin
+      .from("spaces")
+      .select("id")
+      .eq("created_by", user.id);
+    if (spacesError) throw new Error("Could not inspect group ownership: " + spacesError.message);
+    if ((ownedSpaces ?? []).length > 0) {
+      return respond({
+        error: "This account still owns one or more groups or channels. Transfer ownership explicitly from each group's management screen before deleting the account.",
+        code: "OWNED_SPACES_REMAIN",
+        owned_space_count: ownedSpaces.length,
+      }, 409);
+    }
+
     // Find every Storage object owned by this user, including group avatars whose paths
     // are based on space IDs rather than user IDs.
     const { data: objects, error: objectsError } = await admin.rpc(
@@ -106,21 +121,6 @@ Deno.serve(async (req: Request) => {
           .eq("avatar_url", object.name);
         if (avatarError) throw new Error("Could not detach a group image: " + avatarError.message);
       }
-    }
-
-    // Never assign group ownership implicitly during account deletion.
-    // The owner must explicitly resolve every owned space before deletion can proceed.
-    const { data: ownedSpaces, error: spacesError } = await admin
-      .from("spaces")
-      .select("id")
-      .eq("created_by", user.id);
-    if (spacesError) throw new Error("Could not inspect group ownership: " + spacesError.message);
-    if ((ownedSpaces ?? []).length > 0) {
-      return respond({
-        error: "This account still owns one or more groups or channels. Transfer ownership explicitly from each group's management screen before deleting the account.",
-        code: "OWNED_SPACES_REMAIN",
-        owned_space_count: ownedSpaces.length,
-      }, 409);
     }
 
     // Delete all files owned by the account. Text messages and their sender IDs remain;
