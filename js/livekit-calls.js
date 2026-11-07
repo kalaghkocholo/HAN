@@ -27,6 +27,21 @@
       catch (error) { console.warn("[Farnaz LiveKit] Event handler failed:", error); }
     }
 
+    function setAudioSessionType(type) {
+      try {
+        const session = typeof navigator !== "undefined" ? navigator.audioSession : null;
+        if (session && "type" in session) session.type = type;
+      } catch (error) {
+        console.warn("[Farnaz LiveKit] Audio session mode unavailable:", error);
+      }
+    }
+
+    function getLocalCameraTrack() {
+      if (!room || !room.localParticipant || !sdk || !sdk.Track || !sdk.Track.Source) return null;
+      const publication = room.localParticipant.getTrackPublication(sdk.Track.Source.Camera);
+      return publication && publication.track ? publication.track : null;
+    }
+
     function assertReady() {
       if (!supabase || !supabase.auth || !supabase.functions) {
         throw new Error("Supabase client is not ready.");
@@ -111,6 +126,9 @@
           .on(events.AudioPlaybackStatusChanged, function () {
             emit("audio-playback-status", { canPlaybackAudio: room ? room.canPlaybackAudio : false });
           })
+          .on(events.ConnectionQualityChanged, function (quality, participant) {
+            emit("connection-quality", { quality: quality, participant: participant || null });
+          })
           .on(events.MediaDevicesError, function (error) {
             emit("media-device-error", { message: String(error && error.message || error || "Media device error") });
           });
@@ -133,9 +151,13 @@
         // Keep media publication explicit. Outgoing callers can join the room silently
         // while ringing, then enable the microphone only after the receiver accepts.
         // Call connect from a user action on iOS when local media should be enabled.
-        if (publishMicrophoneOnConnect) await room.localParticipant.setMicrophoneEnabled(true);
+        if (publishMicrophoneOnConnect) {
+          setAudioSessionType("play-and-record");
+          await room.localParticipant.setMicrophoneEnabled(true);
+        }
         if (callType === "video" && publishCameraOnConnect) {
           await room.localParticipant.setCameraEnabled(true);
+          emit("local-camera-track", { track: getLocalCameraTrack(), enabled: true });
         }
         microphoneEnabled = publishMicrophoneOnConnect;
         cameraEnabled = callType === "video" && publishCameraOnConnect;
@@ -164,6 +186,7 @@
     async function setMicrophoneEnabled(enabled) {
       if (!room || !connected) throw new Error("Not connected to a call.");
       microphoneEnabled = Boolean(enabled);
+      if (microphoneEnabled) setAudioSessionType("play-and-record");
       await room.localParticipant.setMicrophoneEnabled(microphoneEnabled);
       localMediaEnabled = microphoneEnabled || cameraEnabled;
       emit("microphone-changed", { enabled: microphoneEnabled });
@@ -178,6 +201,31 @@
       await room.localParticipant.setCameraEnabled(cameraEnabled);
       localMediaEnabled = microphoneEnabled || cameraEnabled;
       emit("camera-changed", { enabled: cameraEnabled });
+      emit("local-camera-track", { track: getLocalCameraTrack(), enabled: cameraEnabled });
+    }
+
+    async function switchCamera() {
+      if (!room || !connected || callType !== "video") throw new Error("Video camera is not available.");
+      if (typeof room.switchActiveDevice !== "function") throw new Error("Camera switching is not supported by this browser.");
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter(device => device.kind === "videoinput");
+      const currentTrack = getLocalCameraTrack();
+      const currentId = currentTrack && currentTrack.mediaStreamTrack && currentTrack.mediaStreamTrack.getSettings
+        ? currentTrack.mediaStreamTrack.getSettings().deviceId : "";
+      const next = cameras.find(device => device.deviceId && device.deviceId !== currentId);
+      if (!next) throw new Error("No alternate camera is available.");
+      await room.switchActiveDevice("videoinput", next.deviceId, true);
+      emit("camera-device-changed", { deviceId: next.deviceId, label: next.label || "" });
+      emit("local-camera-track", { track: getLocalCameraTrack(), enabled: true });
+      return { deviceId: next.deviceId, label: next.label || "" };
+    }
+
+    async function setAudioOutput(deviceId) {
+      if (!room || !connected) throw new Error("Not connected to a call.");
+      if (typeof room.switchActiveDevice !== "function") throw new Error("Audio output selection is not supported by this browser.");
+      await room.switchActiveDevice("audiooutput", String(deviceId), true);
+      emit("audio-output-changed", { deviceId: String(deviceId) });
+      return true;
     }
 
     async function startAudioPlayback() {
@@ -198,8 +246,14 @@
       cameraEnabled = false;
       if (currentRoom) {
         try { await currentRoom.disconnect(true); }
-        finally { emit("ended"); }
+        finally {
+          setAudioSessionType("playback");
+          setAudioSessionType("auto");
+          emit("ended");
+        }
       } else {
+        setAudioSessionType("playback");
+        setAudioSessionType("auto");
         emit("ended");
       }
     }
@@ -209,6 +263,9 @@
       disconnect: disconnect,
       setMicrophoneEnabled: setMicrophoneEnabled,
       setCameraEnabled: setCameraEnabled,
+      switchCamera: switchCamera,
+      setAudioOutput: setAudioOutput,
+      getLocalCameraTrack: getLocalCameraTrack,
       startAudioPlayback: startAudioPlayback,
       getState: function () {
         return {
