@@ -186,7 +186,11 @@
     byId("farnazLiveKitDialog").classList.toggle("is-audio-call", callType !== "video");
     byId("farnazLiveKitDialog").dataset.callType = callType;
     byId("farnazLiveKitDialog").dataset.callState = incoming ? "incoming" : "outgoing";
-    byId("farnazLiveKitControls").hidden = true;
+    byId("farnazLiveKitControls").hidden = incoming;
+    byId("farnazLiveKitMute").disabled = true;
+    byId("farnazLiveKitAudioRoute").disabled = true;
+    byId("farnazLiveKitCamera").disabled = true;
+    byId("farnazLiveKitFlip").disabled = true;
     byId("farnazLiveKitAccept").hidden = !incoming;
     byId("farnazLiveKitReject").hidden = !incoming;
     byId("farnazLiveKitEnd").hidden = incoming;
@@ -233,6 +237,10 @@
     byId("farnazLiveKitCamera").hidden = callType !== "video";
     byId("farnazLiveKitFlip").hidden = callType !== "video";
     byId("farnazLiveKitUnlockWrap").hidden = true;
+    byId("farnazLiveKitMute").disabled = false;
+    byId("farnazLiveKitAudioRoute").disabled = false;
+    byId("farnazLiveKitCamera").disabled = callType !== "video";
+    byId("farnazLiveKitFlip").disabled = callType !== "video";
     updateControlState();
   }
 
@@ -471,7 +479,7 @@
     if (isIOSBrowser()) {
       // WebKit may resolve setSinkId() without changing the real speaker route
       // for a single remote WebRTC audio track. Never show a false success state.
-      setStatus(tr("در آیفون، خروجی بلندگو یا هدفون را از کنترل پخش صدا در iOS انتخاب کن.", "On iPhone, choose speaker or headphones from the system audio controls."), "connected");
+      setStatus(tr("برای انتخاب بلندگو یا هدفون، هنگام تماس مرکز کنترل آیفون را باز کن و مسیر صدا را از کنترل پخش انتخاب کن. این محدودیت iOS است.", "To choose speaker or headphones, open iPhone Control Center during the call and select the audio route from playback controls. This is an iOS limitation."), "connected");
       return;
     }
     const mediaDevices = root.navigator && root.navigator.mediaDevices;
