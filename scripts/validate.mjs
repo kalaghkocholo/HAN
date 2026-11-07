@@ -578,6 +578,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
 const accountDeletionEdge = read("supabase/functions/delete-farnaz-account/index.ts");
 const accountDeletionMigration = read("supabase/migrations/20261107141239_account_deletion_preserve_messages.sql");
 const accountDeletionSessionMigration = read("supabase/migrations/20261107143219_account_deletion_enforce_active_sessions.sql");
+const accountDeletionRpcMigration = read("supabase/migrations/20261107143748_account_deletion_guard_definer_rpcs.sql");
 if (!html.includes('id="deleteAccountButton"') ||
     !coreSource.includes("function deleteAccount()") ||
     !coreSource.includes('client.functions.invoke("delete-farnaz-account"') ||
@@ -601,7 +602,8 @@ if (!html.includes('id="deleteAccountButton"') ||
     !accountDeletionSessionMigration.includes("private.farnaz_has_active_auth_session") ||
     !accountDeletionSessionMigration.includes("auth.sessions") ||
     !accountDeletionSessionMigration.includes("AS RESTRICTIVE") ||
-    !accountDeletionSessionMigration.includes("on storage.objects")) {
+    !accountDeletionSessionMigration.includes("on storage.objects") ||
+    (accountDeletionRpcMigration.match(/private.farnaz_has_active_auth_session\(\)/g)||[]).length < 17) {
   errors.push("Account deletion must require recent reauthentication, revoke all sessions, reject old access tokens through restrictive RLS policies, clean owned Storage objects, await local cleanup, and preserve private/group message history.");
 }
 
