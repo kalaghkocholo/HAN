@@ -269,7 +269,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v293"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-private-chat1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-private-chat1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v295"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-outbox2') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-outbox2') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-outbox2')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -459,10 +459,11 @@ const authChecks = [
    coreSource.includes("retrying those requests can duplicate messages or side effects."),
     "js/core.js must not automatically replay potentially non-idempotent Supabase POST writes after transport failures"],
   [chatSource.includes('const senderId=String(currentUser.id),receiverId=String(currentChatUser.user_id);') &&
-   chatSource.includes('sender_id:senderId,receiver_id:receiverId') &&
+   chatSource.includes('userId:senderId,receiver_id:receiverId') &&
+   chatSource.includes('sender_id:userId,receiver_id:receiverId') &&
    chatSource.includes('if(String(currentChatUser?.user_id||"")===receiverId){') &&
    chatSource.includes('input.value="";input.style.height="auto";'),
-    "js/chat-menu-v5.js must bind private message writes and composer cleanup to the initiating account/chat"],
+    "js/chat-menu-v5.js must bind queued private message writes and composer cleanup to the initiating account/chat"],
   [chatSource.includes("// Re-check before caching anything so a late response cannot repopulate the") &&
    chatSource.includes("if(request!==chatRequestNumber||currentUser?.id!==myId||String(currentChatUser?.user_id)!==String(contactId))return;"),
     "js/chat-menu-v5.js must discard stale private-message results after the hidden-message read and before caching"],
