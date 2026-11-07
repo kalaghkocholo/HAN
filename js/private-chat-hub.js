@@ -34,6 +34,7 @@
         '<section class="private-hub-section private-hub-destructive"><button type="button" class="private-hub-row is-danger" id="contactInfoDelete"><span><strong>حذف از فهرست گفتگوها</strong><small>فقط برای حساب تو؛ پیام‌های طرف مقابل باقی می‌مانند</small></span><span>›</span></button></section>' +
       '</section>';
     document.body.appendChild(dialog);
+    [$("conversationTitle"),$("chatAvatar")].forEach(node=>{if(!node)return;node.setAttribute("role","button");node.tabIndex=0;node.setAttribute("aria-haspopup","dialog");node.setAttribute("aria-label",tr("اطلاعات مخاطب","Contact information"));});
     $("closeContactInfo").addEventListener("click",close);
     dialog.addEventListener("click",e=>{if(e.target===dialog)close();});
     dialog.addEventListener("keydown",e=>{
