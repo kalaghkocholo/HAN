@@ -110,15 +110,15 @@ if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") |
     !privateChatWorkflow.includes("tests/private-message-outbox.test.mjs")) {
   errors.push("Private messages must be durably queued and fault-injection tested for upload interruption, ambiguous inserts, and intentional duplicate text");
 }
-if (!html.includes("./js/local-store.js?v=20261107-outbox1") ||
-    !html.includes("./js/chat-menu-v5.js?v=20261107-outbox1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v294")) {
+if (!html.includes("./js/local-store.js?v=20261107-outbox2") ||
+    !html.includes("./js/chat-menu-v5.js?v=20261107-outbox2") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v295")) {
   errors.push("App and service worker must reference the durable outbox release assets");
 }
 const privateChatModel = sources["js/private-chat-model.js"];
 const privateChatMenu = sources["js/chat-menu-v5.js"];
 const privateChatModelPosition = html.indexOf("./js/private-chat-model.js?v=20261107-private-chat1");
-const privateChatMenuPosition = html.indexOf("./js/chat-menu-v5.js?v=20261107-outbox1");
+const privateChatMenuPosition = html.indexOf("./js/chat-menu-v5.js?v=20261107-outbox2");
 if (privateChatModelPosition < 0 || privateChatMenuPosition < 0 || privateChatModelPosition > privateChatMenuPosition) {
   errors.push("index.html must load the private chat model before chat-menu-v5.js");
 }
