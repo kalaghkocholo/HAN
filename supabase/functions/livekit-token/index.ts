@@ -131,7 +131,7 @@ Deno.serve(async (req: Request) => {
   if (missingConfiguration.length > 0) {
     // Variable names only; never log secret values or their lengths.
     console.error("LiveKit token endpoint missing configuration variables:", missingConfiguration);
-    return jsonResponse({ error: "Call service is not configured.", missing: missingConfiguration }, 503, origin);
+    return jsonResponse({ error: "Call service is not configured." }, 503, origin);
   }
 
   try {
