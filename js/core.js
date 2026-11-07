@@ -2003,8 +2003,8 @@ async function openContactInfo(){
   $("contactInfoDelete").textContent=contactInfoText("حذف گفتگو","Delete conversation");
   $("closeContactInfo").setAttribute("aria-label",contactInfoText("بستن","Close"));
   const name=currentChatUser.display_name||(english?"Farnaz user":"مخاطب فرناز");
-  $("contactInfoTitle").textContent=name;
-  $("contactInfoAbout").textContent=contactInfoText("گفتگوی خصوصی در فرناز","Private conversation on Farnaz");
+  $("contactInfoTitle").textContent=currentChatUser.is_deleted_account?(english?"Deleted account":"حساب حذف‌شده"):name;
+  $("contactInfoAbout").textContent=currentChatUser.is_deleted_account?contactInfoText("این حساب حذف شده است.","This account has been deleted."):contactInfoText("گفتگوی خصوصی در فرناز","Private conversation on Farnaz");
   $("contactInfoPhone").hidden=true;$("contactInfoPhone").textContent="";
   renderAvatar($("contactInfoAvatar"),currentChatUser.avatar_url||"",name);
   $("contactInfoActions").replaceChildren();$("contactInfoMediaList").replaceChildren();
@@ -2799,7 +2799,7 @@ async function refreshConversationList(){
         if(id&&!importedPhoneNames.has(id)&&String(item.display_name||"").trim())importedPhoneNames.set(id,String(item.display_name).trim());
       }
     }catch(phoneNameError){console.warn("Conversation local contact names:",phoneNameError);}
-    const privateSnapshot=entries.map(c=>{const profile=profilesById.get(String(c.user_id));return {...c,kind:"private",pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:profile||(profilesLoaded?{deleted_account:true}:{})};});
+    const privateSnapshot=entries.map(c=>{const profile=profilesById.get(String(c.user_id));const visibleProfile=profile?.display_name?profile:(profilesLoaded?{deleted_account:true}:(profile||{}));return {...c,kind:"private",pref:prefFor(c.user_id),local_contact_name:String(prefFor(c.user_id).display_name||importedPhoneNames.get(String(c.user_id))||"").trim(),profile:visibleProfile};});
     let spaceSnapshot=[];
     try{spaceSnapshot=await window.FarnazGetUnifiedSpaceInboxSnapshot?.()||[];}catch(spaceInboxError){console.warn("Unified group and channel inbox:",spaceInboxError);setConnectionBanner(english?"Groups and channels could not be refreshed.":"به‌روزرسانی گروه‌ها و کانال‌ها انجام نشد؛ دوباره تلاش می‌کنیم.");}
     if(currentUser?.id!==myId||request!==conversationListRequestNumber)return;
