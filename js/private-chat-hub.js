@@ -234,7 +234,7 @@
       const hiddenResult=page.length?await client.from("message_hidden").select("message_id").eq("user_id",user).in("message_id",page.map(m=>m.id)):{data:[],error:null};
       if(hiddenResult.error)throw hiddenResult.error;
       const pageHidden=new Set((hiddenResult.data||[]).map(row=>String(row.message_id)));
-      const visible=page.filter(m=>!pageHidden.has(String(m.id))&&(kind!=="files"||! /^(image|video|audio)\\//i.test(m.attachment_mime||"")));
+      const visible=page.filter(m=>!pageHidden.has(String(m.id))&&(kind!=="files"||! /^(image|video|audio)\//i.test(m.attachment_mime||"")));
       if(kind==="links")renderLinks(visible,append,other);
       else await renderAttachments(visible,append,token,other);
       if(token!==request||kind!==category)return;
