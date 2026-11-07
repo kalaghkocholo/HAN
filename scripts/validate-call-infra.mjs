@@ -101,7 +101,7 @@ requireCheck(callUi.includes("root.FarnazLiveKitCallUI") &&
   callUi.includes("setSinkId") &&
   callUi.includes("On iPhone, choose speaker or headphones from the system audio controls.") &&
   appHtml.includes("livekit-call-ui.js") &&
-  appHtml.includes("call-ui.css?v=20261107-call-ui1") &&
+  appHtml.includes("call-ui.css?v=20261107-call-ui2") &&
   appHtml.includes('new URLSearchParams(window.location.search).get("livekitPilot") === "1"'),
   "The LiveKit call UI must expose incoming/outgoing, mute, audio playback, and video controls behind the disabled pilot flag.");
 requireCheck(!/FARNAZ_LIVEKIT_CALLS_ENABLED\s*=\s*true/.test(appHtml),
