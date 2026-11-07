@@ -1,7 +1,7 @@
 "use strict";
-const CACHE_NAME="farnaz-shell-v285";
+const CACHE_NAME="farnaz-shell-v286";
 const APP_BASE=new URL("./",self.location.href);
-const SHELL=["./","./index.html","./styles.css?v=20261107-profile-avatar1","./chat-viewport.css?v=20261107-css-cleanup1","./spaces.css?v=20261107-profile-avatar1","./js/local-store.js?v=20261026-3","./js/supabase-sdk.js","./js/core.js?v=20261107-conversation-core2","./js/chat-menu-v5.js?v=20261107-reply-guard1","./js/spaces.js?v=20261107-conversation-spaces3","./js/calls.js?v=20261107-css-cleanup1","./js/livekit-sdk-loader.js?v=20261105-pilot1","./js/livekit-calls.js?v=20261105-pilot2","./js/livekit-call-sessions.js?v=20261105-pilot1","./js/livekit-call-controller.js?v=20261105-pilot1","./js/livekit-call-ui.js?v=20261105-pilot1","./manifest.webmanifest","./farnaz-icon.svg?v=20261024-4"];
+const SHELL=["./","./index.html","./styles.css?v=20261107-account-delete1","./chat-viewport.css?v=20261107-css-cleanup1","./spaces.css?v=20261107-profile-avatar1","./js/local-store.js?v=20261026-3","./js/supabase-sdk.js","./js/core.js?v=20261107-account-delete1","./js/chat-menu-v5.js?v=20261107-account-delete1","./js/spaces.js?v=20261107-account-delete1","./js/calls.js?v=20261107-css-cleanup1","./js/livekit-sdk-loader.js?v=20261105-pilot1","./js/livekit-calls.js?v=20261105-pilot2","./js/livekit-call-sessions.js?v=20261105-pilot1","./js/livekit-call-controller.js?v=20261105-pilot1","./js/livekit-call-ui.js?v=20261105-pilot1","./manifest.webmanifest","./farnaz-icon.svg?v=20261024-4"];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(SHELL.map(path=>new URL(path,APP_BASE).href))).then(()=>self.skipWaiting()));
 });
