@@ -954,7 +954,11 @@ async function flushPrivateOutbox(){
         const {data:blocked,error:blockError}=await client.from("blocked_contacts").select("blocked_user_id")
           .eq("blocker_id",userId).eq("blocked_user_id",receiverId).maybeSingle();
         if(blockError)throw blockError;
-        if(blocked)throw new Error(english?"This contact is blocked. Unblock them to send the queued message.":"این مخاطب مسدود است؛ برای ارسال پیام در صف، ابتدا مسدودسازی را بردار.");
+        if(blocked){
+          if(String(currentChatUser?.user_id||"")===receiverId)
+            setStatus("sendMessageStatus",english?"This queued message is paused because the contact is blocked.":"این پیام در صف متوقف شده چون مخاطب مسدود است.");
+          continue;
+        }
         let attachmentPath=null;
         if(record.file){
           const safeName=(record.attachment_name||"attachment").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-120)||"attachment";
