@@ -968,6 +968,7 @@ async function flushPrivateOutbox(){
             if(!conflict)throw uploadError;
           }
         }
+        if(String(currentUser?.id||"")!==userId)break;
         const row={id:record.id,sender_id:userId,receiver_id:receiverId,body:record.body||null,
           message_type:record.message_type||"text",attachment_path:attachmentPath,
           attachment_name:record.attachment_name||null,attachment_mime:record.attachment_mime||null,
