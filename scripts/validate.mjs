@@ -668,6 +668,24 @@ if (!html.includes('id="deleteAccountButton"') ||
   errors.push("Account deletion must require recent reauthentication, revoke all sessions, reject old access tokens through restrictive RLS policies, clean owned Storage objects, await local cleanup, and preserve private/group message history.");
 }
 
+const localStoreSource=sources["js/local-store.js"];
+if (!localStoreSource.includes("const DB_VERSION=4;") ||
+    !localStoreSource.includes('const STORE_CONTACT_PHOTOS="contactPhotos";') ||
+    !localStoreSource.includes("async function getContactPhoto") ||
+    !localStoreSource.includes("async function saveContactPhoto") ||
+    !localStoreSource.includes("async function removeContactPhoto") ||
+    !localStoreSource.includes("STORE_CONTACT_PHOTOS];") ||
+    !hubSource.includes('id="privateHubAvatarEdit"') ||
+    !hubSource.includes('id="privateHubAvatarFile"') ||
+    !hubSource.includes("function normalizeContactPhoto") ||
+    !hubSource.includes("saveContactPhoto(user,other,blob)") ||
+    !hubSource.includes("visible only to you") ||
+    !sources["styles.css"].includes(".private-hub-avatar-edit") ||
+    !sources["service-worker.js"].includes("farnaz-shell-v297") ||
+    !html.includes("20261107-contact-photo1")) {
+  errors.push("Private chat hub must support account-scoped local contact photos with a camera editor, validated image normalization, logout cleanup, and refreshed asset caches.");
+}
+
 if (errors.length) {
   console.error("Farnaz validation failed:");
   for (const error of errors) console.error("- " + error);
