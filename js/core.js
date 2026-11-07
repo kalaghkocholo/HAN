@@ -1446,9 +1446,9 @@ function showGuest(){
   profileRequestNumber++;
   // Invalidate every in-flight list request before clearing the signed-in UI.
   // Also invalidate private-chat work so a late response cannot repopulate the guest screen.
-  chatRequestNumber++;contactInfoRequest++;messageSearchRequest++;
+  chatRequestNumber++;messageSearchRequest++;
   conversationListRequestNumber++;savedContactsRequestNumber++;unmatchedPhoneContactsRequestNumber++;
-  if(contactInfoDialog)contactInfoDialog.hidden=true;
+  window.closeContactInfo?.();
   if(messageSearchDialog)messageSearchDialog.hidden=true;
   currentUser=null;currentProfileName="";currentAvatarUrl="";currentPhone="";
   currentChatUser=null;
