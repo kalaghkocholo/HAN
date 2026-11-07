@@ -750,6 +750,7 @@ async function subscribeToMessagesNow(){
     }
     if(status!=="SUBSCRIBED")console.warn("Farnaz inbox realtime status:",status,err?.message||err||"No error details provided");
     if(status==="SUBSCRIBED"){
+      flushPrivateOutbox();
       if(!subscriptionSettled){subscriptionSettled=true;clearTimeout(subscriptionTimeout);resolveSubscription();}
       reconnectAttempts=0;
       if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null;}
