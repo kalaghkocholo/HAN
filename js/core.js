@@ -1207,6 +1207,7 @@ function toggleLanguage(){
   updateAuthTexts();
   applySettingsLanguage();
   if(currentUser){refreshConversationList();refreshSavedContacts();}
+  window.dispatchEvent(new CustomEvent("farnaz-language-changed"));
 }
 function renderUser(user,name){
   currentUser=user;currentProfileName=(name||"").trim();
@@ -2122,7 +2123,7 @@ async function toggleContactBlock(){
     if(result.error)throw result.error;
     if(String(currentUser?.id)!==userId||String(currentChatUser?.user_id)!==contactId)return;
     contactInfoBlocked=!contactInfoBlocked;
-    button.textContent=contactInfoBlocked?contactInfoText("رفع مسدودسازی","Unblock contact"):contactInfoText("مسدود کردن مخاطب","Block contact");
+    button.querySelector("strong").textContent=contactInfoBlocked?contactInfoText("رفع مسدودسازی","Unblock contact"):contactInfoText("مسدود کردن مخاطب","Block contact");
     $("chatSubtitle").textContent=contactInfoBlocked?contactInfoText("مخاطب مسدود شده است","Contact blocked"):contactInfoText("گفتگوی خصوصی","Private conversation");
     $("contactInfoStatus").textContent=contactInfoBlocked?contactInfoText("مخاطب مسدود شد؛ پیام و تماس جدید مجاز نیست.","Contact blocked. New messages and calls are disabled."):contactInfoText("مسدودسازی برداشته شد.","Contact unblocked.");
   }catch(error){
