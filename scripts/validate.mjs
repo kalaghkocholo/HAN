@@ -580,7 +580,7 @@ const accountDeletionMigration = read("supabase/migrations/20261107180000_accoun
 if (!html.includes('id="deleteAccountButton"') ||
     !coreSource.includes("function deleteAccount()") ||
     !coreSource.includes('client.functions.invoke("delete-farnaz-account"') ||
-    !coreSource.includes('client.auth.signInWithPassword({email:currentUser.email,password})') ||
+    !coreSource.includes('client.auth.signInWithPassword({email:deletionEmail,password})') ||
     !sources["styles.css"].includes(".profile-delete-overlay") ||
     !accountDeletionEdge.includes("auth.admin.deleteUser(user.id, false)") ||
     !accountDeletionEdge.includes('auth.getUser(jwt)') ||
