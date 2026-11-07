@@ -2142,7 +2142,7 @@ function openChat(contact,fromPage="chatsPage"){
   const switchingContacts=previousContactId!==nextContactId;
   currentChatUser=contact;previousPage=fromPage;
   const deletedContact=!!contact.is_deleted_account;
-  $("messageText").disabled=deletedContact;$("sendMessageButton").disabled=deletedContact;$("attachmentMenuButton").disabled=deletedContact;
+  $("messageText").disabled=deletedContact;$("sendMessageButton").disabled=deletedContact;$("attachmentMenuButton").disabled=deletedContact;$("recordAudioButton").disabled=deletedContact;
   document.querySelectorAll("#chatPage .call-actions button").forEach(button=>button.disabled=deletedContact);
   if(deletedContact)$("attachmentMenu").hidden=true;
   FarnazConversationController.openPrivate(contact.user_id,fromPage);startPrivateTypingChannel(contact.user_id).catch(()=>{});
