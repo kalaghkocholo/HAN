@@ -51,7 +51,7 @@
       if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;
       const tabs=[...$("privateHubCategoryTabs").querySelectorAll("[data-hub-category]")];
       const current=tabs.indexOf(document.activeElement);let next=current;
-      if(e.key==="Home")next=0;else if(e.key==="End")next=tabs.length-1;else next=(current+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+      if(e.key==="Home")next=0;else if(e.key==="End")next=tabs.length-1;else {const forward=document.documentElement.dir==="rtl"?e.key==="ArrowLeft":e.key==="ArrowRight";next=(current+(forward?1:-1)+tabs.length)%tabs.length;}
       e.preventDefault();tabs[next].focus();selectCategory(tabs[next].dataset.hubCategory);
     });
     $("privateHubLoadMore").addEventListener("click",()=>loadPage(true));
