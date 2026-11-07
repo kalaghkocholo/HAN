@@ -5,7 +5,7 @@
   const labels = {photos:["تصاویر","Photos"],videos:["ویدئوها","Videos"],files:["فایل‌ها","Files"],audio:["صوت","Audio"],links:["پیوندها","Links"]};
   const tr = (fa,en) => english ? en : fa;
   const $ = id => document.getElementById(id);
-  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, hiddenIds=new Set(), focusBefore=null;
+  let dialog=null, contactId=null, category="photos", cursor=null, more=false, busy=false, request=0, hiddenIds=new Set(), focusBefore=null, visiblePhone="";
 
   function ensure(){
     if(dialog && dialog.isConnected) return dialog;
@@ -26,11 +26,11 @@
             '<button type="button" role="tab" data-hub-category="photos" aria-selected="true">تصاویر</button><button type="button" role="tab" data-hub-category="videos" aria-selected="false">ویدئوها</button><button type="button" role="tab" data-hub-category="files" aria-selected="false">فایل‌ها</button><button type="button" role="tab" data-hub-category="audio" aria-selected="false">صوت</button><button type="button" role="tab" data-hub-category="links" aria-selected="false">پیوندها</button>' +
           '</div><p id="contactInfoMediaStatus" class="muted-note private-hub-media-status" role="status" aria-live="polite"></p><div id="contactInfoMediaList" class="contact-info-media-list private-hub-media-list"></div><button type="button" id="privateHubLoadMore" class="private-hub-load-more" hidden>موارد قدیمی‌تر</button>' +
         '</section>' +
-        '<section class="private-hub-section private-hub-management"><h3>مدیریت گفتگو</h3>' +
+        '<section class="private-hub-section private-hub-management"><h3 id="privateHubManagementTitle">مدیریت گفتگو</h3>' +
           '<button type="button" class="private-hub-row" id="privateHubRename"><span><strong>تغییر نام مخاطب</strong><small>نام دلخواه فقط برای خودت</small></span><span>›</span></button>' +
           '<button type="button" class="private-hub-row" id="privateHubArchive"><span><strong>بایگانی گفتگو</strong><small>پیام‌ها حذف نمی‌شوند</small></span><span>›</span></button>' +
         '</section>' +
-        '<section class="private-hub-section"><h3>امنیت و حریم خصوصی</h3><button type="button" class="private-hub-row" id="contactInfoBlock"><span><strong>مسدودسازی مخاطب</strong><small>پیام و تماس جدید متوقف می‌شود</small></span><span>›</span></button><p id="contactInfoStatus" class="status muted-note" role="status" aria-live="polite"></p></section>' +
+        '<section class="private-hub-section"><h3 id="privateHubSafetyTitle">امنیت و حریم خصوصی</h3><button type="button" class="private-hub-row" id="contactInfoBlock"><span><strong>مسدودسازی مخاطب</strong><small>پیام و تماس جدید متوقف می‌شود</small></span><span>›</span></button><p id="contactInfoStatus" class="status muted-note" role="status" aria-live="polite"></p></section>' +
         '<section class="private-hub-section private-hub-destructive"><button type="button" class="private-hub-row is-danger" id="contactInfoDelete"><span><strong>حذف از فهرست گفتگوها</strong><small>فقط برای حساب تو؛ پیام‌های طرف مقابل باقی می‌مانند</small></span><span>›</span></button></section>' +
       '</section>';
     document.body.appendChild(dialog);
@@ -73,7 +73,7 @@
     };
     const b=document.createElement("button");b.type="button";b.className="contact-info-action";
     const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox","0 0 24 24");svg.setAttribute("aria-hidden","true");svg.innerHTML=paths[icon];
-    const text=document.createElement("span");text.textContent=label;b.append(svg,text);b.addEventListener("click",handler);$("contactInfoActions").appendChild(b);
+    b.dataset.hubAction=icon;const text=document.createElement("span");text.textContent=label;b.append(svg,text);b.addEventListener("click",handler);$("contactInfoActions").appendChild(b);
   }
 
   function applyLanguage(){
@@ -82,13 +82,11 @@
     $("closeContactInfo").setAttribute("aria-label",tr("بازگشت","Back"));
     $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
     $("contactInfoMediaTitle").textContent=tr("محتوای مشترک","Shared content");
-    $("privateHubManagementTitle")?.remove();
-    const management=$("privateHubRename").closest(".private-hub-section");
-    management.querySelector("h3").textContent=tr("مدیریت گفتگو","Conversation management");
+    $("privateHubManagementTitle").textContent=tr("مدیریت گفتگو","Conversation management");
     $("privateHubRename").querySelector("strong").textContent=tr("تغییر نام مخاطب","Rename contact");
     $("privateHubRename").querySelector("small").textContent=tr("نام دلخواه فقط برای خودت","A name visible only to you");
     $("privateHubArchive").querySelector("small").textContent=tr("پیام‌ها حذف نمی‌شوند","Messages are not deleted");
-    $("privateHubSafetyTitle")?.remove();
+    $("privateHubSafetyTitle").textContent=tr("امنیت و حریم خصوصی","Safety and privacy");
     $("contactInfoBlock").querySelector("strong").textContent=tr("مسدودسازی مخاطب","Block contact");
     $("contactInfoBlock").querySelector("small").textContent=tr("پیام و تماس جدید متوقف می‌شود","Stops new messages and calls");
     $("contactInfoDelete").querySelector("strong").textContent=tr("حذف از فهرست گفتگوها","Remove conversation");
@@ -124,7 +122,7 @@
     $("contactInfoTitle").textContent=currentChatUser.is_deleted_account?tr("حساب حذف‌شده","Deleted account"):name;
     $("contactInfoAbout").textContent=currentChatUser.is_deleted_account?tr("این حساب حذف شده است.","This account has been deleted."):tr("گفتگوی خصوصی در فرناز","Private conversation on Farnaz");
     $("contactInfoPresence").textContent=tr("در حال بررسی وضعیت…","Checking status…");
-    $("contactInfoPhone").hidden=true;$("contactInfoPhone").textContent="";
+    visiblePhone="";$("contactInfoPhone").hidden=true;$("contactInfoPhone").textContent="";
     $("contactInfoActions").replaceChildren();$("contactInfoMediaList").replaceChildren();
     $("contactInfoMediaStatus").textContent=tr("در حال بارگذاری…","Loading…");$("contactInfoStatus").textContent="";
     $("contactInfoBlock").disabled=true;$("contactInfoDelete").disabled=false;$("privateHubRename").disabled=!!currentChatUser.is_deleted_account;
@@ -151,6 +149,7 @@
         if(profile.avatar_url)renderAvatar($("contactInfoAvatar"),profile.avatar_url,alias||profile.display_name);
       }
       if(profile?.phone){
+        visiblePhone=profile.phone;
         $("contactInfoPhone").textContent=(english?"Phone: ":"شماره تلفن: ")+formatContactPhone(profile.phone);
         $("contactInfoPhone").dir="ltr";$("contactInfoPhone").hidden=false;
       }
