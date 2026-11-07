@@ -104,7 +104,7 @@ if (!sources["service-worker.js"].includes("./js/private-chat-model.js?v=2026110
 if (!privateChatMenu.includes("PrivateChatModel.olderCursorFilter") || !privateChatMenu.includes("sent=sent.or(cursorFilter)") || !privateChatMenu.includes("received=received.or(cursorFilter)")) {
   errors.push("Private chat history must use the tested compound keyset cursor in both directions");
 }
-if (!privateChatTests.includes("timestamp collisions") || !privateChatWorkflow.includes("tests/private-chat-model.test.mjs")) {
+if (!privateChatTests.includes("equal-timestamp") || !privateChatWorkflow.includes("tests/private-chat-model.test.mjs")) {
   errors.push("Private chat pagination tests must be present and run in CI");
 }
 
@@ -245,7 +245,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v292"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-account-delete1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-account-delete1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v293"') || !sources["service-worker.js"].includes('styles.css?v=20261107-account-delete1') || !sources["service-worker.js"].includes('core.js?v=20261107-account-delete7-language1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261026-3') || !sources["service-worker.js"].includes('calls.js?v=20261107-css-cleanup1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-private-chat1') || !html.includes('calls.js?v=20261107-css-cleanup1') || !html.includes('chat-menu-v5.js?v=20261107-private-chat1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
