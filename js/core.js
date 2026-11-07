@@ -1949,9 +1949,11 @@ async function openContactInfo(){
   $("contactInfoBlock").textContent=contactInfoText("در حال بررسی…","Checking…");
   contactInfoBlocked=false;contactInfoDialog.hidden=false;
   addContactInfoAction(contactInfoText("پیام","Message"),"✉",closeContactInfo);
-  addContactInfoAction(contactInfoText("ویرایش نام مخاطب","Edit contact name"),"✎",renameCurrentContact);
-  addContactInfoAction(contactInfoText("تماس صوتی","Audio call"),"#chatPage .call-actions button[onclick=\"startCall('audio')\"] svg",()=>{closeContactInfo();startCall("audio");});
-  addContactInfoAction(contactInfoText("تماس تصویری","Video call"),"#chatPage .call-actions button[onclick=\"startCall('video')\"] svg",()=>{closeContactInfo();startCall("video");});
+  if(!currentChatUser.is_deleted_account){
+    addContactInfoAction(contactInfoText("ویرایش نام مخاطب","Edit contact name"),"✎",renameCurrentContact);
+    addContactInfoAction(contactInfoText("تماس صوتی","Audio call"),"#chatPage .call-actions button[onclick=\"startCall('audio')\"] svg",()=>{closeContactInfo();startCall("audio");});
+    addContactInfoAction(contactInfoText("تماس تصویری","Video call"),"#chatPage .call-actions button[onclick=\"startCall('video')\"] svg",()=>{closeContactInfo();startCall("video");});
+  }
   addContactInfoAction(contactInfoText("جست‌وجو در گفتگو","Search chat"),"⌕",searchCurrentConversation);
   try{
     const client=getClient();
@@ -1960,6 +1962,10 @@ async function openContactInfo(){
       client.from("blocked_contacts").select("blocked_user_id").eq("blocker_id",currentUser.id).eq("blocked_user_id",contactId).maybeSingle()
     ]);
     if(request!==contactInfoRequest||String(currentChatUser?.user_id)!==String(contactId))return;
+    if(!profileResult&&currentChatUser.is_deleted_account){
+      $("contactInfoTitle").textContent=english?"Deleted account":"حساب حذف‌شده";
+      $("contactInfoAbout").textContent=english?"This account has been deleted.":"این حساب حذف شده است.";
+    }
     if(profileResult?.display_name){
       $("contactInfoTitle").textContent=profileResult.display_name;
       const profileDetails=[profileResult.username?"@"+profileResult.username:"",profileResult.about||contactInfoText("عضو فرناز","Farnaz member")].filter(Boolean);
