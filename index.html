@@ -29,7 +29,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 
 </style>
 
-<link rel="stylesheet" href="./styles.css?v=20261107-viewport1">
+<link rel="stylesheet" href="./styles.css?v=20261108-inbox-search1">
 <link rel="stylesheet" href="./spaces.css?v=20261107-profile-avatar1" media="print" onload="this.onload=null;this.media='all'">
 <link rel="stylesheet" href="./chat-viewport.css?v=20261107-viewport1">
 <link rel="stylesheet" href="./call-ui.css?v=20261108-iphone-call5">
@@ -40,8 +40,8 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 
 <!-- صفحه گفتگوها -->
 <section class="page" id="chatsPage">
-  <div class="chats-topline"><div class="page-heading"><h2 id="chatsHeading">گفتگوها</h2><p id="chatsIntro">گفتگوهای اخیرت را اینجا می‌بینی.</p></div><button class="chats-new-button" type="button" onclick="openComposeMenu()" aria-label="پیام جدید" title="پیام جدید"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15M8 7h7M8 10h5M14.5 16.5 20 11l2 2-5.5 5.5-3 .8z"/></svg></button></div>
-  <label class="conversation-search" for="conversationSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="conversationSearch" type="search" autocomplete="off" placeholder="جستجوی گفتگوها" aria-label="جستجوی گفتگوها"></label>
+  <div class="chats-topline"><button class="chats-new-button" id="topNewChatButton" type="button" onclick="openComposeMenu()" aria-label="پیام جدید" title="پیام جدید"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15M8 7h7M8 10h5M14.5 16.5 20 11l2 2-5.5 5.5-3 .8z"/></svg></button><button class="chats-search-button" id="toggleConversationSearch" type="button" aria-label="جستجوی گفتگوها" title="جستجوی گفتگوها" aria-expanded="false" aria-controls="conversationSearchPanel"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button></div>
+  <div class="conversation-search-panel" id="conversationSearchPanel" hidden><label class="conversation-search" for="conversationSearch"><input id="conversationSearch" type="search" autocomplete="off" placeholder="جستجوی گفتگوها" aria-label="جستجوی گفتگوها"></label></div>
   <div class="conversation-tools"><button class="mini-button" id="showActiveChats" type="button" onclick="setConversationView('active')">گفتگوها</button><button class="mini-button" id="showArchivedChats" type="button" onclick="setConversationView('archived')">آرشیو</button></div>
   <div class="contacts-category-tabs inbox-type-filters" role="group" aria-label="فیلتر نوع گفتگو"><button class="contacts-category-tab is-active" type="button" data-inbox-filter="all" aria-pressed="true">همه</button><button class="contacts-category-tab" type="button" data-inbox-filter="private" aria-pressed="false">خصوصی</button><button class="contacts-category-tab" type="button" data-inbox-filter="group" aria-pressed="false">گروه‌ها</button><button class="contacts-category-tab" type="button" data-inbox-filter="channel" aria-pressed="false">کانال‌ها</button></div>
   <div class="list" id="conversationList"></div>
