@@ -588,6 +588,7 @@ if (!html.includes('id="deleteAccountButton"') ||
     !accountDeletionEdge.includes("auth.admin.deleteUser(user.id, false)") ||
     !accountDeletionEdge.includes('admin.auth.admin.signOut(jwt, "global")') ||
     !accountDeletionEdge.includes('sessions_revoked: true') ||
+    !accountDeletionEdge.includes('The deletion process did not finish. If your session was revoked, sign in again and retry.') ||
     !accountDeletionEdge.includes('auth.getUser(jwt)') ||
     !accountDeletionEdge.includes('farnaz_account_deletion_storage_objects') ||
     !accountDeletionEdge.includes('last_sign_in_at') ||
