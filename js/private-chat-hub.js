@@ -18,7 +18,7 @@
     dialog.setAttribute("aria-labelledby","privateHubHeading");
     dialog.innerHTML =
       '<section class="contact-info-card private-hub-sheet">' +
-        '<header class="private-hub-header"><button type="button" class="private-hub-back" id="closeContactInfo" aria-label="بستن">←</button><h2 id="privateHubHeading">اطلاعات گفتگو</h2><span></span></header>' +
+        '<header class="private-hub-header"><button type="button" class="private-hub-back" id="closeContactInfo" aria-label="بستن"><span id="privateHubBackGlyph">→</span></button><h2 id="privateHubHeading">اطلاعات گفتگو</h2><span></span></header>' +
         '<section class="private-hub-identity"><div class="contact-info-avatar avatar large" id="contactInfoAvatar">F</div><h3 id="contactInfoTitle"></h3><p id="contactInfoAbout" class="muted-note"></p><p id="contactInfoPresence" class="private-hub-presence" role="status"></p><div id="contactInfoPhone" class="contact-info-phone" hidden></div></section>' +
         '<div class="contact-info-actions private-hub-actions" id="contactInfoActions" aria-label="اقدام‌های گفتگو"></div>' +
         '<section class="private-hub-section"><h3 id="contactInfoMediaTitle">محتوای مشترک</h3>' +
@@ -76,6 +76,28 @@
     const text=document.createElement("span");text.textContent=label;b.append(svg,text);b.addEventListener("click",handler);$("contactInfoActions").appendChild(b);
   }
 
+  function applyLanguage(){
+    $("privateHubBackGlyph").textContent=english?"←":"→";
+    $("closeContactInfo").setAttribute("aria-label",tr("بازگشت","Back"));
+    $("privateHubHeading").textContent=tr("اطلاعات گفتگو","Conversation info");
+    $("contactInfoMediaTitle").textContent=tr("محتوای مشترک","Shared content");
+    $("privateHubManagementTitle")?.remove();
+    const management=$("privateHubRename").closest(".private-hub-section");
+    management.querySelector("h3").textContent=tr("مدیریت گفتگو","Conversation management");
+    $("privateHubRename").querySelector("strong").textContent=tr("تغییر نام مخاطب","Rename contact");
+    $("privateHubRename").querySelector("small").textContent=tr("نام دلخواه فقط برای خودت","A name visible only to you");
+    $("privateHubArchive").querySelector("small").textContent=tr("پیام‌ها حذف نمی‌شوند","Messages are not deleted");
+    $("privateHubSafetyTitle")?.remove();
+    $("contactInfoBlock").querySelector("strong").textContent=tr("مسدودسازی مخاطب","Block contact");
+    $("contactInfoBlock").querySelector("small").textContent=tr("پیام و تماس جدید متوقف می‌شود","Stops new messages and calls");
+    $("contactInfoDelete").querySelector("strong").textContent=tr("حذف از فهرست گفتگوها","Remove conversation");
+    $("contactInfoDelete").querySelector("small").textContent=tr("فقط برای حساب تو؛ پیام‌های طرف مقابل باقی می‌مانند","Only for your account; the other person keeps their messages");
+    const tabLabels={photos:tr("تصاویر","Photos"),videos:tr("ویدئوها","Videos"),files:tr("فایل‌ها","Files"),audio:tr("صوت","Audio"),links:tr("پیوندها","Links")};
+    $("privateHubCategoryTabs").querySelectorAll("[data-hub-category]").forEach(b=>b.textContent=tabLabels[b.dataset.hubCategory]);
+  }
+
+  window.addEventListener("farnaz-language-changed",applyLanguage);
+
   function syncTabs(){
     $("privateHubCategoryTabs").querySelectorAll("[data-hub-category]").forEach(b=>{
       const active=b.dataset.hubCategory===category;b.setAttribute("aria-selected",String(active));b.tabIndex=active?0:-1;
@@ -105,26 +127,26 @@
       action(tr("تماس تصویری","Video call"),"video",()=>{close();startCall("video");});
     }
     action(tr("جست‌وجو","Search"),"search",()=>searchCurrentConversation());
-    syncTabs();updateArchiveLabel();
+    applyLanguage();syncTabs();updateArchiveLabel();
     try{
       const client=getClient();
-      const [profile,blocked,hidden]=await Promise.all([
+      const [profile,blocked]=await Promise.all([
         getContactProfile(other),
-        client.from("blocked_contacts").select("blocked_user_id").eq("blocker_id",user).eq("blocked_user_id",other).maybeSingle(),
-        client.from("message_hidden").select("message_id").eq("user_id",user)
+        client.from("blocked_contacts").select("blocked_user_id").eq("blocker_id",user).eq("blocked_user_id",other).maybeSingle()
       ]);
       if(token!==request||String(currentUser?.id)!==user||String(currentChatUser?.user_id)!==other)return;
       if(profile?.display_name){
-        $("contactInfoTitle").textContent=profile.display_name;
-        $("contactInfoAbout").textContent=[profile.username?"@"+profile.username:"",profile.about||tr("عضو فرناز","Farnaz member")].filter(Boolean).join(" · ");
-        if(profile.avatar_url)renderAvatar($("contactInfoAvatar"),profile.avatar_url,profile.display_name);
+        const alias=String(prefFor(other).display_name||"").trim();
+        $("contactInfoTitle").textContent=alias||profile.display_name;
+        $("contactInfoAbout").textContent=[alias?profile.display_name:"",profile.username?"@"+profile.username:"",profile.about||tr("عضو فرناز","Farnaz member")].filter(Boolean).join(" · ");
+        if(profile.avatar_url)renderAvatar($("contactInfoAvatar"),profile.avatar_url,alias||profile.display_name);
       }
       if(profile?.phone){
         $("contactInfoPhone").textContent=(english?"Phone: ":"شماره تلفن: ")+formatContactPhone(profile.phone);
         $("contactInfoPhone").dir="ltr";$("contactInfoPhone").hidden=false;
       }
-      if(blocked.error)throw blocked.error;if(hidden.error)throw hidden.error;
-      contactInfoBlocked=!!blocked.data;hiddenIds=new Set((hidden.data||[]).map(x=>String(x.message_id)));
+      if(blocked.error)throw blocked.error;
+      contactInfoBlocked=!!blocked.data;
       $("contactInfoBlock").querySelector("strong").textContent=contactInfoBlocked?tr("رفع مسدودسازی","Unblock contact"):tr("مسدودسازی مخاطب","Block contact");
       $("contactInfoBlock").disabled=!!currentChatUser.is_deleted_account;
       await refreshPrivatePresence(other);
@@ -188,9 +210,12 @@
       for(const r of results)if(r.error)throw r.error;
       const unique=new Map();for(const r of results)for(const m of r.data||[])unique.set(String(m.id),m);
       const ordered=[...unique.values()].sort(newestFirst),page=ordered.slice(0,PAGE);
-      more=results.some(r=>(r.data||[]).length===PAGE);
+      more=ordered.length>PAGE||results.some(r=>(r.data||[]).length===PAGE);
       if(page.length)cursor=page[page.length-1];
-      const visible=page.filter(m=>!hiddenIds.has(String(m.id)));
+      const hiddenResult=page.length?await client.from("message_hidden").select("message_id").eq("user_id",user).in("message_id",page.map(m=>m.id)):{data:[],error:null};
+      if(hiddenResult.error)throw hiddenResult.error;
+      const pageHidden=new Set((hiddenResult.data||[]).map(row=>String(row.message_id)));
+      const visible=page.filter(m=>!pageHidden.has(String(m.id)));
       if(kind==="links")renderLinks(visible,append,other);
       else await renderAttachments(visible,append,token,other);
       if(token!==request||kind!==category)return;
