@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="./farnaz-icon.svg?v=20261024-4">
 <meta name="description" content="فرناز؛ ارتباطی نزدیک‌تر، در هر کجا.">
 <title>فرناز | Farnaz</title>
-<link rel="preload" href="./js/core.js?v=20261107-account-delete7-language1" as="script">
+<link rel="preload" href="./js/core.js?v=20261107-viewport1" as="script">
 <link rel="preconnect" href="https://iemykhluluoymsbqpjsn.supabase.co" crossorigin>
 <style>
 :root{--bg:#101828;--panel:#172237;--panel2:#1d2b42;--border:#2b3a50;--mint:#50e3c2;--muted:#aab5c7;--white:#f8fafc}
@@ -29,9 +29,9 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
 
 </style>
 
-<link rel="stylesheet" href="./styles.css?v=20261107-private-hub-photo1">
+<link rel="stylesheet" href="./styles.css?v=20261107-viewport1">
 <link rel="stylesheet" href="./spaces.css?v=20261107-profile-avatar1" media="print" onload="this.onload=null;this.media='all'">
-<link rel="stylesheet" href="./chat-viewport.css?v=20261107-css-cleanup1">
+<link rel="stylesheet" href="./chat-viewport.css?v=20261107-viewport1">
 </head>
 <body data-auth-state="guest">
 <main class="app">
@@ -309,9 +309,9 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
   <div class="conversation-tools" id="selectionToolbar"><span class="muted-note" id="selectedCount">۰ پیام انتخاب شده</span><button class="mini-button" type="button" onclick="replyToSelected()">پاسخ</button><button class="mini-button" type="button" onclick="forwardSelectedMessages()">فوروارد</button><button class="mini-button danger" type="button" onclick="deleteSelectedMessages()">حذف</button><button class="mini-button" type="button" onclick="exitMessageSelection()">لغو</button></div>
   <button class="mini-button" id="loadOlderButton" type="button" onclick="loadOlderMessages()" hidden>پیام‌های قدیمی‌تر</button>
   <div id="messageList" class="conversation-message-list" role="log" aria-live="polite" aria-label="پیام‌های گفتگو"></div>
-  <div id="replyPreview" class="message-quote" hidden></div>
-  <form id="sendMessageForm" class="conversation-composer">
+    <form id="sendMessageForm" class="conversation-composer">
     <div class="composer-shell conversation-composer-shell">
+      <div id="replyPreview" class="message-quote composer-reply-preview" hidden></div>
       <div class="voice-preview" id="voicePreview" hidden>
         <div class="voice-preview-heading"><span id="voicePreviewLabel">پیام صوتی آماده ارسال</span><button class="voice-preview-remove" id="removeVoicePreview" type="button" onclick="discardRecordedVoice()" aria-label="حذف صدای ضبط‌شده">×</button></div>
         <audio id="voicePreviewPlayer" controls preload="metadata"></audio>
@@ -512,6 +512,7 @@ header{display:flex;align-items:center;gap:10px;min-height:48px;margin:4px 0 17p
         return;
       }
       const featureScripts=[
+        "./js/chat-viewport-controller.js?v=20261107-viewport1",
         "./js/private-chat-model.js?v=20261107-private-chat1",
         "./js/private-chat-hub.js?v=20261107-contact-photo1",
         "./js/chat-menu-v5.js?v=20261107-outbox2",
