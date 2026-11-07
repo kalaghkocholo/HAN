@@ -577,7 +577,7 @@ if (!html.includes('id="allowSpaceAdditionsSetting"') ||
 
 const accountDeletionEdge = read("supabase/functions/delete-farnaz-account/index.ts");
 const accountDeletionMigration = read("supabase/migrations/20261107180000_account_deletion_preserve_messages.sql");
-const accountDeletionSessionMigration = read("supabase/migrations/20261107203000_account_deletion_enforce_active_sessions.sql");
+const accountDeletionSessionMigration = read("supabase/migrations/20261107143219_account_deletion_enforce_active_sessions.sql");
 if (!html.includes('id="deleteAccountButton"') ||
     !coreSource.includes("function deleteAccount()") ||
     !coreSource.includes('client.functions.invoke("delete-farnaz-account"') ||
