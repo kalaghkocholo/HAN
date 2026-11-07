@@ -1261,6 +1261,7 @@ async function signOutOtherSessions(){
 
 function deleteAccount(){
   if(!currentUser||!currentUser.email)return;
+  const deletionUserId=String(currentUser.id),deletionEmail=String(currentUser.email);
   document.getElementById("accountDeleteDialog")?.remove();
   const modal=document.createElement("div");
   modal.id="accountDeleteDialog";modal.className="profile-delete-overlay";
@@ -1294,17 +1295,21 @@ function deleteAccount(){
       byId("accountDeleteStatus").textContent=english?'The confirmation text does not match.':'عبارت تأیید درست نیست.';
       return;
     }
-    const accountId=String(currentUser?.id||"");
+    const accountId=deletionUserId;
     const submit=byId("accountDeleteSubmit"),cancel=byId("accountDeleteCancel"),closeButton=byId("accountDeleteClose");
     submit.disabled=true;cancel.disabled=true;closeButton.disabled=true;
     byId("accountDeleteStatus").textContent=english?"Verifying your password and deleting account…":"در حال تأیید رمز عبور و حذف حساب…";
     try{
       const client=getClient();
       if(password.trim()){
-        const {data:reauth,error:reauthError}=await client.auth.signInWithPassword({email:currentUser.email,password});
+        const {data:reauth,error:reauthError}=await client.auth.signInWithPassword({email:deletionEmail,password});
         if(reauthError)throw new Error(english?"The password is incorrect.":"رمز عبور صحیح نیست.");
         if(String(reauth?.user?.id||"")!==accountId)throw new Error(english?"The account could not be verified.":"هویت حساب تأیید نشد.");
       }
+      if(String(currentUser?.id||"")!==deletionUserId)throw new Error(english?"The signed-in account changed. Close this dialog and try again.":"حساب واردشده تغییر کرده است؛ پنجره را ببند و دوباره تلاش کن.");
+      const {data:sessionData,error:sessionError}=await client.auth.getSession();
+      if(sessionError)throw sessionError;
+      if(String(sessionData?.session?.user?.id||"")!==deletionUserId)throw new Error(english?"The current session belongs to a different account.":"نشست فعلی متعلق به حساب دیگری است.");
       const {data:result,error:functionError}=await client.functions.invoke("delete-farnaz-account",{body:{confirmation:"DELETE"}});
       if(functionError){
         let detail=functionError.message||"";
