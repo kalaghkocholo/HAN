@@ -1271,8 +1271,8 @@ function deleteAccount(){
   const byId=id=>modal.querySelector("#"+id);
   byId("accountDeleteTitle").textContent=english?"Delete account permanently":"حذف دائمی حساب کاربری";
   byId("accountDeleteWarning").textContent=english
-    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. To prevent unintended privilege changes, account deletion is blocked until you explicitly resolve ownership of every group and channel you manage. Other sessions are revoked, but an access token already issued may remain valid until it expires. If you use Google, leave the password blank only if you signed in within the last 10 minutes."
-    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. برای جلوگیری از واگذاری ناخواستهٔ مدیریت، تا زمانی که مالکیت گروه‌ها و کانال‌های تحت مدیریت خود را به‌صورت آگاهانه تعیین تکلیف نکرده‌اید، حذف حساب انجام نمی‌شود. نشست‌های دیگر باطل می‌شوند، اما توکن دسترسی صادرشده ممکن است تا زمان انقضای خودش اعتبار داشته باشد. اگر با گوگل وارد شده‌اید، فقط در صورتی رمز را خالی بگذارید که در ۱۰ دقیقهٔ اخیر وارد حساب شده باشید.";
+    ?"This action cannot be undone. Your profile, contacts, and files will be removed. Your previous message text will remain in other people's conversations as “Deleted account”. Attachments you uploaded will be removed. To prevent unintended privilege changes, account deletion is blocked until you explicitly resolve ownership of every group and channel you manage. All sessions are revoked. Protected database and file requests also verify the active session, so an old access token cannot keep using protected app data after revocation. If you use Google, leave the password blank only if you signed in within the last 10 minutes."
+    :"این کار برگشت‌پذیر نیست. پروفایل، مخاطبان و فایل‌های شما حذف می‌شوند. متن پیام‌های قبلی در گفتگوهای دیگران با عنوان «حساب حذف‌شده» باقی می‌ماند؛ فایل‌های پیوست شما پاک می‌شوند. برای جلوگیری از واگذاری ناخواستهٔ مدیریت، تا زمانی که مالکیت گروه‌ها و کانال‌های تحت مدیریت خود را به‌صورت آگاهانه تعیین تکلیف نکرده‌اید، حذف حساب انجام نمی‌شود. همهٔ نشست‌ها باطل می‌شوند و درخواست‌های محافظت‌شدهٔ پایگاه داده و فایل نیز اعتبار نشست را بررسی می‌کنند؛ بنابراین توکن قدیمی پس از ابطال نشست نمی‌تواند به داده‌های محافظت‌شدهٔ برنامه دسترسی داشته باشد. اگر با گوگل وارد شده‌اید، فقط در صورتی رمز را خالی بگذارید که در ۱۰ دقیقهٔ اخیر وارد حساب شده باشید.";
   byId("accountDeleteEmail").textContent=currentUser.email;
   byId("accountDeletePasswordLabel").textContent=english?"Password (optional if you just signed in with Google)":"رمز عبور (در ورود با گوگل، اگر اخیراً وارد شده‌اید اختیاری است)";
   byId("accountDeletePhraseLabel").textContent=english?'Type "DELETE ACCOUNT" to continue':'برای ادامه عبارت «حذف حساب» را وارد کنید';
@@ -1318,10 +1318,20 @@ function deleteAccount(){
       }
       if(!result?.success)throw new Error(result?.error||(english?"Account deletion was not confirmed.":"حذف حساب تأیید نشد."));
       modal.remove();
+      let localCleanupConfirmed=true;
+      try{
+        const cleanupResult=await window.FarnazLocalStore?.clearUser(deletionUserId);
+        localCleanupConfirmed=cleanupResult!==false;
+      }catch(cleanupError){
+        localCleanupConfirmed=false;
+        console.warn("Account was deleted, but local cache cleanup needs another attempt:",cleanupError);
+      }
       try{await client.auth.signOut({scope:"local"});}catch(_){}
       try{localStorage.removeItem("sb-iemykhluluoymsbqpjsn-auth-token");}catch(_){}
       showGuest();
-      window.alert(english?"Your Farnaz account has been permanently deleted.":"حساب فرناز شما به‌طور دائمی حذف شد.");
+      window.alert(localCleanupConfirmed
+        ?(english?"Your Farnaz account has been permanently deleted.":"حساب فرناز شما به‌طور دائمی حذف شد.")
+        :(english?"Your account was deleted, but this device could not confirm that all local cached data was cleared. Reopen the app online to retry cleanup.":"حساب شما حذف شد، اما پاک‌سازی کامل داده‌های ذخیره‌شده روی این دستگاه تأیید نشد. برنامه را با اینترنت دوباره باز کنید تا پاک‌سازی تکرار شود."));
     }catch(error){
       byId("accountDeleteStatus").textContent=(english?"Could not delete account: ":"حذف حساب ناموفق بود: ")+(error?.message||String(error));
       submit.disabled=false;cancel.disabled=false;closeButton.disabled=false;
