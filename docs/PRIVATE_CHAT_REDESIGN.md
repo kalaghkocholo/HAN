@@ -210,3 +210,14 @@ Verification scope and limitations:
 - Added fault-injection tests that execute the production retry function against controlled Supabase/Storage adapters: offline hold, interrupted attachment upload, retry after an object already exists, ambiguous insert committed before response loss, failed insert with no commit, blocked-recipient isolation, identical intentional messages, and account switching during upload. GitHub Actions is configured to run these alongside the pagination tests.
 - These automated tests exercise the production retry orchestration but do not emulate Safari's actual IndexedDB implementation or prove real two-account delivery. Real Safari offline/online and two-account E2E tests remain required.
 
+Verification recorded on commit `a5a63b1ffa6096317ce01dc6b1e05f1b892f3395`:
+- JavaScript syntax checks: passed.
+- Application structure validation: passed (210 static IDs and asset/CSS/client-secret checks).
+- Call infrastructure security invariants: passed.
+- Existing LiveKit tests: 27 passed, 0 failed.
+- Private chat ordering plus outbox fault-injection tests: 14 passed, 0 failed (6 pagination/model tests and 8 outbox retry tests).
+- LiveKit token endpoint type-check: passed.
+- GitHub Actions run: [42386851006](https://github.com/kalaghkocholo/HAN/actions/runs/42386851006), success.
+- Vercel did not create a deployment for this cache-busted commit; the commit status reports the team's build-rate limit. Do not use an older deployment as proof that this cache-busted version is live.
+
+
