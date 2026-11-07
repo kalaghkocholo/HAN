@@ -1407,3 +1407,12 @@ body[data-theme="light"] .farnaz-livekit-actions button:not(.is-accept):not(.is-
 .compose-menu-cancel:active{background:var(--panel2)}
 @media(hover:hover){.compose-menu-option:hover{background:var(--panel2);border-color:var(--mint)}.compose-menu-cancel:hover{color:var(--white)}}
 @media(prefers-reduced-motion:reduce){.compose-menu-option{transition:none}}
+
+/* Private-chat local contact photo: camera overlay matches the profile editor. */
+.private-hub-avatar-wrap{position:relative;width:104px;margin:0 auto 8px;display:flex;flex-direction:column;align-items:center}
+.private-hub-avatar-wrap .contact-info-avatar{margin:0 auto 8px}
+.private-hub-avatar-edit{position:absolute;inset-inline-end:3px;top:52px;display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--panel);border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 2px 8px #0003;cursor:pointer}
+.private-hub-avatar-edit svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.private-hub-avatar-edit:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.private-hub-avatar-edit:disabled{opacity:.55;cursor:wait}
+.private-hub-avatar-note{margin:0!important;color:var(--muted);font-size:10px;line-height:1.4}
