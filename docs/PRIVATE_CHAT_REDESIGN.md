@@ -164,3 +164,27 @@ Required automated and manual coverage:
 ## Verification boundary
 
 This document is based on source inspection of the current `main` tree and read-only inspection of the connected Supabase schema, policies, indexes and advisors on 2026-11-07. It is not a penetration test, a two-account E2E test, a full browser audit, or an external cryptographic review. No application code, database schema, or Supabase settings were changed during this audit.
+
+
+## 9. First implementation increment — deterministic private-message history
+
+Implemented directly on `main` after the audit:
+
+- Added `js/private-chat-model.js` as a small, pure and independently testable message-ordering/pagination model.
+- Private-message history now orders by `created_at DESC, id DESC` and uses a compound keyset cursor `(created_at,id)` for both sent and received directions. This prevents same-timestamp messages from being skipped at page boundaries.
+- The two directional query results are merged and deduplicated by message ID before the 50-message page is rendered.
+- Query errors are checked before treating a page as valid.
+- Added `tests/private-chat-model.test.mjs` covering timestamp collisions, deterministic order, deduplication, cursor validation, page boundaries and has-more behavior.
+- Added the model to the ordered runtime loader and service-worker shell; bumped the shell cache to `farnaz-shell-v293`.
+- Added syntax, loader-order, shell-cache and cursor-contract checks to static validation; CI now runs the new unit tests.
+
+Verification on commit `1736325939c753f049448b60b73dc8772d4c1448`:
+- JavaScript syntax validation: passed.
+- Application structure validation: passed.
+- Call infrastructure security invariants: passed.
+- Existing LiveKit test suite: passed.
+- New private-chat model tests: passed.
+- LiveKit token endpoint type-check: passed.
+- Vercel status: failed due to the team's deployment build-rate limit, not a reported source build error. The current production deployment was not replaced by this change.
+
+This increment addresses deterministic history pagination only. It does not yet add offline outbox/idempotency, media library redesign, mute controls, notification delivery, E2EE, or two-account end-to-end security coverage.
