@@ -47,7 +47,7 @@ jobs:
         run: node scripts/validate-call-infra.mjs
       - name: Test isolated LiveKit adapter
         run: node --test tests/livekit-adapter.test.mjs tests/livekit-call-sessions.test.mjs tests/livekit-call-controller.test.mjs tests/livekit-call-ui.test.mjs tests/livekit-sdk-loader.test.mjs
-      - name: Test private chat ordering and pagination
-        run: node --test tests/private-chat-model.test.mjs
+      - name: Test private chat ordering and durable outbox retries
+        run: node --test tests/private-chat-model.test.mjs tests/private-message-outbox.test.mjs
       - name: Type-check LiveKit token endpoint
         run: deno check --no-config --no-lock supabase/functions/livekit-token/index.ts
