@@ -83,7 +83,7 @@
     const node = byId("farnazLiveKitAvatar");
     if (!node) return;
     node.replaceChildren();
-    const url = typeof avatarUrl === "string" && /^https:\\/\\//i.test(avatarUrl) ? avatarUrl : "";
+    const url = typeof avatarUrl === "string" && avatarUrl.startsWith("https://") ? avatarUrl : "";
     if (url) {
       const image = root.document.createElement("img");
       image.src = url;
