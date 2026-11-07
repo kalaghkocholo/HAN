@@ -2140,7 +2140,11 @@ function openChat(contact,fromPage="chatsPage"){
     window.FarnazLocalStore?.saveDraft(currentUser.id,previousContactId,draftInput.value).catch(cacheError=>console.warn("Could not preserve previous draft:",cacheError));
   }
   const switchingContacts=previousContactId!==nextContactId;
-  currentChatUser=contact;previousPage=fromPage;FarnazConversationController.openPrivate(contact.user_id,fromPage);startPrivateTypingChannel(contact.user_id).catch(()=>{});
+  currentChatUser=contact;previousPage=fromPage;
+  const deletedContact=!!contact.is_deleted_account;
+  $("messageText").disabled=deletedContact;$("sendMessageButton").disabled=deletedContact;$("attachmentMenuButton").disabled=deletedContact;
+  if(deletedContact)$("attachmentMenu").hidden=true;
+  FarnazConversationController.openPrivate(contact.user_id,fromPage);startPrivateTypingChannel(contact.user_id).catch(()=>{});
   if(switchingContacts&&draftInput){
     draftInput.value="";draftInput.style.height="auto";
     const draftUserId=currentUser?.id,draftContactId=nextContactId;
@@ -2160,8 +2164,8 @@ function openChat(contact,fromPage="chatsPage"){
   };
   chatAvatar.setAttribute("role","button");chatAvatar.tabIndex=0;
   chatAvatar.setAttribute("aria-label",english?"View profile photo":"بزرگ‌نمایی عکس مخاطب");
-  setStatus("sendMessageStatus","");
-  currentChatPresenceLabel=english?"Private conversation":"گفتگوی خصوصی";
+  setStatus("sendMessageStatus",deletedContact?(english?"This account has been deleted. You can read the conversation, but cannot send new messages.":"این حساب حذف شده است؛ می‌توانید تاریخچه را بخوانید اما امکان ارسال پیام جدید وجود ندارد."):"");
+  currentChatPresenceLabel=deletedContact?(english?"Deleted account":"حساب حذف‌شده"):(english?"Private conversation":"گفتگوی خصوصی");
   navigate("chatPage");refreshPrivatePresence(contact.user_id);
   // Keep the deletion boundary. Opening a chat must never undelete its old history.
   // loadPrivateMessages filters both local cache and server results against hidden_at.
