@@ -129,3 +129,6 @@
   padding:0!important;
   border-radius:50%!important;
 }
+
+/* LiveKit is the sole active call surface; suppress the legacy modal if a stale listener recreates it. */
+html.farnaz-livekit-active #farnazCallDialog{display:none!important}
