@@ -8,6 +8,7 @@
   let callType = "audio";
   let startedAt = 0;
   let timerId = null;
+  let endingCall = false;
   let microphoneEnabled = true;
   let cameraEnabled = true;
   let remoteVideoTrack = null;
@@ -194,6 +195,8 @@
     byId("farnazLiveKitAccept").hidden = !incoming;
     byId("farnazLiveKitReject").hidden = !incoming;
     byId("farnazLiveKitEnd").hidden = incoming;
+    byId("farnazLiveKitEnd").disabled = false;
+    endingCall = false;
     byId("farnazLiveKitCamera").hidden = true;
     byId("farnazLiveKitFlip").hidden = true;
     byId("farnazLiveKitUnlockWrap").hidden = true;
@@ -287,6 +290,9 @@
       startTimer();
     } else if (event.type === "session-finished") {
       root.FarnazCalls?.stopRingtone?.();
+      endingCall = false;
+      const endButton = byId("farnazLiveKitEnd");
+      if (endButton) endButton.disabled = false;
       activeSession = null;
       activeRole = null;
       stopTimer();
@@ -421,15 +427,27 @@
   }
 
   async function end() {
+    if (endingCall) return;
+    endingCall = true;
     root.FarnazCalls?.stopRingtone?.();
+    const button = byId("farnazLiveKitEnd");
+    if (button) button.disabled = true;
     if (!controller || !activeSession) {
       const dialog = byId("farnazLiveKitDialog");
       if (dialog) dialog.hidden = true;
+      endingCall = false;
+      if (button) button.disabled = false;
       return;
     }
     setStatus(tr("در حال پایان تماس…", "Ending call…"), "ending");
-    try { await controller.end(); }
-    catch (error) { setStatus(tr("پایان تماس ناموفق بود: ", "Could not end call: ") + error.message, "error"); }
+    try {
+      await controller.end();
+    } catch (error) {
+      setStatus(tr("پایان تماس ناموفق بود: ", "Could not end call: ") + error.message, "error");
+    } finally {
+      endingCall = false;
+      if (button) button.disabled = false;
+    }
   }
 
   async function toggleMicrophone() {
