@@ -309,7 +309,43 @@
 
     async function answer() { return updateStatus("active"); }
     async function reject() { return updateStatus("rejected"); }
-    async function end() { return updateStatus("ended"); }
+    async function end() {
+      assertReady();
+      const session = activeSession;
+      const role = activeRole;
+      if (!session) return null;
+      if (!LIVE.has(session.status)) {
+        await clearActiveSession(session.status, true);
+        return session;
+      }
+
+      // End the local session first. The UI and microphone/camera must never
+      // wait for an auth refresh, a slow database write, or Realtime teardown.
+      activeSession = null;
+      activeRole = null;
+      clearRingingTimer();
+      const channel = callChannel;
+      callChannel = null;
+      emit("finished", { session: session, role: role, status: "ended" });
+      void removeChannel(channel);
+
+      // Persist the terminal status in the background. A failed/offline write
+      // must not keep the caller on the ending screen.
+      Promise.resolve().then(async function () {
+        await verifyUser();
+        const result = await supabase.from("call_sessions")
+          .update({ status: "ended" })
+          .eq("id", session.id)
+          .in("status", ["ringing", "active"])
+          .select(SESSION_COLUMNS)
+          .maybeSingle();
+        if (result.error) throw result.error;
+        return result.data;
+      }).catch(function (error) {
+        emit("error", { phase: "end-status", error: error, session: session });
+      });
+      return session;
+    }
 
     async function watchIncoming() {
       await verifyUser();
