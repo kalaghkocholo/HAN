@@ -90,3 +90,18 @@
  .farnaz-livekit-dialog.is-video-call .farnaz-livekit-control span{top:58px;font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.farnaz-livekit-control,.farnaz-livekit-action{transition:none}}
+
+/* Incoming-call decline action: keep a true circular iPhone-style hit target. */
+#farnazLiveKitReject{
+  display:grid;
+  place-items:center;
+  flex:0 0 72px;
+  width:72px!important;
+  height:72px!important;
+  min-width:72px!important;
+  min-height:72px!important;
+  aspect-ratio:1;
+  padding:0!important;
+  border-radius:50%!important;
+  overflow:hidden;
+}
