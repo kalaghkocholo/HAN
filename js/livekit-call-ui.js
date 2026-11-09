@@ -23,7 +23,7 @@
     camera: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/></svg>',
     cameraOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8M15 10l6-3v10l-4-2M3 3l18 18"/></svg>',
     flip: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6"/><circle cx="11" cy="13" r="3"/><path d="m16 16 3 3 3-3m-3 3v-7"/></svg>',
-    end: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15.5c4.8-4.2 13.2-4.2 18 0l-2.3 4a1.5 1.5 0 0 1-1.8.6l-3.2-1.2a1.5 1.5 0 0 1-1-1.4v-1.2a12 12 0 0 0-3.4 0v1.2a1.5 1.5 0 0 1-1 1.4l-3.2 1.2a1.5 1.5 0 0 1-1.8-.6L3 15.5Z"/></svg>',
+    end: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.59a1 1 0 0 1-.25 1.01z" transform="rotate(135 12 12)"/></svg>',
     accept: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.8 10.6a14.2 14.2 0 0 0 7.6 7.6l2.2-2.2a1 1 0 0 1 1.02-.24 11.6 11.6 0 0 0 3.62.58 1 1 0 0 1 1 1V21a1 1 0 0 1-1 1A18.2 18.2 0 0 1 2 4.8a1 1 0 0 1 1-1h3.7a1 1 0 0 1 1 1 11.6 11.6 0 0 0 .58 3.62 1 1 0 0 1-.24 1.02z"/></svg>',
     volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6"/></svg>',
     close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>'
@@ -31,7 +31,12 @@
 
   function ensureDialog() {
     let dialog = byId("farnazLiveKitDialog");
-    if (dialog) return dialog;
+    if (dialog) {
+      root.document.querySelectorAll("#farnazLiveKitDialog").forEach(function (node) {
+        if (node !== dialog) node.remove();
+      });
+      return dialog;
+    }
     dialog = root.document.createElement("section");
     dialog.id = "farnazLiveKitDialog";
     dialog.className = "farnaz-livekit-dialog";
@@ -180,6 +185,9 @@
 
   function show(title, status, incoming) {
     ensureDialog();
+    // The legacy WebRTC dialog must never appear alongside the LiveKit dialog.
+    const legacyDialog = byId("farnazCallDialog");
+    if (legacyDialog) legacyDialog.hidden = true;
     byId("farnazLiveKitTitle").textContent = title || tr("تماس فرناز", "Farnaz call");
     setAvatar(title, null);
     byId("farnazLiveKitDialog").hidden = false;
