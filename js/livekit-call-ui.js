@@ -62,9 +62,9 @@
         '<footer class="farnaz-livekit-footer">' +
           '<div class="farnaz-livekit-controls" id="farnazLiveKitControls" hidden>' +
             '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitMute" aria-label="خاموش‌کردن میکروفون" aria-pressed="true" title="میکروفون">' + icon("mic") + '<span>میکروفون</span></button>' +
-            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitAudioRoute" aria-label="خروجی صدا" title="خروجی صدا">' + icon("speaker") + '<span>بلندگو</span></button>' +
             '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitCamera" aria-label="خاموش‌کردن دوربین" aria-pressed="true" title="دوربین" hidden>' + icon("camera") + '<span>دوربین</span></button>' +
             '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitFlip" aria-label="تعویض دوربین" title="تعویض دوربین" hidden>' + icon("flip") + '<span>تعویض</span></button>' +
+            '<button type="button" class="farnaz-livekit-control" id="farnazLiveKitAudioRoute" aria-label="خروجی صدا" title="خروجی صدا">' + icon("speaker") + '<span>بلندگو</span></button>' +
           '</div>' +
           '<div class="farnaz-livekit-actions">' +
             '<button type="button" id="farnazLiveKitAccept" class="farnaz-livekit-action is-accept" aria-label="پاسخ به تماس" title="پاسخ" hidden>' + icon("accept") + '</button>' +
