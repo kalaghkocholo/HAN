@@ -91,17 +91,41 @@
 }
 @media(prefers-reduced-motion:reduce){.farnaz-livekit-control,.farnaz-livekit-action{transition:none}}
 
-/* Incoming-call decline action: keep a true circular iPhone-style hit target. */
-#farnazLiveKitReject{
-  display:grid;
-  place-items:center;
-  flex:0 0 72px;
+/* Force both LiveKit decline and hang-up controls to remain circular on iOS Safari. */
+#farnazLiveKitReject,
+#farnazLiveKitEnd{
+  display:grid!important;
+  place-items:center!important;
+  box-sizing:border-box!important;
+  flex:0 0 72px!important;
   width:72px!important;
   height:72px!important;
   min-width:72px!important;
   min-height:72px!important;
-  aspect-ratio:1;
+  max-width:72px!important;
+  max-height:72px!important;
+  aspect-ratio:1 / 1!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  transform:none;
+}
+
+/* Legacy call dialog controls use the same circular geometry. */
+#farnazCallReject,
+#farnazCallHangup{
+  display:grid!important;
+  place-items:center!important;
+  box-sizing:border-box!important;
+  flex:0 0 64px!important;
+  width:64px!important;
+  height:64px!important;
+  min-width:64px!important;
+  min-height:64px!important;
+  max-width:64px!important;
+  max-height:64px!important;
+  aspect-ratio:1 / 1!important;
   padding:0!important;
   border-radius:50%!important;
-  overflow:hidden;
 }
