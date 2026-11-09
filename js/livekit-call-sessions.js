@@ -231,14 +231,14 @@
         const callType = target.callType === "video" ? "video" : "audio";
         if (!UUID_RE.test(peerId) || peerId === currentUserId) throw new Error("A valid, different contact is required.");
 
-        const result = await supabase.from("call_sessions").insert({
-          caller_id: currentUserId,
-          receiver_id: peerId,
-          call_type: callType,
-          status: "ringing"
-        }).select(SESSION_COLUMNS).single();
+        // Use the database RPC as the single creation path. It serializes calls
+        // per caller and expires only that caller's abandoned ringing invitations.
+        const result = await supabase.rpc("start_farnaz_call", {
+          p_receiver_id: peerId,
+          p_call_type: callType
+        });
         if (result.error) throw result.error;
-        const createdSession = result.data;
+        const createdSession = Array.isArray(result.data) ? result.data[0] : result.data;
         if (!createdSession || String(createdSession.caller_id) !== currentUserId ||
             String(createdSession.receiver_id) !== peerId || createdSession.status !== "ringing") {
           throw new Error("The call invitation returned an invalid session.");
