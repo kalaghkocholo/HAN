@@ -715,7 +715,7 @@ html[dir="ltr"] .app.chat-mode #chatPage .conversation-back-button svg{
 .farnaz-call-actions{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 .farnaz-call-actions button{border:0;border-radius:13px;padding:12px 18px;font:inherit;font-weight:700}
 .farnaz-call-accept{background:#20a66a;color:white}
-.farnaz-call-reject{background:#c93d4b;color:white}
+.farnaz-call-reject{display:grid;place-items:center;width:64px;height:64px;min-width:64px;min-height:64px;flex:0 0 64px;padding:0;border-radius:50%;background:#ff453a;color:white}
 @media(prefers-reduced-motion:no-preference){.farnaz-call-card{animation:farnaz-call-in .16s ease-out}@keyframes farnaz-call-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}}
 
 .space-call-actions[hidden]{display:none!important}
