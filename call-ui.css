@@ -94,7 +94,6 @@
 /* Force both LiveKit decline and hang-up controls to remain circular on iOS Safari. */
 #farnazLiveKitReject,
 #farnazLiveKitEnd{
-  display:grid!important;
   place-items:center!important;
   box-sizing:border-box!important;
   flex:0 0 72px!important;
@@ -115,7 +114,6 @@
 /* Legacy call dialog controls use the same circular geometry. */
 #farnazCallReject,
 #farnazCallHangup{
-  display:grid!important;
   place-items:center!important;
   box-sizing:border-box!important;
   flex:0 0 64px!important;
