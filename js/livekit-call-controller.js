@@ -101,7 +101,9 @@
       } else if (event.type === "finished") {
         if (eventCallId && activeCallId && eventCallId !== activeCallId) return;
         activeCallId = null;
-        await disconnectMedia();
+        // Notify the UI immediately; LiveKit disconnect can take longer on iOS
+        // or a weak network and must not delay the finished-call transition.
+        disconnectMedia().catch(error => emit("error", { phase: "media-disconnect-after-end", error: error }));
       }
       emit("session-" + event.type, event);
     }
@@ -219,13 +221,15 @@
       assertReady();
       const manager = ensureSessions();
       ending = true;
-      const statusPromise = manager.getState().session ? manager.end() : Promise.resolve(null);
-      const mediaPromise = disconnectMedia();
-      const results = await Promise.allSettled([statusPromise, mediaPromise]);
-      ending = false;
-      const failed = results.find(result => result.status === "rejected");
-      if (failed) throw failed.reason;
-      return results[0].value;
+      try {
+        // Session manager emits "finished" synchronously after clearing local
+        // state. Media shutdown continues independently in the background.
+        const result = await manager.end();
+        disconnectMedia().catch(error => emit("error", { phase: "media-disconnect-after-end", error: error }));
+        return result;
+      } finally {
+        ending = false;
+      }
     }
 
     async function close() {
