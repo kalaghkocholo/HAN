@@ -519,6 +519,12 @@ window.refreshFarnazCallHistory=refreshFarnazCallHistory;
 async function setUser(userId){
   const request=++userSwitchSequence,next=userId?String(userId):null;
   if(window.FARNAZ_LIVEKIT_CALLS_ENABLED===true){
+    const previousChannel=inboxChannel;inboxChannel=null;
+    if(previousChannel){try{await getClient().removeChannel(previousChannel);}catch(_){}}
+    if(activeCall)await cleanupCall(false);
+    pendingIncomingSessions.clear();
+    const legacyDialog=byId("farnazCallDialog");if(legacyDialog)legacyDialog.hidden=true;
+    try{window.FarnazCalls?.stopRingtone?.();}catch(_){}
     signedInUserId=next;
     if(!window.FarnazLiveKitCallUI)throw new Error("The feature-gated LiveKit call UI was not loaded.");
     await window.FarnazLiveKitCallUI.setUser(next);
