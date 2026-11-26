@@ -371,7 +371,7 @@ function getClient(){
       auth:{
         // Keep one stable storage key across reloads and GitHub Pages launches.
         storageKey:"sb-iemykhluluoymsbqpjsn-auth-token",
-        storage:window.localStorage,
+        storage:window.FarnazAuthStorage||window.localStorage,
         persistSession:true,
         autoRefreshToken:true,
         detectSessionInUrl:true,
@@ -383,6 +383,16 @@ function getClient(){
   return farnazClient;
 }
 
+async function clearPersistedAuthSession(){
+  const key="sb-iemykhluluoymsbqpjsn-auth-token";
+  try{
+    if(window.FarnazAuthStorage?.removeItem)await window.FarnazAuthStorage.removeItem(key);
+    else localStorage.removeItem(key);
+  }catch(error){
+    console.warn("Could not clear persisted auth storage:",error);
+    try{localStorage.removeItem(key);}catch(_){}
+  }
+}
 function setStatus(id,msg,isError=false){
   const e=$(id);if(!e)return;
   e.textContent=msg;e.classList.toggle("error-text",isError);
@@ -1353,7 +1363,7 @@ function deleteAccount(){
         console.warn("Account was deleted, but local cache cleanup needs another attempt:",cleanupError);
       }
       try{await client.auth.signOut({scope:"local"});}catch(_){}
-      try{localStorage.removeItem("sb-iemykhluluoymsbqpjsn-auth-token");}catch(_){}
+      await clearPersistedAuthSession();
       showGuest();
       window.alert(localCleanupConfirmed
         ?(english?"Your Farnaz account has been permanently deleted.":"حساب فرناز شما به‌طور دائمی حذف شد.")
@@ -1778,7 +1788,7 @@ async function logout(){
     if(result?.timedOut||result?.error){
       // Supabase local sessions are persisted under this explicit storage key.
       // If its own local cleanup stalls/fails, remove only this app's auth session.
-      try{localStorage.removeItem("sb-iemykhluluoymsbqpjsn-auth-token");}catch(storageError){
+      try{await clearPersistedAuthSession();}catch(storageError){
         console.warn("Could not clear persisted auth session:",storageError);
       }
       if(result?.error)console.warn("Supabase local sign-out failed; cleared persisted session:",result.error);
@@ -1788,7 +1798,7 @@ async function logout(){
     }
   }catch(e){
     console.error("Farnaz logout failed:",e);
-    try{localStorage.removeItem("sb-iemykhluluoymsbqpjsn-auth-token");}catch(storageError){
+    try{await clearPersistedAuthSession();}catch(storageError){
       console.warn("Could not clear persisted auth session:",storageError);
     }
     logoutWarning=english
@@ -3074,6 +3084,7 @@ async function refreshConversationList(){
   window.FarnazBoot=()=>{
     if(farnazBootStarted)return;
     farnazBootStarted=true;
+    void window.FarnazAuthStorage?.requestPersistence?.();
     void restoreSavedSession();
   };
   // Safari may suspend a standalone PWA while the network is unavailable.

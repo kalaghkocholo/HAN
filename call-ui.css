@@ -188,3 +188,22 @@ html.farnaz-livekit-active #farnazCallDialog{display:none!important}
 
 /* Center the two audio controls as a compact iPhone-style pair. */
 .farnaz-call-dialog.is-audio-call .farnaz-call-controls{grid-template-columns:repeat(2,minmax(84px,96px));justify-content:center;width:auto;gap:24px}
+
+/* Precisely fit contact photos inside the circular audio-call avatar frame. */
+.farnaz-call-dialog.is-audio-call .farnaz-call-avatar{
+  position:relative;display:block;flex:0 0 auto;
+  width:clamp(142px,42vw,184px);height:clamp(142px,42vw,184px);
+  min-width:clamp(142px,42vw,184px);min-height:clamp(142px,42vw,184px);
+  aspect-ratio:1/1;overflow:hidden;isolation:isolate;border-radius:50%;
+}
+.farnaz-call-dialog.is-audio-call .farnaz-call-avatar img{
+  position:absolute;inset:0;display:block;width:100%;height:100%;
+  min-width:100%;min-height:100%;max-width:none;max-height:none;margin:0;
+  object-fit:cover;object-position:50% 50%;border:0;border-radius:inherit;
+}
+@media(max-height:700px){
+ .farnaz-call-dialog.is-audio-call .farnaz-call-avatar{
+  width:clamp(108px,27vh,145px);height:clamp(108px,27vh,145px);
+  min-width:clamp(108px,27vh,145px);min-height:clamp(108px,27vh,145px);
+ }
+}

@@ -29,6 +29,7 @@ jobs:
         run: |
           node --check js/supabase-sdk.js
           node --check js/local-store.js
+          node --check js/auth-storage.js
           node --check js/private-chat-model.js
           node --check js/private-chat-hub.js
           node --check js/core.js
@@ -57,7 +58,7 @@ jobs:
       - name: Test mobile chat viewport and keyboard controller
         run: node --test tests/chat-viewport-controller.test.mjs
       - name: Test service worker caching and notification safety
-        run: node --test tests/service-worker.test.mjs
+        run: node --test tests/service-worker.test.mjs tests/auth-storage.test.mjs
       - name: Test private chat ordering and durable outbox retries
         run: node --test tests/private-chat-model.test.mjs tests/private-message-outbox.test.mjs
       - name: Type-check LiveKit token endpoint

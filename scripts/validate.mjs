@@ -78,6 +78,7 @@ if (html.includes("cdn.jsdelivr.net/npm/@supabase/supabase-js") || html.includes
 
 const clientFiles = [
   "js/local-store.js",
+  "js/auth-storage.js",
   "js/private-chat-model.js",
   "js/private-chat-hub.js",
   "js/core.js",
@@ -289,7 +290,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!/const CACHE_NAME="farnaz-shell-v\d+";/.test(sources["service-worker.js"]) || !sources["service-worker.js"].includes('styles.css?v=20261109-call-reject-round1') || !sources["service-worker.js"].includes('core.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('spaces.js?v=20261126-avatar-origin1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-contact-photo1') || !sources["service-worker.js"].includes('calls.js?v=20261126-legacy-iphone2') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('call-ui.css?v=20261126-legacy-iphone2') || !html.includes('call-ui.css?v=20261126-legacy-iphone2') || !html.includes('calls.js?v=20261126-legacy-iphone2') || !html.includes('chat-menu-v5.js?v=20261107-viewport1')) {
+if (!/const CACHE_NAME="farnaz-shell-v\d+";/.test(sources["service-worker.js"]) || !sources["service-worker.js"].includes('styles.css?v=20261109-call-reject-round1') || !sources["service-worker.js"].includes('core.js?v=20261126-persistent-auth1') || !sources["service-worker.js"].includes('spaces.js?v=20261126-avatar-origin1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-contact-photo1') || !sources["service-worker.js"].includes('calls.js?v=20261126-legacy-iphone2') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('call-ui.css?v=20261126-avatar-fit1') || !html.includes('call-ui.css?v=20261126-avatar-fit1') || !html.includes('calls.js?v=20261126-legacy-iphone2') || !html.includes('chat-menu-v5.js?v=20261107-viewport1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -320,7 +321,7 @@ for (const [passed, message] of safeUpdateChecks) { if (!passed) errors.push(mes
 const loaderChecks = [
   [html.includes('script.src="./js/supabase-sdk.js"') && html.includes("watchScript(script,()=>{") && html.includes("loadLocalScripts();"),
     "index.html must wait for the local Supabase SDK before loading the app core"],
-  [html.includes('core.src="./js/core.js?v=20261107-viewport1"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
+  [html.includes('core.src="./js/core.js?v=20261126-persistent-auth1"') && html.includes("watchScript(core,()=>{") && html.includes("فرناز هنگام راه‌اندازی با خطای اجرایی روبه‌رو شد"),
     "index.html must handle successful, failed, and stalled core-script loading"],
   [html.includes("watchScript(script,loadNextFeature,()=>{") && html.includes("featureScripts[featureIndex++]") && html.includes('if(typeof window.FarnazBoot==="function")window.FarnazBoot();'),
     "index.html must load feature scripts sequentially and boot only after the loader sequence"],
@@ -375,7 +376,14 @@ const authChecks = [
   [coreSource.includes('storageKey:"sb-iemykhluluoymsbqpjsn-auth-token"') &&
    coreSource.includes("persistSession:true") &&
    coreSource.includes("autoRefreshToken:true") &&
-   coreSource.includes("storage:window.localStorage"),
+   coreSource.includes("storage:window.FarnazAuthStorage||window.localStorage") &&
+   coreSource.includes("clearPersistedAuthSession()") &&
+   sources["js/auth-storage.js"].includes("async getItem(key)") &&
+   sources["js/auth-storage.js"].includes("async setItem(key,value)") &&
+   sources["js/auth-storage.js"].includes("async removeItem(key)") &&
+   sources["js/auth-storage.js"].includes("SameSite=Lax") &&
+   html.includes("./js/auth-storage.js?v=20261126-cookie-session1") &&
+   sources["service-worker.js"].includes("auth-storage.js?v=20261126-cookie-session1"),
     "js/core.js must keep the explicit persisted Supabase session configuration"],
   [coreSource.includes("client.auth.signInWithPassword({email,password})"),
     "js/core.js must retain the email/password sign-in path"],

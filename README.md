@@ -21,6 +21,7 @@ Farnaz is a mobile-first, Persian/English private communication web app. The cur
 - `styles.css` — shared application styling
 - `spaces.css` — extracted styling for groups, channels, and their dialogs/composer
 - `js/core.js` — Supabase setup, authentication, navigation, profiles, contacts, and shared state
+- `js/auth-storage.js` — chunked first-party cookie storage for persistent Supabase sessions in installed iOS web apps, with localStorage migration and fallback
 - `js/local-store.js`, `js/private-chat-model.js`, `js/private-chat-hub.js` — account-scoped local storage, deterministic private-message ordering/outbox, and contact/shared-content views
 - `js/chat-menu-v5.js` — private messaging, message actions, attachment/voice flows, and connection recovery
 - `js/spaces.js` — groups/channels UI and related messaging flows
@@ -72,7 +73,8 @@ Run these checks after UI, database, authentication, or message-flow changes:
 10. Disconnect and reconnect the network; confirm the app recovers without duplicate messages.
 11. Check browser console and network requests for errors.
 12. With two separate test accounts on different devices, test incoming/outgoing audio and video calls, reject, hang up, permissions denied, and network loss. Calls may fail on restrictive networks until a TURN relay is configured.
-13. Install the PWA, enable notification permission, and verify notification clicks open Farnaz. Do not consider push after app closure verified until the server push sender is configured and tested.
+13. Install the PWA, sign in once from the installed app, fully close it, reopen it, and verify the Supabase session is restored without asking for the password again.
+14. Enable notification permission, and verify notification clicks open Farnaz. Do not consider push after app closure verified until the server push sender is configured and tested.
 
 Use dedicated test accounts and non-sensitive test content. Do not test privacy boundaries with real users' private data.
 
