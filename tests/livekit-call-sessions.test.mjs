@@ -110,6 +110,24 @@ function createHarness(userId) {
   const supabase = {
     auth: { getUser: async () => ({ data: { user: { id: userId } }, error: null }) },
     from: table => new Query(table),
+    // Mirrors public.start_farnaz_call: caller identity is derived from the authenticated session.
+    rpc: async (name, args) => {
+      if (name !== "start_farnaz_call") return { data: null, error: new Error("Unexpected rpc") };
+      if (!args || !["audio", "video"].includes(args.p_call_type)) return { data: null, error: new Error("Invalid call type") };
+      if (!args.p_receiver_id || args.p_receiver_id === userId) return { data: null, error: new Error("Invalid call recipient") };
+      const row = {
+        id: callId,
+        caller_id: userId,
+        receiver_id: args.p_receiver_id,
+        call_type: args.p_call_type,
+        status: "ringing",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      rows.set(row.id, row);
+      notify("call_sessions", "INSERT", row);
+      return { data: { ...row }, error: null };
+    },
     channel: name => new FakeChannel(name),
     removeChannel: async channel => { channel.removed = true; return "ok"; },
     seedCall(row) { rows.set(row.id, { ...row }); notify("call_sessions", "INSERT", row); },
@@ -139,6 +157,7 @@ test("starts a direct audio invitation and ends it without touching legacy calls
   assert.equal(supabase.channels.filter(channel => channel.subscribed).length, 1);
 
   await manager.end();
+  await tick(); // end() persists terminal status in the background
   assert.equal(supabase.rows.get(callId).status, "ended");
   assert.equal(manager.getState().status, "idle");
   await manager.close();
@@ -167,6 +186,7 @@ test("receiver recovers an incoming invitation, answers, and ends it", async () 
   assert.ok(events.includes("accepted"));
 
   await manager.end();
+  await tick(); // end() persists terminal status in the background
   assert.equal(supabase.rows.get(callId).status, "ended");
   assert.equal(manager.getState().status, "idle");
   await manager.close();
