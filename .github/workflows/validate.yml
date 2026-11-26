@@ -43,6 +43,11 @@ jobs:
           node --check js/livekit-sdk-loader.js
           node --check service-worker.js
           node --check scripts/validate.mjs
+          node --check scripts/validate-call-infra.mjs
+          node --check scripts/build.mjs
+          node --check scripts/verify-dist.mjs
+      - name: Install build tooling
+        run: npm install --no-audit --no-fund
       - name: Validate application structure
         run: node scripts/validate.mjs
       - name: Validate call infrastructure security invariants
@@ -51,7 +56,13 @@ jobs:
         run: node --test tests/livekit-adapter.test.mjs tests/livekit-call-sessions.test.mjs tests/livekit-call-controller.test.mjs tests/livekit-call-ui.test.mjs tests/livekit-sdk-loader.test.mjs
       - name: Test mobile chat viewport and keyboard controller
         run: node --test tests/chat-viewport-controller.test.mjs
+      - name: Test service worker caching and notification safety
+        run: node --test tests/service-worker.test.mjs
       - name: Test private chat ordering and durable outbox retries
         run: node --test tests/private-chat-model.test.mjs tests/private-message-outbox.test.mjs
       - name: Type-check LiveKit token endpoint
         run: deno check --no-config --no-lock supabase/functions/livekit-token/index.ts
+      - name: Type-check account deletion endpoint
+        run: deno check --no-config --no-lock supabase/functions/delete-farnaz-account/index.ts
+      - name: Build and verify the minified production bundle
+        run: npm run build
