@@ -195,7 +195,17 @@ async function open(id){
   if(!path){el.textContent=fallback||"👥";return;}
   const setImage=url=>{if(!url||el.dataset.avatarPath!==path)return;el.style.setProperty("display","grid","important");el.style.setProperty("position","relative","important");el.style.setProperty("overflow","hidden","important");el.style.setProperty("visibility","visible","important");el.style.setProperty("opacity","1","important");if(el.classList.contains("space-info-avatar")){el.style.removeProperty("width");el.style.removeProperty("height");el.style.removeProperty("min-width");el.style.removeProperty("min-height");el.style.removeProperty("flex-shrink");el.style.removeProperty("border-radius");}else{el.style.setProperty("width","44px","important");el.style.setProperty("height","44px","important");el.style.setProperty("min-width","44px","important");el.style.setProperty("min-height","44px","important");el.style.setProperty("flex-shrink","0","important");el.style.setProperty("border-radius","50%","important");}const img=document.createElement("img");img.alt="";img.decoding="async";img.style.cssText="display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;border-radius:50%!important;visibility:visible!important;opacity:1!important;z-index:2!important";img.onerror=()=>{if(el.dataset.avatarPath!==path)return;if(privateGroup&&!el.dataset.avatarFallbackTried){el.dataset.avatarFallbackTried="1";const pub=getClient().storage.from("group-avatars").getPublicUrl(path).data?.publicUrl;if(pub&&pub!==url){img.src=pub;return;}}el.replaceChildren(document.createTextNode(fallback||"👥"));};el.replaceChildren(img);img.src=url;};
   delete el.dataset.avatarFallbackTried;
-  if(path.startsWith("https://")||path.startsWith("http://")){setImage(path);return;}
+  if(/^https?:\/\//i.test(path)){
+    // Only load remote avatars from this project's own Supabase host.
+    let trusted=false;
+    try{
+      const base=new URL(window.FARNAZ_CONFIG.supabaseUrl);
+      const remote=new URL(path);
+      trusted=remote.protocol==="https:"&&remote.origin===base.origin;
+    }catch(_){}
+    if(trusted)setImage(path);else el.textContent=fallback||"👥";
+    return;
+  }
   if(privateGroup){getClient().storage.from("group-avatars").createSignedUrl(path,3600).then(({data,error})=>{if(!error&&data?.signedUrl)setImage(data.signedUrl);else{const pub=getClient().storage.from("group-avatars").getPublicUrl(path).data?.publicUrl;if(pub)setImage(pub);else if(el.dataset.avatarPath===path)el.replaceChildren(document.createTextNode(fallback||"👥"));}}).catch(()=>{if(el.dataset.avatarPath===path)el.replaceChildren(document.createTextNode(fallback||"👥"));});return;}
   const url=getClient().storage.from("avatars").getPublicUrl(path).data?.publicUrl;setImage(url);
  }
