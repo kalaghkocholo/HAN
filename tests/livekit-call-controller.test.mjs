@@ -178,6 +178,8 @@ test("explicit end closes media and session lifecycle", async () => {
   await h.controller.start({ peerId: callSession.receiver_id, callType: "audio" });
   await h.controller.end();
 
+  // end() returns immediately; the media disconnect completes asynchronously.
+  await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(h.mediaInstances[0].getState().connected, false);
   assert.equal(h.mediaInstances[0].getState().disposed, true);
   assert.ok(h.order.includes("session-end"));
