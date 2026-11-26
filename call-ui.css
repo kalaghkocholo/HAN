@@ -168,7 +168,7 @@ html.farnaz-livekit-active #farnazCallDialog{display:none!important}
 .farnaz-call-dialog.is-video-call .farnaz-call-identity strong{font-size:16px}
 .farnaz-call-dialog.is-video-call .farnaz-call-identity p{font-size:12px}
 .farnaz-call-dialog.is-video-call .farnaz-call-media video#farnazRemoteVideo{z-index:1}
-.farnaz-call-dialog.is-video-call .farnaz-call-media video#farnazLocalVideo{top:calc(88px + env(safe-area-inset-top,0px));right:16px;left:auto;z-index:3;width:clamp(92px,26vw,116px);height:auto;max-height:26%;aspect-ratio:3/4;object-fit:cover;border:1px solid #ffffff80;border-radius:17px;box-shadow:0 8px 26px #0009}
+.farnaz-call-dialog.is-video-call .farnaz-call-media video#farnazLocalVideo{top:calc(88px + env(safe-area-inset-top,0px));right:16px;bottom:auto;left:auto;z-index:3;width:clamp(92px,26vw,116px);height:auto;max-height:26%;aspect-ratio:3/4;object-fit:cover;border:1px solid #ffffff80;border-radius:17px;box-shadow:0 8px 26px #0009}
 .farnaz-call-dialog.is-video-call .farnaz-call-toolbar{position:absolute;left:0;right:0;bottom:0;gap:18px;padding:22px 16px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent 0%,#05060845 20%,#050608e8 100%)}
 .farnaz-call-dialog.is-video-call .farnaz-call-controls{width:min(100%,390px)}
 .farnaz-call-dialog.is-video-call .farnaz-call-controls button{width:58px;height:58px;min-width:58px;min-height:58px;background:#30343dcc;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
@@ -185,3 +185,6 @@ html.farnaz-livekit-active #farnazCallDialog{display:none!important}
 }
 @media(max-width:360px){.farnaz-call-dialog.is-video-call .farnaz-call-toolbar{padding-inline:10px}.farnaz-call-dialog.is-video-call .farnaz-call-controls button{width:52px;height:52px;min-width:52px;min-height:52px}}
 @media(prefers-reduced-motion:reduce){.farnaz-call-controls button,.farnaz-call-actions button{transition:none}}
+
+/* Center the two audio controls as a compact iPhone-style pair. */
+.farnaz-call-dialog.is-audio-call .farnaz-call-controls{grid-template-columns:repeat(2,minmax(84px,96px));justify-content:center;width:auto;gap:24px}
