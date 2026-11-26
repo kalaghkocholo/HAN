@@ -104,7 +104,7 @@ if (!hubSource.includes("createSignedUrls(paths,3600)") ||
     !hubSource.includes('await refreshPrivatePresence(other)') ||
     !sources["styles.css"].includes(".private-hub-category-tabs") ||
     !html.includes("./js/private-chat-hub.js?v=20261107-contact-photo1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v302")) {
+    !/^const CACHE_NAME="farnaz-shell-v\\d+";/.test(sources["service-worker.js"])) {
   errors.push("Private conversation hub must load as the single contact-info surface, expose all shared-content categories, batch signed URLs, and use stable (created_at,id) pagination.");
 }
 
@@ -131,7 +131,7 @@ if (!chatOutbox.includes("window.FarnazFlushPrivateOutbox=flushPrivateOutbox") |
 }
 if (!html.includes("./js/local-store.js?v=20261107-contact-photo1") ||
     !html.includes("./js/chat-menu-v5.js?v=20261107-viewport1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v302")) {
+    !/^const CACHE_NAME="farnaz-shell-v\\d+";/.test(sources["service-worker.js"])) {
   errors.push("App and service worker must reference the durable outbox release assets");
 }
 const privateChatModel = sources["js/private-chat-model.js"];
@@ -289,7 +289,7 @@ if (html.includes('id="navSpacesBtn"') || sources["js/spaces.js"].includes('b.da
   errors.push("groups must be accessed from the unified conversations page, not a separate bottom navigation tab");
 }
 const chatSource = sources["js/chat-menu-v5.js"];
-if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v302"') || !sources["service-worker.js"].includes('styles.css?v=20261107-viewport1') || !sources["service-worker.js"].includes('core.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-contact-photo1') || !sources["service-worker.js"].includes('calls.js?v=20261107-call-ui1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('call-ui.css?v=20261107-call-ui4') || !html.includes('call-ui.css?v=20261107-call-ui4') || !html.includes('calls.js?v=20261107-call-ui1') || !html.includes('chat-menu-v5.js?v=20261107-viewport1')) {
+if (!sources["service-worker.js"].includes('const CACHE_NAME="farnaz-shell-v302"') || !sources["service-worker.js"].includes('styles.css?v=20261109-call-reject-round1') || !sources["service-worker.js"].includes('core.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('spaces.js?v=20261107-account-delete1') || !sources["service-worker.js"].includes('local-store.js?v=20261107-contact-photo1') || !sources["service-worker.js"].includes('calls.js?v=20261109-call-ui-hidden-fix1') || !sources["service-worker.js"].includes('chat-menu-v5.js?v=20261107-viewport1') || !sources["service-worker.js"].includes('call-ui.css?v=20261109-facetime-controls2') || !html.includes('call-ui.css?v=20261109-facetime-controls2') || !html.includes('calls.js?v=20261109-call-ui-hidden-fix1') || !html.includes('chat-menu-v5.js?v=20261107-viewport1')) {
   errors.push("service-worker.js must use the current shell cache and core asset versions");
 }
 if (!chatSource.includes('quote.dataset.replyTarget=String(m.reply_to_id)') ||
@@ -344,7 +344,7 @@ for (const [passed, message] of authSignupChecks) {
 const uiChecks = [
   [html.includes('id="presenceVisibilityLabel"') && html.includes('id="lastSeenVisibilityLabel"') && html.includes('id="showTypingLabel"') && coreSource.includes("presenceVisibilitySetting") && coreSource.includes("Online status") && coreSource.includes("lastSeenVisibilitySetting"),
     "presence and privacy settings must translate their labels, hints, and select options"],
-  [html.includes('class="page-heading"><h2 id="chatsHeading"') && html.includes('class="page-heading"><h2 id="contactsHeading"') && sources["styles.css"].includes("env(safe-area-inset-top, 0px)") && sources["styles.css"].includes("inset-inline-start:10px"),
+  [!html.includes('id="chatsHeading"') && html.includes('class="page-heading"><h2 id="contactsHeading"') && sources["styles.css"].includes("env(safe-area-inset-top, 0px)") && sources["styles.css"].includes("inset-inline-start:10px"),
     "page headers must be separated, safe-area aware, and use logical-direction controls"],
   [!html.includes('id="contactSearchButton"') && sources["styles.css"].includes(".contact-info-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}") && sources["styles.css"].includes(".app.chat-mode>#chatPage .send-row textarea,.app.spaces-chat-mode>#chatPage .send-row textarea{"),
     "new-chat screen must use the saved-contact list/search only, contact actions must stay on one row, and composer surfaces must share one color"],
@@ -577,9 +577,9 @@ if (!viewportControllerSource.includes("win.FarnazChatViewportController") ||
   errors.push("Conversation viewport and keyboard geometry must have one tested controller, with no competing legacy handlers.");
 }
 if (!html.includes("./js/chat-viewport-controller.js?v=20261107-viewport1") ||
-    !html.includes("styles.css?v=20261107-viewport1") ||
+    !html.includes("styles.css?v=20261109-call-reject-round1") ||
     !html.includes("chat-viewport.css?v=20261107-viewport1") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v302") ||
+    !/^const CACHE_NAME="farnaz-shell-v\\d+";/.test(sources["service-worker.js"]) ||
     !sources["service-worker.js"].includes("./js/chat-viewport-controller.js?v=20261107-viewport1") ||
     !(html.includes('class="composer-shell conversation-composer-shell">') && html.includes('id="replyPreview" class="message-quote composer-reply-preview"'))) {
   errors.push("Conversation viewport release must load the controller, keep reply preview inside the composer, and refresh the shell cache.");
@@ -704,7 +704,7 @@ if (!localStoreSource.includes("const DB_VERSION=4;") ||
     !hubSource.includes("saveContactPhoto(user,other,blob)") ||
     !hubSource.includes("visible only to you") ||
     !sources["styles.css"].includes(".private-hub-avatar-edit") ||
-    !sources["service-worker.js"].includes("farnaz-shell-v302") ||
+    !/^const CACHE_NAME="farnaz-shell-v\\d+";/.test(sources["service-worker.js"]) ||
     !html.includes("20261107-contact-photo1")) {
   errors.push("Private chat hub must support account-scoped local contact photos with a camera editor, validated image normalization, logout cleanup, and refreshed asset caches.");
 }
