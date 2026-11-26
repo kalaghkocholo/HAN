@@ -130,3 +130,58 @@
 
 /* LiveKit is the sole active call surface; suppress the legacy modal if a stale listener recreates it. */
 html.farnaz-livekit-active #farnazCallDialog{display:none!important}
+
+/* Native-style surface for the default legacy WebRTC call path. This is visual-only. */
+.farnaz-call-dialog{position:fixed;inset:0;z-index:10120;display:flex;align-items:stretch;justify-content:center;padding:0;background:#050608;color:#f5f5f7;isolation:isolate;overscroll-behavior:contain;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif}
+.farnaz-call-dialog[hidden],.farnaz-call-dialog [hidden]{display:none!important}
+.farnaz-call-card{position:relative;display:flex;flex-direction:column;width:100%;max-width:480px;height:100%;min-height:0;margin:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 24px calc(20px + env(safe-area-inset-bottom,0px));overflow:hidden;box-sizing:border-box;border:0;border-radius:0;background:linear-gradient(180deg,#252b36 0%,#171c25 48%,#090c12 100%);color:#f5f5f7;box-shadow:none}
+.farnaz-call-top{position:relative;z-index:7;display:flex;justify-content:flex-end;min-height:42px}
+.farnaz-call-top button{display:grid;place-items:center;width:38px;height:38px;padding:0;border:1px solid #ffffff20;border-radius:50%;background:#ffffff12;color:#fff}
+.farnaz-call-top button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.farnaz-call-identity{position:relative;z-index:2;display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:150px;text-align:center}
+.farnaz-call-avatar{display:grid;place-items:center;width:clamp(142px,42vw,184px);height:clamp(142px,42vw,184px);overflow:hidden;border:1px solid #ffffff24;border-radius:50%;background:linear-gradient(145deg,#687487,#303847);color:#fff;font-size:64px;font-weight:500;box-shadow:0 16px 52px #0007}
+.farnaz-call-avatar img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center;border-radius:50%}
+.farnaz-call-identity strong{max-width:90%;overflow:hidden;color:#fff;font-size:24px;font-weight:650;letter-spacing:-.4px;text-overflow:ellipsis;white-space:nowrap}
+.farnaz-call-identity p{min-height:22px;margin:0;color:#d5d8df;font-size:14px;line-height:1.5;text-align:center}
+.farnaz-call-media{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.farnaz-call-media video{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:cover;border-radius:0;background:#050608}
+.farnaz-call-media audio{display:none!important}
+.farnaz-call-toolbar{position:relative;z-index:4;display:flex;flex:0 0 auto;flex-direction:column;align-items:center;gap:28px;padding:16px 0 calc(18px + env(safe-area-inset-bottom,0px))}
+.farnaz-call-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;justify-items:center;gap:10px;width:min(100%,390px);min-height:66px}
+.farnaz-call-controls[hidden]{display:none}
+.farnaz-call-controls button{display:grid;place-items:center;width:62px;height:62px;min-width:62px;min-height:62px;padding:0;border:1px solid #ffffff14;border-radius:50%;background:#414752;color:#fff;box-shadow:0 7px 20px #0003;transition:background .16s ease,transform .16s ease}
+.farnaz-call-controls button[aria-pressed="false"]{background:#f2f2f7;color:#20232a}
+.farnaz-call-controls button svg,.farnaz-call-actions button svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.farnaz-call-controls button:active,.farnaz-call-actions button:active{transform:scale(.94)}
+.farnaz-call-actions{display:flex;align-items:center;justify-content:center;gap:54px;width:100%;min-height:72px;margin:0;flex-wrap:nowrap}
+.farnaz-call-actions button{display:grid;place-items:center;box-sizing:border-box;flex:0 0 68px;width:68px;height:68px;min-width:68px;min-height:68px;max-width:68px;max-height:68px;padding:0;border:0;border-radius:50%;color:#fff;box-shadow:0 9px 28px #0007}
+.farnaz-call-accept{background:#30d158}
+.farnaz-call-reject{background:#ff453a}
+.farnaz-call-actions button[hidden]{display:none!important}
+.farnaz-call-dialog button{font-family:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.farnaz-call-dialog button:focus-visible{outline:3px solid #a8c7ff;outline-offset:4px}
+.farnaz-call-dialog.is-video-call .farnaz-call-card{max-width:none;padding:0;background:#050608}
+.farnaz-call-dialog.is-video-call .farnaz-call-top{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:16px;right:16px;justify-content:flex-end}
+.farnaz-call-dialog.is-video-call .farnaz-call-identity{position:absolute;top:calc(66px + env(safe-area-inset-top,0px));left:16px;right:16px;flex:0 0 auto;min-height:0;pointer-events:none}
+.farnaz-call-dialog.is-video-call .farnaz-call-avatar{display:none}
+.farnaz-call-dialog.is-video-call .farnaz-call-identity strong,.farnaz-call-dialog.is-video-call .farnaz-call-identity p{padding:5px 12px;border:1px solid #ffffff20;border-radius:999px;background:#11151dbd;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.farnaz-call-dialog.is-video-call .farnaz-call-identity strong{font-size:16px}
+.farnaz-call-dialog.is-video-call .farnaz-call-identity p{font-size:12px}
+.farnaz-call-dialog.is-video-call .farnaz-call-media video#farnazRemoteVideo{z-index:1}
+.farnaz-call-dialog.is-video-call .farnaz-call-media video#farnazLocalVideo{top:calc(88px + env(safe-area-inset-top,0px));right:16px;left:auto;z-index:3;width:clamp(92px,26vw,116px);height:auto;max-height:26%;aspect-ratio:3/4;object-fit:cover;border:1px solid #ffffff80;border-radius:17px;box-shadow:0 8px 26px #0009}
+.farnaz-call-dialog.is-video-call .farnaz-call-toolbar{position:absolute;left:0;right:0;bottom:0;gap:18px;padding:22px 16px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent 0%,#05060845 20%,#050608e8 100%)}
+.farnaz-call-dialog.is-video-call .farnaz-call-controls{width:min(100%,390px)}
+.farnaz-call-dialog.is-video-call .farnaz-call-controls button{width:58px;height:58px;min-width:58px;min-height:58px;background:#30343dcc;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+.farnaz-call-dialog.is-video-call .farnaz-call-controls button[aria-pressed="false"]{background:#f2f2f7;color:#20232a}
+@media(min-width:700px){
+ .farnaz-call-dialog{align-items:center;padding:24px;background:#000b;backdrop-filter:blur(8px)}
+ .farnaz-call-dialog.is-audio-call .farnaz-call-card{height:min(860px,calc(100dvh - 48px));border:1px solid #ffffff1b;border-radius:32px;box-shadow:0 28px 100px #000b}
+ .farnaz-call-dialog.is-video-call .farnaz-call-card{width:min(560px,calc(100vw - 48px));height:min(900px,calc(100dvh - 48px));border:1px solid #ffffff1b;border-radius:28px;box-shadow:0 28px 100px #000b}
+}
+@media(max-height:700px){
+ .farnaz-call-dialog.is-audio-call .farnaz-call-card{padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+ .farnaz-call-dialog.is-audio-call .farnaz-call-avatar{width:clamp(108px,27vh,145px);height:clamp(108px,27vh,145px)}
+ .farnaz-call-dialog.is-audio-call .farnaz-call-toolbar{gap:20px}
+}
+@media(max-width:360px){.farnaz-call-dialog.is-video-call .farnaz-call-toolbar{padding-inline:10px}.farnaz-call-dialog.is-video-call .farnaz-call-controls button{width:52px;height:52px;min-width:52px;min-height:52px}}
+@media(prefers-reduced-motion:reduce){.farnaz-call-controls button,.farnaz-call-actions button{transition:none}}

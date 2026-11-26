@@ -43,9 +43,7 @@ document.addEventListener("touchend",unlockRingtoneAudio,{capture:true,passive:t
 
 function ensureDialog(){
   let dialog=byId("farnazCallDialog");
-  // Older or partially restored UI may contain the dialog shell without all
-  // required controls. Rebuild its contents instead of returning an incomplete
-  // dialog that later causes null-element errors during call startup.
+  // Keep the legacy WebRTC engine and give it the native-style call surface.
   if(dialog&&byId("farnazCallHangup"))return dialog;
   if(!dialog){
     dialog=document.createElement("section");
@@ -53,7 +51,20 @@ function ensureDialog(){
     dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");
     dialog.setAttribute("aria-labelledby","farnazCallTitle");
   }
-  dialog.innerHTML='<div class="farnaz-call-card"><div class="farnaz-call-top"><strong id="farnazCallTitle">تماس فرناز</strong><button type="button" id="farnazCallClose" aria-label="بستن پنجره تماس">×</button></div><p id="farnazCallStatus" role="status" aria-live="polite"></p><div class="farnaz-call-media"><video id="farnazLocalVideo" autoplay muted playsinline hidden></video><video id="farnazRemoteVideo" autoplay playsinline hidden></video><audio id="farnazRemoteAudio" autoplay playsinline></audio></div><div class="farnaz-call-toolbar"><div class="farnaz-call-controls" id="farnazCallControls" hidden><button type="button" id="farnazCallSpeaker" aria-label="بلندگو" aria-pressed="false" title="بلندگو"><span class="farnaz-call-control-icon">🔊</span></button><button type="button" id="farnazCallMic" aria-label="میکروفون" aria-pressed="true" title="میکروفون"><span class="farnaz-call-control-icon">🎙️</span></button><button type="button" id="farnazCallCamera" aria-label="دوربین" aria-pressed="true" title="دوربین" hidden><span class="farnaz-call-control-icon">📷</span></button><button type="button" id="farnazCallSwitchCamera" aria-label="تعویض دوربین" title="تعویض دوربین" hidden><span class="farnaz-call-control-icon">🔄</span></button></div><div class="farnaz-call-actions"><button type="button" id="farnazCallAccept" class="farnaz-call-accept" aria-label="پاسخ" title="پاسخ" hidden>✓</button><button type="button" id="farnazCallReject" class="farnaz-call-reject" aria-label="رد تماس" title="رد تماس" hidden>✕</button><button type="button" id="farnazCallHangup" class="farnaz-call-reject" aria-label="پایان تماس" title="پایان تماس" hidden>✕</button></div></div></div>';
+  dialog.innerHTML=`<div class="farnaz-call-card">
+    <header class="farnaz-call-top"><button type="button" id="farnazCallClose" aria-label="بستن پنجره تماس" title="بستن"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+    <div class="farnaz-call-identity"><div class="farnaz-call-avatar" id="farnazCallAvatar" aria-hidden="true"> </div><strong id="farnazCallTitle">تماس فرناز</strong><p id="farnazCallStatus" role="status" aria-live="polite"></p></div>
+    <div class="farnaz-call-media"><video id="farnazRemoteVideo" autoplay playsinline hidden></video><video id="farnazLocalVideo" autoplay muted playsinline hidden></video><audio id="farnazRemoteAudio" autoplay playsinline></audio></div>
+    <div class="farnaz-call-toolbar">
+      <div class="farnaz-call-controls" id="farnazCallControls" hidden>
+        <button type="button" id="farnazCallSpeaker" aria-label="بلندگو" aria-pressed="false" title="بلندگو"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19.5 6.5a9 9 0 0 1 0 11"/></svg></button>
+        <button type="button" id="farnazCallMic" aria-label="میکروفون" aria-pressed="true" title="میکروفون"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg></button>
+        <button type="button" id="farnazCallCamera" aria-label="دوربین" aria-pressed="true" title="دوربین" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></button>
+        <button type="button" id="farnazCallSwitchCamera" aria-label="تعویض دوربین" title="تعویض دوربین" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3"/></svg></button>
+      </div>
+      <div class="farnaz-call-actions"><button type="button" id="farnazCallAccept" class="farnaz-call-accept" aria-label="پاسخ" title="پاسخ" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 9.5 17 19 7.5"/></svg></button><button type="button" id="farnazCallReject" class="farnaz-call-reject" aria-label="رد تماس" title="رد تماس" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button><button type="button" id="farnazCallHangup" class="farnaz-call-reject" aria-label="پایان تماس" title="پایان تماس" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 15.5c4.5-4 10.5-4 15 0l-2.2 3.1a1.5 1.5 0 0 1-1.8.5l-2.1-1a1.5 1.5 0 0 1-.8-1.2l-.1-1.1a11 11 0 0 0-3 0l-.1 1.1a1.5 1.5 0 0 1-.8 1.2l-2.1 1a1.5 1.5 0 0 1-1.8-.5L4.5 15.5Z"/></svg></button></div>
+    </div>
+  </div>`;
   document.body.appendChild(dialog);
   byId("farnazCallClose").onclick=()=>{if(activeCall)endCall(true);else dialog.hidden=true;};
   byId("farnazCallAccept").onclick=acceptIncoming;
@@ -153,8 +164,18 @@ async function switchCamera(){
     setCallStatus(tr("تعویض دوربین انجام نشد.","Could not switch camera."));
   }
 }
-function showDialog(title,status){
-  const d=ensureDialog();byId("farnazCallTitle").textContent=title;setCallStatus(status);d.hidden=false;
+function showDialog(title,status,callType="audio",name="",avatarUrl=""){
+  const d=ensureDialog();
+  d.classList.toggle("is-video-call",callType==="video");
+  d.classList.toggle("is-audio-call",callType!=="video");
+  byId("farnazCallTitle").textContent=name||title;
+  const avatar=byId("farnazCallAvatar");
+  if(avatar){
+    avatar.replaceChildren();
+    if(typeof renderAvatar==="function")renderAvatar(avatar,avatarUrl||"",name||title);
+    else avatar.textContent=String(name||title||"?").trim().charAt(0).toUpperCase();
+  }
+  setCallStatus(status);d.hidden=false;
   byId("farnazCallAccept").hidden=true;byId("farnazCallReject").hidden=true;byId("farnazCallHangup").hidden=true;
   byId("farnazLocalVideo").hidden=true;byId("farnazRemoteVideo").hidden=true;
   byId("farnazCallControls").hidden=true;
@@ -392,7 +413,7 @@ async function startCall(type){
   if(receiverId===initiatingUserId)return;
   callStartInProgress=true;
   let startedCall=null,keepDialog=false;
-  showDialog(type==="video"?tr("تماس تصویری","Video call"):tr("تماس صوتی","Audio call"),tr("در حال بررسی وضعیت تماس…","Checking call status…"));
+  showDialog(type==="video"?tr("تماس تصویری","Video call"):tr("تماس صوتی","Audio call"),tr("در حال بررسی وضعیت تماس…","Checking call status…"),type,currentChatUser.display_name||currentChatUser.name||"",currentChatUser.avatar_url||"");
   try{
     const {data:blocked,error:blockError}=await Promise.race([
       getClient().from("blocked_contacts").select("blocked_user_id").eq("blocker_id",initiatingUserId).eq("blocked_user_id",receiverId).maybeSingle(),
@@ -559,7 +580,7 @@ async function handleCallStatusUpdate(session){
     await cleanupCall(false);
     if(wasReceiver||session.status==="rejected"){
       showDialog(session.status==="missed"?tr("تماس بی‌پاسخ","Missed call"):tr("تماس پایان یافت","Call ended"),
-        session.status==="missed"?tr("تماس‌گیرنده ارتباط را قطع کرد.","The caller ended the call."):tr("تماس پایان یافت.","The call has ended."));
+        session.status==="missed"?tr("تماس‌گیرنده ارتباط را قطع کرد.","The caller ended the call."):tr("تماس پایان یافت.","The call has ended."),session.call_type||"audio");
       setTimeout(()=>{const d=byId("farnazCallDialog");if(d)d.hidden=true;},1600);
     }else{const d=byId("farnazCallDialog");if(d)d.hidden=true;}
   }
@@ -581,7 +602,7 @@ async function handleIncomingSession(session,client){
     }
     const name=profile?.display_name||tr("مخاطب فرناز","Farnaz contact");
     activeCall={session,role:"receiver",otherId:String(session.caller_id),signalChannel:null,pc:null,localStream:null,pendingCandidates:[],timeout:null};
-    showDialog(session.call_type==="video"?tr("تماس تصویری ورودی","Incoming video call"):tr("تماس صوتی ورودی","Incoming audio call"),tr("تماس از طرف ","Incoming call from ")+name);
+    showDialog(session.call_type==="video"?tr("تماس تصویری ورودی","Incoming video call"):tr("تماس صوتی ورودی","Incoming audio call"),tr("تماس از طرف ","Incoming call from ")+name,session.call_type||"audio",name,profile?.avatar_url||"");
     startRingtone();
     byId("farnazCallAccept").hidden=false;byId("farnazCallReject").hidden=false;
     await notifyBackground(tr("تماس ورودی در فرناز","Incoming Farnaz call"),name,"call-"+session.id);

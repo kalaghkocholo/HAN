@@ -13,7 +13,7 @@ Farnaz is a mobile-first, Persian/English private communication web app. The cur
 - Read-receipt and per-user message visibility features
 - Persian (RTL) and English (LTR) interface modes
 
-**Implementation status:** The LiveKit one-to-one audio/video path is an isolated pilot and is disabled by default. It can be explicitly enabled for controlled testing with `?livekitPilot=1`; do not treat calls as production-verified until two-device tests cover permissions, reject/end flows, and restrictive mobile networks. Group calls are not implemented. The PWA shell supports offline fallback and background refresh of cached assets. Push delivery after the app is closed still needs VAPID keys, subscription persistence, and a server-side sender. Offline caching does not make Supabase messaging available without a network.
+**Implementation status:** The default one-to-one audio/video call path remains the existing WebRTC implementation. Its call interface now uses the iPhone-inspired Phone/FaceTime visual design independently of the media engine. The LiveKit one-to-one path remains an isolated pilot, disabled by default and available only for controlled testing with `?livekitPilot=1`; do not treat it as production-verified until two-device tests cover permissions, reject/end flows, and restrictive mobile networks. Group calls are not implemented. The PWA shell supports offline fallback and background refresh of cached assets. Push delivery after the app is closed still needs VAPID keys, subscription persistence, and a server-side sender. Offline caching does not make Supabase messaging available without a network.
 
 ## Repository layout
 
