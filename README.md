@@ -13,7 +13,7 @@ Farnaz is a mobile-first, Persian/English private communication web app. The cur
 - Read-receipt and per-user message visibility features
 - Persian (RTL) and English (LTR) interface modes
 
-**Implementation status (not yet production-verified):** One-to-one WebRTC audio/video signaling and call UI have been added, but they still need two-device testing and a TURN relay for reliable connections. Group calls are not implemented. The PWA manifest and service worker shell cache are in place. Notifications can be enabled on-device while the app is connected; push delivery after the app is closed still needs VAPID keys, subscription persistence, and a server-side sender. Offline caching does not make Supabase messaging available without a network.
+**Implementation status:** The LiveKit one-to-one audio/video path is an isolated pilot and is disabled by default. It can be explicitly enabled for controlled testing with `?livekitPilot=1`; do not treat calls as production-verified until two-device tests cover permissions, reject/end flows, and restrictive mobile networks. Group calls are not implemented. The PWA shell supports offline fallback and background refresh of cached assets. Push delivery after the app is closed still needs VAPID keys, subscription persistence, and a server-side sender. Offline caching does not make Supabase messaging available without a network.
 
 ## Repository layout
 
@@ -21,9 +21,11 @@ Farnaz is a mobile-first, Persian/English private communication web app. The cur
 - `styles.css` — shared application styling
 - `spaces.css` — extracted styling for groups, channels, and their dialogs/composer
 - `js/core.js` — Supabase setup, authentication, navigation, profiles, contacts, and shared state
+- `js/local-store.js`, `js/private-chat-model.js`, `js/private-chat-hub.js` — account-scoped local storage, deterministic private-message ordering/outbox, and contact/shared-content views
 - `js/chat-menu-v5.js` — private messaging, message actions, attachment/voice flows, and connection recovery
 - `js/spaces.js` — groups/channels UI and related messaging flows
-- `js/calls.js` — one-to-one WebRTC call UI and signaling client
+- `js/calls.js` — legacy call entry points and gated LiveKit pilot integration
+- `js/livekit-calls.js`, `js/livekit-call-sessions.js`, `js/livekit-call-controller.js`, `js/livekit-call-ui.js` — isolated LiveKit adapter, session lifecycle, media controller, and call interface
 - `service-worker.js`, `manifest.webmanifest`, `farnaz-icon.svg` — PWA shell, install metadata, and notification event handler
 - `supabase/migrations/` — recent hardening and call-signaling migrations; this is **not yet a complete historical migration baseline**
 - `scripts/validate.mjs` — dependency-free checks for local asset references, duplicate static IDs, CSS structure, and common server-key patterns
@@ -45,17 +47,14 @@ Supabase publishable keys are expected to be public in browser applications. Sec
 
 ## Local validation
 
-A recent Node.js release can check JavaScript syntax without installing application dependencies:
+Use Node.js 20 or newer. For the complete local quality gate:
 
 ```sh
-node --check js/core.js
-node --check js/chat-menu-v5.js
-node --check js/spaces.js
-node --check js/calls.js
-node --check service-worker.js
+npm install
+npm run check
 ```
 
-These checks detect syntax errors only; they do **not** prove that browser behavior, Supabase permissions, realtime delivery, uploads, or iOS keyboard behavior work correctly. The repository's GitHub Actions workflow runs the syntax checks automatically.
+`npm run check` runs application and call-infrastructure validation, the automated test suite, and the production build verifier. Syntax-only checks can also be run with `node --check` on the relevant JavaScript files. Automated checks do **not** replace two-device browser testing, Supabase permission checks, or iOS keyboard/audio-route testing.
 
 ## Release smoke-test checklist
 
@@ -84,3 +83,13 @@ Use dedicated test accounts and non-sensitive test content. Do not test privacy 
 - Keep the checked-in migration history aligned with the connected database. The historical migration set still needs to be reconstructed before a fresh environment can be reliably provisioned from source control.
 - Review Supabase security and performance advisors after database changes. Advisor warnings need context: a function required by an authenticated RPC flow is not automatically unsafe, and an unused index may simply not have been exercised yet.
 - Enable leaked-password protection in Supabase Auth settings before inviting real users.
+
+
+## Production build and caching
+
+The source tree remains directly servable (including GitHub Pages). Vercel builds and serves the minified `dist/` output:
+
+- `npm run build` minifies first-party JavaScript and CSS file-by-file; it does not bundle classic scripts because the app relies on shared global names and inline handlers.
+- `scripts/verify-dist.mjs` checks that output files parse, required global names and inline handlers survive minification, and development-only files are excluded.
+- When a local asset changes, update its version query in both `index.html` and `service-worker.js`, then increment the service-worker cache name. The static validator checks that shell URLs and versions stay synchronized.
+- The service worker uses a network-first strategy for navigation with a short timeout and cached-page fallback; versioned code assets use stale-while-revalidate so the cached copy can load immediately while a fresh copy updates in the background.
