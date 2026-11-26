@@ -101,7 +101,7 @@ requireCheck(callUi.includes("root.FarnazLiveKitCallUI") &&
   callUi.includes("controller.startAudioPlayback") &&
   callUi.includes("farnazLiveKitAudioRoute") &&
   callUi.includes("setSinkId") &&
-  callUi.includes("On iPhone, choose speaker or headphones from the system audio controls.") &&
+  callUi.includes("To choose speaker or headphones, open iPhone Control Center during the call and select the audio route from playback controls. This is an iOS limitation.") &&
   appHtml.includes("livekit-call-ui.js") &&
   appHtml.includes("call-ui.css?v=20261109-facetime-controls2") &&
   appHtml.includes('new URLSearchParams(window.location.search).get("livekitPilot") === "1"'),
@@ -116,7 +116,7 @@ requireCheck(sessions.includes("root.FarnazCallSessions") &&
   sessions.includes("async function watchIncoming()") &&
   sessions.includes('async function answer() { return updateStatus("active"); }') &&
   sessions.includes('async function reject() { return updateStatus("rejected"); }') &&
-  sessions.includes('async function end() { return updateStatus("ended"); }') &&
+  sessions.includes("async function end() {") && sessions.includes('emit("finished", { session: session, role: role, status: "ended" })') && sessions.includes("clearRingingTimer();") &&
   sessions.includes("supabase.auth.getUser()") &&
   sessionDocs.includes("Only the receiver may change") &&
   sessionDocs.includes("does not capture media") &&
