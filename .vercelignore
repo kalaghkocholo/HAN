@@ -3,7 +3,9 @@
 README.md
 docs/
 infra/
-scripts/
+# scripts/build.mjs and scripts/verify-dist.mjs are needed by the production build.
+scripts/validate.mjs
+scripts/validate-call-infra.mjs
 tests/
 
 # Supabase CLI configuration, migrations, and Edge Function source are
