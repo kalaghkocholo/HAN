@@ -92,7 +92,15 @@
     const initial = (String(name || "F").trim().charAt(0) || "F").toLocaleUpperCase();
     node.replaceChildren();
     node.dataset.hasImage = "false";
-    const url = typeof avatarUrl === "string" && /^https:\/\//i.test(avatarUrl.trim()) ? avatarUrl.trim() : "";
+    let url = "";
+    if (typeof avatarUrl === "string") {
+      // Only load avatars from this project's own Supabase host; peer-controlled URLs must not trigger third-party requests.
+      try {
+        const candidate = new URL(avatarUrl.trim());
+        const base = new URL(root.FARNAZ_CONFIG.supabaseUrl);
+        if (candidate.protocol === "https:" && candidate.origin === base.origin) url = candidate.href;
+      } catch (_) {}
+    }
     if (!url) {
       node.textContent = initial;
       return;
