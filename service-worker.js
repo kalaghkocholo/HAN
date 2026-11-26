@@ -6,38 +6,57 @@ self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(SHELL.map(path=>new Request(new URL(path,APP_BASE).href,{cache:"reload"})))).then(()=>self.skipWaiting()));
 });
 self.addEventListener("activate",event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("farnaz-shell-")&&key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key.startsWith("farnaz-shell-")&&key!==CACHE_NAME).map(key=>caches.delete(key)));
+    try{if(self.registration.navigationPreload)await self.registration.navigationPreload.enable();}catch(_){}
+    await self.clients.claim();
+  })());
 });
+// A short navigation timeout prevents a blank screen on weak mobile connections.
+const NAVIGATION_TIMEOUT_MS=4000;
+function fetchWithTimeout(request,ms){
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error("Network timeout")),ms);
+    fetch(request).then(response=>{clearTimeout(timer);resolve(response);},error=>{clearTimeout(timer);reject(error);});
+  });
+}
 self.addEventListener("fetch",event=>{
   const req=event.request;
   if(req.method!=="GET")return;
   const url=new URL(req.url);
   if(url.origin!==self.location.origin||!url.pathname.startsWith(APP_BASE.pathname))return;
   if(req.mode==="navigate"){
-    // Network-first is intentional: stale cached HTML must never hide a published build.
+    // Network-first: stale cached HTML must not hide a published build.
     const pageKey=new URL("./index.html",APP_BASE).href;
-    event.respondWith(fetch(req).then(async response=>{
-      if(response.ok){
-        const copy=response.clone();
-        await caches.open(CACHE_NAME).then(cache=>cache.put(pageKey,copy));
+    event.respondWith((async()=>{
+      try{
+        const preloaded=await event.preloadResponse;
+        const response=preloaded||await fetchWithTimeout(req,NAVIGATION_TIMEOUT_MS);
+        if(response&&response.ok){
+          const copy=response.clone();
+          event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.put(pageKey,copy)).catch(()=>{}));
+        }
+        return response;
+      }catch(_){
+        return await caches.match(pageKey)||await caches.match(req,{ignoreSearch:true})||Response.error();
       }
-      return response;
-    }).catch(async()=>{
-      return await caches.match(pageKey)||await caches.match(req,{ignoreSearch:true})||Response.error();
-    }));
+    })());
     return;
   }
   const isCodeAsset=/\.(?:html|css|js)$/i.test(url.pathname)||url.search.length>0;
   if(isCodeAsset){
-    // Network-first for HTML/CSS/JS and versioned assets; use cache only when offline.
-    event.respondWith(fetch(req).then(async response=>{
-      if(response.ok&&response.type==="basic"){
-        await caches.open(CACHE_NAME).then(cache=>cache.put(req,response.clone()));
-      }
-      return response;
-    }).catch(async()=>{
-      return await caches.match(req)||Response.error();
-    }));
+    // Stale-while-revalidate: cached code starts instantly while the fresh copy updates in background.
+    event.respondWith((async()=>{
+      const cache=await caches.open(CACHE_NAME);
+      const cached=await cache.match(req);
+      const refresh=fetch(req).then(async response=>{
+        if(response.ok&&response.type==="basic")await cache.put(req,response.clone());
+        return response;
+      }).catch(()=>null);
+      if(cached){event.waitUntil(refresh);return cached;}
+      return await refresh||Response.error();
+    })());
     return;
   }
   event.respondWith((async()=>{
@@ -64,7 +83,12 @@ self.addEventListener("push",event=>{
 });
 self.addEventListener("notificationclick",event=>{
   event.notification.close();
-  const target=new URL(event.notification.data?.url||"./",APP_BASE).href;
+  let target=APP_BASE.href;
+  try{
+    // Notification payloads are untrusted: only navigate inside this app.
+    const requested=new URL(event.notification.data?.url||"./",APP_BASE);
+    if(requested.origin===APP_BASE.origin&&requested.pathname.startsWith(APP_BASE.pathname))target=requested.href;
+  }catch(_){}
   event.waitUntil(self.clients.matchAll({type:"window",includeUncontrolled:true}).then(clients=>{
     for(const client of clients){if(client.url.startsWith(APP_BASE.origin+APP_BASE.pathname)){client.focus();client.navigate?.(target);return;}}
     return self.clients.openWindow(target);
